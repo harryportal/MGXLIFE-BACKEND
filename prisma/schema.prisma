@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// schema.prisma
+model Distributor {
+  id                 String        @id @default(uuid())
+  name               String
+  email              String        @unique
+  password           String
+  subscriptionStatus Boolean
+  referralLink       String
+  commissionEarned   Float
+  referredBy         Distributor?  @relation(name:"ReferredBy", fields: [referredById], references: [id])
+  referredById       String
+  referredUsers      Distributor[] @relation(name:"ReferredBy")
+  payments           Payment[]
+  orders             Order[]
+}
+
+model Order {
+  id           Int        @id @default(autoincrement())
+  orderNumber  String
+  amountPaid   Float
+  createdAt    DateTime   @default(now())
+  distributor  Distributor? @relation(fields: [distributorId], references: [id])
+  distributorId String?
+}
+
+model Product {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String
+  price       Float
+  image       String?
+}
+
+model Payment {
+  id           Int      @id @default(autoincrement())
+  amount       Float
+  status       String
+  createdAt    DateTime @default(now())
+  distributor  Distributor @relation(fields: [distributorId], references: [id])
+  distributorId String
+}
+
+
