@@ -1,140 +1,135 @@
 import {prisma} from "../../utils/db/prisma";
-import { Profile, User } from "@prisma/client";
+import { Distributor, RefreshToken } from "@prisma/client";
 import { comparePassword, createAcessToken, createRefreshToken, hashPassword, verifyJWT } from "../../utils/jwtAuth/jwt";
-import { AuthError, BadRequestError, ConflictError } from "../../common/error";
-import { userPayload } from "./auth.interface";
-
+import { AuthError, BadRequestError, ConflictError, NotFoundError } from "../../common/error";
+//import { distributorPayload } from "./auth.interface";
+import shortid from "shortid";
 
 
 export class AuthRepository{
-    private user;
-    private profile;
     private refreshToken;
+    private distributor;
     constructor(){
-        this.user = prisma.user;
-        this.profile = prisma.profile;
+        this.distributor = prisma.distributor;
         this.refreshToken = prisma.refreshToken;
     }
 
-    public createUser = async(userObject: Omit<User, "id">): Promise<string>=>{
-        const { fullname, company, email, contact, referal, purpose, country } = userObject;
+    /* create the referal link using shortID and prepend the id with mg#.
+          even though it will not be available to the user until subscription has been payed with stripe*/   
+    private generateReferralLink = ():string=>{
+        const randomString = shortid.generate();
+        return `mg#${randomString}`;
+    }
 
+    public createDistributorwithoutReferal = async(userObject: Omit<Distributor, "id">)=>{
+        const {email, firstName, lastName, password} = userObject
+
+        this.checkAccountwithEmail(email);
+        const hashedPassword = await hashPassword(password);
+        const referringId = this.generateReferralLink();
+        
+        // todo: remove password before returning the data!
+        const userData  = await this.distributor.create({
+            data:{
+                email, firstName, lastName, password: hashedPassword, referringId
+            }
+        });
+        return userData;
+
+    }
+    public getDistributor = async(email:string)=> {
+        const distributor = await this.distributor.findUnique({
+            where: {
+                email
+            }
+        });
+        if(!distributor) {  throw new NotFoundError("No Distributor with Email exists!")};
+        return distributor;
+    }
+
+    // returns a conflict error if a distributor with email already exists
+    private checkAccountwithEmail = async(email:string)=>{
         //check if user with email exists already
-        let checkEmail = await this.user.findUnique({
+        let checkEmail = await this.distributor.findUnique({
             where: {email}
         })
-
-        if (checkEmail) { throw new ConflictError() };
-
-        let userData: User = await this.user.create({
-            data:{
-                fullname, company, email, contact, referal, purpose, country
-            }, 
-        });
-
-        const token = createAcessToken(userData, false);
-        return token // return just the token so they can be authenticated to proceed to setting up profile
+        if (checkEmail) { throw new ConflictError("An account with a distributor exists") };
     }
-
-    public getUser = async(id:string | null, email:string |  null)=>{
-        // returns user with the given Id or email address
-        let user;
-        if (id) {
-            user = await prisma.user.findUnique({
-            where: { id }
-            });
-        } else if (email) {
-            user = await prisma.user.findUnique({
-            where: { email }
-            });
-        } else {
-            throw new BadRequestError('Both ID and email are empty.');
+    
+    public createDistributorwithReferal = async(userObject: Omit<Distributor, "id">)=>{
+        const {email, firstName, lastName, password, referredById} = userObject
+        this.checkAccountwithEmail(email);
+        const referringId = this.generateReferralLink();
+        const hashedPassword = await hashPassword(password);
+        await this.distributor.findUnique({
+            where: {
+                referringId
+            }
         }
-        if(!user) {  throw new AuthError("No User with Email or ID!")}
-        return user;
-    }
+        )
 
-    public addProfile = async(profileObject: Omit<Profile, "id">, userId: string)=>{
-        let {category, businessNo, businessCategory, businessModel, 
-            dealSizeMin, dealSizeMax, financeRequired, aboutCompany, imageUrl } = profileObject;
-        
-    
-        financeRequired = Boolean(financeRequired);
-        dealSizeMax = Number(dealSizeMax);
-        businessNo = Number(businessNo);
-        dealSizeMin = Number(dealSizeMin);
-    
-        const profile = await this.profile.create({
+        const userData  = await this.distributor.create({
             data:{
-                category, businessNo, businessCategory, businessModel, dealSizeMax, dealSizeMin, financeRequired, 
-                aboutCompany, imageUrl, user: {connect: {id: userId}}
+                email, firstName, lastName, password: hashedPassword, 
+                referredBy: {connect: {id: referredById}}, referringId
             }
         });
-        return profile;
+        return userData;
     }
-
-    public addPassword = async(password: string, token:string): Promise<User>=>{
-        // decode the token to fetch the user that the password belongs to
-        const user: userPayload = verifyJWT(token);
-
-        const updatedUser = await this.user.update({
-            where:{
-                email: user.email
-            }, 
-            data:{
-                password: await hashPassword(password)
-            }
-        })
-
-        return updatedUser; 
-     }
 
 
     public getAcessToken = async(refreshToken:string)=>{
         const verifiedPayload = verifyJWT(refreshToken);
 
-        // check if the refresh token belongs to the user and is not expired
         const token = await this.refreshToken.findUnique({
             where: {  token: refreshToken }
         });
 
         if (!token || token.expiresAt < new Date) { throw new AuthError("Invalid Refresh Token") };
 
-        // generate new access token for the user
-        const user = await this.user.findUnique({
+        const user = await this.distributor.findUnique({
             where: {
                 id: verifiedPayload.id
             }
-        }) as User;
+        }) as Distributor;
         
         const acessToken = createAcessToken(user);
         return acessToken;
-        
-    }
+    };
 
-    public deleteRefreshToken = async(refreshToken:string)=>{
+    public deleteRefreshToken = async(refreshToken:string):Promise<void>=>{
         verifyJWT(refreshToken);
         
         const deletedToken = await this.refreshToken.delete({
             where: { token: refreshToken }
         });        
     }
+    
+    public resetPassword = async(token:string, password:string)=>{
+        let distributor = verifyJWT(token);
+        const hashedPassword = await hashPassword(password);
+        distributor = await this.distributor.update({
+            where:{
+                id: distributor.id
+            },
+            data:{
+                password: hashedPassword
+            }
+        });
+    }
 
     public signinUser = async(email:string, password:string)=>{
-        const user = await this.user.findUnique({
+        const distributor = await this.distributor.findUnique({
             where:{ email }
         });
     
-        if(!user) { throw new AuthError("Invalid Login Credentials")}
+        if(!distributor) { throw new AuthError("Invalid Login Credentials")}
 
-        // throw an error if the user has not set the password;
-        if(!user.password) {  throw new AuthError("No password associated with current user!") }
-
-        const checkPassword = await comparePassword(password, user.password!)
+        const checkPassword = await comparePassword(password, distributor.password!)
         if(!checkPassword) { throw new AuthError("Invalid Login Credentials") }
         
-        const accessToken =  createAcessToken(user);
-        const refreshToken = createRefreshToken(user.id);
+        const accessToken =  createAcessToken(distributor);
+        const refreshToken = createRefreshToken(distributor.id);
 
         // creates a date 15 days from now.
         const refreshTokenExpiresAt = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000); 
@@ -142,7 +137,7 @@ export class AuthRepository{
             data:{
                 expiresAt: refreshTokenExpiresAt,
                 token: refreshToken,
-                user: {connect: {id:user.id }}
+                distributor: {connect: {id:distributor.id }}
             }
         });
 

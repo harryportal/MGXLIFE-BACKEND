@@ -5,7 +5,6 @@ import { ErrorHandler } from './common/error';
 import { Application } from 'express';
 import authRouter from "./modules/auth/auth.router";
 import userRouter from "./modules/user/user.router";
-import listingRouter from "./modules/lisiting/lisiting.router";
 import paymentRouter from "./modules/payment/payment.router";
 
 const app: Application = express();
@@ -21,8 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/auth", authRouter);
-app.use("/user", userRouter);
-app.use("/listing", listingRouter)
+app.use("/refferal", referalRouter);
 
 
 app.use('*', ErrorHandler.pagenotFound());

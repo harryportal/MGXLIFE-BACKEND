@@ -13,21 +13,25 @@ datasource db {
 // schema.prisma
 model Distributor {
   id                 String        @id @default(uuid())
-  name               String
+  firstName          String
+  lastName           String
   email              String        @unique
   password           String
-  subscriptionStatus Boolean
-  referralLink       String
-  commissionEarned   Float
+  subscriptionStatus Boolean       @default(false)
+  referringId        String        @unique
+  imageUrl           String?
+  commissionEarned   Float?
   referredBy         Distributor?  @relation(name:"ReferredBy", fields: [referredById], references: [id])
   referredById       String
   referredUsers      Distributor[] @relation(name:"ReferredBy")
   payments           Payment[]
   orders             Order[]
+  refreshtokens      RefreshToken[]
 }
 
 model Order {
-  id           Int        @id @default(autoincrement())
+  id           String @id @default(uuid())
+  shopifyId    String  @unique
   orderNumber  String
   amountPaid   Float
   createdAt    DateTime   @default(now())
@@ -35,16 +39,23 @@ model Order {
   distributorId String?
 }
 
+enum BonusType {
+  FLAT
+  PERCENTAGE
+}
+
 model Product {
-  id          Int     @id @default(autoincrement())
+  id          String @id @default(uuid())
   name        String
-  description String
+  description String?
   price       Float
   image       String?
+  bonusType   BonusType @default(PERCENTAGE)
+  bonusAmount Float @default(10.0)
 }
 
 model Payment {
-  id           Int      @id @default(autoincrement())
+  id           String @id @default(uuid())
   amount       Float
   status       String
   createdAt    DateTime @default(now())
@@ -52,4 +63,11 @@ model Payment {
   distributorId String
 }
 
-
+model RefreshToken {
+  id        String @id @default(uuid())
+  distributorId    String 
+  token     String @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime 
+  distributor      Distributor    @relation(fields: [distributorId], references: [id])
+}

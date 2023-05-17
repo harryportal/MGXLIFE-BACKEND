@@ -76,7 +76,7 @@ export class InternalServerError extends ApiError{
 }
 
 export class ConflictError extends ApiError{
-  constructor(){
-    super("Email already Exist!", 409)
+  constructor(message:string){
+    super(message, 409)
   }
 }

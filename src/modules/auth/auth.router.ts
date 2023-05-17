@@ -17,4 +17,5 @@ authRouter.post("/reset-password", AuthController.addorResetPassword)
 authRouter.post("/forgot-password", AuthController.forgotPassword)
 
 
+
 export default authRouter;

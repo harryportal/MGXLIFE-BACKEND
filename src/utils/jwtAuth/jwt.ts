@@ -3,7 +3,7 @@ import jwt, { Secret } from 'jsonwebtoken';
 import { InternalServerError } from "../../common/error";
 import { User } from "@prisma/client";
 import { AuthError } from "../../common/error";
-import { userPayload } from "../../modules/auth/auth.interface";
+import { distributorPayload } from "../../modules/auth/auth.interface";
 
 const hashPassword = (password: string) => {
   return bcrypt.hash(password, 5);
@@ -37,7 +37,7 @@ const createRefreshToken = (userId:string, activeStatus = true) =>{
   return token;
 }
 
-const verifyJWT = (token: string): userPayload=>{
+const verifyJWT = (token: string): distributorPayload=>{
   
   try {
     const payload = jwt.verify(token, secret);

@@ -2,10 +2,10 @@ import { Request } from "express";
 
 
 export interface AuthRequest extends Request {
-    user?: userPayload
+    user?: distributorPayload
 }
 
-export interface userPayload{
+export interface distributorPayload{
     id: string;
     email?: string;
     activeStatus?: boolean;
