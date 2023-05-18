@@ -18,7 +18,7 @@ export default class AuthService {
     }
 
     /* Logic for uploading the image */
-    public uploadImage = async(imagepath:string):Promise<string | undefined>=>{
+    private uploadImage = async(imagepath:string):Promise<string | undefined>=>{
         if (!imagepath) { return "" };
         const { imageUrl } = await this.cloudinaryService.uploadImage(imagepath); 
         return imageUrl;
@@ -26,7 +26,7 @@ export default class AuthService {
 
     /* create the referal link using shortID and prepend the id with mg#.
     even though it will not be available to the user until subscription has been payed with stripe*/   
-    public generateReferralLink = ():string=>{
+    private generateReferralLink = ():string=>{
         const randomString = shortid.generate();
         return `mg#${randomString}`;
     }

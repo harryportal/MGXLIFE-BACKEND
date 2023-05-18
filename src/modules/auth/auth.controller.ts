@@ -19,7 +19,7 @@ export class AuthController {
     static getAccessToken = async(req:Request, res:Response)=>{
         const {refreshToken} = req.body;
         const accessToken = await this.authService.getAccessToken(refreshToken);
-        res.json({success:true, data: {accessToken}})
+        return res.json({success:true, data: {accessToken}})
     }
 
     static deleteRefreshToken = async(req:Request, res:Response)=>{
@@ -31,7 +31,7 @@ export class AuthController {
     static SignIn = async(req:Request, res:Response)=>{
         const  {email, password} = req.body;
         const {accessToken, refreshToken} = await this.authService.signIn(email, password); 
-        res.json({success:true, data: {refreshToken, accessToken}})
+        return res.json({success:true, data: {refreshToken, accessToken}})
     }
 
 
