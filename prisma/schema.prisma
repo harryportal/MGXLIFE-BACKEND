@@ -22,7 +22,7 @@ model Distributor {
   imageUrl           String?
   commissionEarned   Float?
   referredBy         Distributor?  @relation(name:"ReferredBy", fields: [referredById], references: [id])
-  referredById       String
+  referredById       String?
   referredUsers      Distributor[] @relation(name:"ReferredBy")
   payments           Payment[]
   orders             Order[]

@@ -11,25 +11,21 @@ export class SignIn {
 
 export class SignUp{
     @IsString()
-    fullname: string;
-
+    firstName: string;
+  
     @IsString()
-    company: string;
-
+    lastName: string;
+  
     @IsEmail()
     email: string;
-
-    @IsPhoneNumber()
-    contact: string;
-
+  
     @IsString()
-    referal: string;
+    password: string;
 
+    @IsOptional()
     @IsString()
-    purpose: string;
-
-    @IsString()
-    country: string;
+    referringId:string
+  
 }
 
 export class Profile {

@@ -1,0 +1,75 @@
+2023-05-19 21:12:20 [32minfo[39m: [32mListening on url http://localhost:3000[39m
+2023-05-19 21:12:35 [32minfo[39m: [32mConnected to Database Successsfully[39m
+2023-05-19 21:24:17 [31merror[39m: [31m[[39m
+[31m  'fullname must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'company must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'company must be a string',[39m
+[31m  'contact must be a valid phone number',[39m
+[31m  'fullname must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'company must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'company must be a string',[39m
+[31m  'contact must be a valid phone number',[39m
+[31m  'referal must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'company must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'company must be a string',[39m
+[31m  'contact must be a valid phone number',[39m
+[31m  'fullname must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'company must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'company must be a string',[39m
+[31m  'contact must be a valid phone number',[39m
+[31m  'referal must be a string',[39m
+[31m  'purpose must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'company must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'company must be a string',[39m
+[31m  'contact must be a valid phone number',[39m
+[31m  'fullname must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'company must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'company must be a string',[39m
+[31m  'contact must be a valid phone number',[39m
+[31m  'referal must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'company must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'company must be a string',[39m
+[31m  'contact must be a valid phone number',[39m
+[31m  'fullname must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'company must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'fullname must be a string',[39m
+[31m  'company must be a string',[39m
+[31m  'contact must be a valid phone number',[39m
+[31m  'referal must be a string',[39m
+[31m  'purpose must be a string',[39m
+[31m  'country must be a string'[39m
+[31m][39m
+2023-05-19 21:33:28 [32minfo[39m: [32mListening on url http://localhost:3000[39m
+2023-05-19 21:33:28 [32minfo[39m: [32mConnected to Database Successsfully[39m
+2023-05-19 21:35:00 [32minfo[39m: [32mListening on url http://localhost:3000[39m
+2023-05-19 21:35:00 [32minfo[39m: [32mConnected to Database Successsfully[39m
+2023-05-19 21:37:47 [32minfo[39m: [32mListening on url http://localhost:3000[39m
+2023-05-19 21:37:47 [32minfo[39m: [32mConnected to Database Successsfully[39m
+2023-05-19 21:42:52 [32minfo[39m: [32mListening on url http://localhost:3000[39m
+2023-05-19 21:42:52 [32minfo[39m: [32mConnected to Database Successsfully[39m

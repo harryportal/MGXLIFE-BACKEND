@@ -7,7 +7,7 @@ export class AuthController {
     static signUp = async(req:Request, res:Response)=>{
         const {refferingId, ...userData }= req.body;
         const distributor = await this.authService.createDistributor(userData, refferingId)
-        return res.status(201).json({success:true, data:distributor})
+        return res.status(201).json({success:true, data:distributor});
     }
 
     static resetPassword = async(req:Request, res:Response)=>{

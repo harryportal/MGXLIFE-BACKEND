@@ -10,11 +10,12 @@ export default class StripeService{
         this.stripe =  new Stripe(this.secretKey,
             {apiVersion: '2022-11-15',  maxNetworkRetries: 3,  timeout: 1000})
     }
-    public createCustomer = async(cardDetails:ICard):Promise<Stripe.Customer>=>{
+    
+    public createCustomer = async(email:string):Promise<Stripe.Customer>=>{
         let customer: Stripe.Customer;
         try {
             customer = await this.stripe.customers.create({
-            
+                email
             });
         }catch(err:any){
             throw new Error(`Failed to create subscription: ${err.message}`)
@@ -23,7 +24,7 @@ export default class StripeService{
     }
 
 
-    public createPaymentMethod = async(cardToken: string): Promise<Stripe.PaymentMethod> {
+    public createPaymentMethod = async(cardToken: string): Promise<Stripe.PaymentMethod>=>{
         try {
           const paymentMethod = await this.stripe.paymentMethods.create({
             type: 'card',
@@ -35,18 +36,18 @@ export default class StripeService{
           });
     
           return paymentMethod;
-        } catch (error) {
-          throw new Error(`Failed to create payment method: ${error.message}`);
+        } catch (err:any) {
+          throw new Error(`Failed to create payment method: ${err.message}`);
         }
       }
     
-      public attachPaymentMethodToCustomer = async(paymentMethodId: string, customerId: string): Promise<void> {
+      public attachPaymentMethodToCustomer = async(paymentMethodId: string, customerId: string): Promise<void>=>{
         try {
           await this.stripe.paymentMethods.attach(paymentMethodId, {
             customer: customerId,
           });
-        } catch (error) {
-          throw new Error(`Failed to attach payment method to customer: ${error.message}`);
+        } catch (err:any) {
+          throw new Error(`Failed to attach payment method to customer: ${err.message}`);
         }
       }
     
