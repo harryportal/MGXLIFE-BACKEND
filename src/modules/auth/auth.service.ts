@@ -124,8 +124,8 @@ export default class AuthService {
 
     public forgotPassword = async(email:string)=>{
         const user = await this.authRepository.getDistributor(email) as Distributor;
-        if(!user) { throw new AuthError("No Email with associated Account!")}
-        if(!user.verified) {throw new AuthError("Please verify your email first!")}
+        if(!user) { throw new BadRequestError("No Email with associated Account!")}
+        if(!user.verified) {throw new BadRequestError("Please verify your email first!")}
         const userToken = createAcessToken(user);
 
         const addPasswordUrl = `${process.env.FRONTENDURL}/reset-password?token=${userToken}`;

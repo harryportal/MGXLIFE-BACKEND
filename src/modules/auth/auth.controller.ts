@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import AuthService from "./auth.service";
 import { AuthRequest, distributorPayload } from "./auth.interface";
-import { Distributor } from "@prisma/client";
 
 export class AuthController {
     private static authService = new AuthService();
@@ -33,13 +32,13 @@ export class AuthController {
     static deleteRefreshToken = async(req:Request, res:Response)=>{
         const refreshToken = req.query.token as string;
         await this.authService.deleteRefreshToken(refreshToken);
-        return res.status(204).json({success:true, message:"success"});
+        return res.status(204);
     }
 
     static verifyEmail = async(req:Request, res:Response)=>{
         const verificationToken = req.query.token as string;
         await this.authService.verifyEmail(verificationToken);
-        return res.status(204).json({success:true, message:"Email has been verified"});
+        return res.status(200).json({success:true, message:"Email has been verified"});
     }
 
     static SignIn = async(req:Request, res:Response)=>{

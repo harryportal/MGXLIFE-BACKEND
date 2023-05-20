@@ -38,7 +38,7 @@ export const createRefreshToken = (user:Distributor) =>{
 }
 
 export const createVerificationToken = (email:string)=>{
-  const token = jwt.sign({ email, type: "refresh"}, secret );
+  const token = jwt.sign({ email, type: "verify"}, secret );
   return token;
 }
 

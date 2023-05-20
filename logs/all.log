@@ -180,3 +180,23 @@
 2023-05-20 13:28:53 [32minfo[39m: [32m[MailResponse]=250 2.0.0 OK  1684585751 y21-20020a7bcd95000000b003f4e8530696sm2111433wmj.46 - gsmtp [MessageID]=<c6553551-6492-6ed8-0dd1-95a44b2bcf83@gmail.com>[39m
 2023-05-20 13:30:01 [32minfo[39m: [32mListening on url http://localhost:3000[39m
 2023-05-20 13:30:01 [32minfo[39m: [32mConnected to Database Successsfully[39m
+2023-05-20 13:33:12 [32minfo[39m: [32mListening on url http://localhost:3000[39m
+2023-05-20 13:33:12 [32minfo[39m: [32mConnected to Database Successsfully[39m
+2023-05-20 13:39:20 [32minfo[39m: [32mListening on url http://localhost:3000[39m
+2023-05-20 13:39:20 [32minfo[39m: [32mConnected to Database Successsfully[39m
+2023-05-20 13:42:39 [32minfo[39m: [32mListening on url http://localhost:3000[39m
+2023-05-20 13:42:40 [32minfo[39m: [32mConnected to Database Successsfully[39m
+2023-05-20 13:43:26 [32minfo[39m: [32mMail sent successfully!![39m
+2023-05-20 13:43:26 [32minfo[39m: [32m[MailResponse]=250 2.0.0 OK  1684586624 t1-20020a5d6a41000000b003063176ef09sm1928896wrw.6 - gsmtp [MessageID]=<6c7420fb-1604-e296-6bae-51866c6c2f6f@gmail.com>[39m
+2023-05-20 13:46:34 [32minfo[39m: [32mListening on url http://localhost:3000[39m
+2023-05-20 13:46:35 [32minfo[39m: [32mConnected to Database Successsfully[39m
+2023-05-20 13:53:26 [32minfo[39m: [32mListening on url http://localhost:3000[39m
+2023-05-20 13:53:26 [32minfo[39m: [32mConnected to Database Successsfully[39m
+2023-05-20 13:54:14 [32minfo[39m: [32mListening on url http://localhost:3000[39m
+2023-05-20 13:54:14 [32minfo[39m: [32mConnected to Database Successsfully[39m
+2023-05-20 13:54:26 [32minfo[39m: [32mListening on url http://localhost:3000[39m
+2023-05-20 13:54:26 [32minfo[39m: [32mConnected to Database Successsfully[39m
+2023-05-20 13:54:35 [32minfo[39m: [32mMail sent successfully!![39m
+2023-05-20 13:54:35 [32minfo[39m: [32m[MailResponse]=250 2.0.0 OK  1684587292 u1-20020a05600c210100b003f4069417absm5449878wml.24 - gsmtp [MessageID]=<517d3e4a-6d03-c95c-d194-6b2c56e20864@gmail.com>[39m
+2023-05-20 13:56:38 [32minfo[39m: [32mListening on url http://localhost:3000[39m
+2023-05-20 13:56:38 [32minfo[39m: [32mConnected to Database Successsfully[39m
