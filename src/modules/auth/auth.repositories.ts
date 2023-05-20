@@ -1,3 +1,5 @@
+import { Distributor } from "@prisma/client";
+import { BadRequestError } from "../../common/error";
 import {prisma} from "../../utils/db/prisma";
 import { DistributorwithoutReferral } from "./auth.interface";
 
@@ -11,19 +13,32 @@ export default class AuthRepository{
     
     public getDistributor = async(email:string)=> {
         const distributor = await this.distributor.findUnique({
-            where: { email }
+            where: {email}
         });
         return distributor;
+    }
+
+    public verifyDistributor = async(email:string)=>{
+        await this.distributor.update({
+            where:{ email }, data :{ verified: true }
+        })
     }
 
     public createDistributorwithReferral = async(distributor:DistributorwithoutReferral,refferedById:string)=>{
         const userData  = await this.distributor.create({
             data:{
                 ...distributor,
-                referredBy: {connect: {id: refferedById}}
+                referredBy: {connect: {referringId: refferedById}}
             }
-        });
+        })
         return userData;
+    }
+
+    public getDistributorwithReferalId = async(referringId:string)=>{
+        const distributor = await this.distributor.findUnique({
+            where:{ referringId }
+        });
+        return distributor;
     }
 
     public createDistributorwithoutReferral = async(distributor:DistributorwithoutReferral)=>{

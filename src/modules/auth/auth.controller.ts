@@ -1,31 +1,45 @@
 import { Request, Response } from "express";
 import AuthService from "./auth.service";
+import { AuthRequest, distributorPayload } from "./auth.interface";
+import { Distributor } from "@prisma/client";
 
 export class AuthController {
     private static authService = new AuthService();
 
     static signUp = async(req:Request, res:Response)=>{
-        const {refferingId, ...userData }= req.body;
-        const distributor = await this.authService.createDistributor(userData, refferingId)
+        const {referringId, ...userData }= req.body;
+        const distributor = await this.authService.createDistributor(userData, referringId)
         return res.status(201).json({success:true, data:distributor});
     }
 
     static resetPassword = async(req:Request, res:Response)=>{
         let {password, confirmPassword, token} = req.body;
         await this.authService.resetPassword(token, password, confirmPassword)
-        return res.status(200).json({success:true})
+        return res.status(200).json({success:true, message:"success"})
     }
 
     static getAccessToken = async(req:Request, res:Response)=>{
-        const {refreshToken} = req.body;
+        const refreshToken = req.query.token as string;
         const accessToken = await this.authService.getAccessToken(refreshToken);
         return res.json({success:true, data: {accessToken}})
     }
 
+    static getVerificationMail = async(req:AuthRequest, res:Response)=>{
+        const {firstname, email} = req.user as distributorPayload;
+        await this.authService.sendVerificationMail(firstname, email);
+        return res.status(200).json({success:true, message:"Check Your Email for Verification!"});
+    }
+
     static deleteRefreshToken = async(req:Request, res:Response)=>{
-        const {refreshToken} = req.body;
+        const refreshToken = req.query.token as string;
         await this.authService.deleteRefreshToken(refreshToken);
-        return res.status(204).json({success:true});
+        return res.status(204).json({success:true, message:"success"});
+    }
+
+    static verifyEmail = async(req:Request, res:Response)=>{
+        const verificationToken = req.query.token as string;
+        await this.authService.verifyEmail(verificationToken);
+        return res.status(204).json({success:true, message:"Email has been verified"});
     }
 
     static SignIn = async(req:Request, res:Response)=>{
@@ -36,9 +50,9 @@ export class AuthController {
 
 
     static forgotPassword = async(req:Request, res:Response)=>{
-        const {email} = req.body;
-        await this.authService.forgotPassword(email);
-        return res.json({success:true})
+        const email = req.query.email as string;
+;       await this.authService.forgotPassword(email);
+        return res.json({success:true, message:"Check Your Inbox!"})
     }
     
 }

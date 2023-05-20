@@ -19,10 +19,11 @@ model Distributor {
   password           String
   subscriptionStatus Boolean       @default(false)
   referringId        String        @unique
-  imageUrl           String?
-  commissionEarned   Float?
+  imageUrl           String?       
+  commissionEarned   Float?  @default(0.0)
   referredBy         Distributor?  @relation(name:"ReferredBy", fields: [referredById], references: [id])
   referredById       String?
+  verified           Boolean @default(false)
   referredUsers      Distributor[] @relation(name:"ReferredBy")
   payments           Payment[]
   orders             Order[]
@@ -46,12 +47,14 @@ enum BonusType {
 
 model Product {
   id          String @id @default(uuid())
-  name        String
-  description String?
+  productId    String @unique
+  title       String
   price       Float
   image       String?
   bonusType   BonusType @default(PERCENTAGE)
   bonusAmount Float @default(10.0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }
 
 model Payment {

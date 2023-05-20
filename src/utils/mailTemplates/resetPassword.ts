@@ -57,7 +57,7 @@ export const createresetTemplate = (name:string, link:string)=>{
 	<a href=${link} class="button" style="background-color: #3498db; color: #ffffff;">Reset Password</a>
 	<p>If you did not request this, please ignore this email or contact our support team immediately.</p>
 	<p>Best regards,</p>
-	<p>The SmeBud Team</p>	</div>
+	<p>The MGXLIFE Team</p>	</div>
 </body>
 </html>
 

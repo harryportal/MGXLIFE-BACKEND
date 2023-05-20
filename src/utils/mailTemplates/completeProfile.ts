@@ -1,4 +1,4 @@
-export const createprofileTemplate = (firstname:string, link:string)=>{
+export const completeprofileTemplate = (firstname:string, link:string)=>{
     return `<!DOCTYPE html>
 	<html>
 	<head>
@@ -52,13 +52,15 @@ export const createprofileTemplate = (firstname:string, link:string)=>{
 	<body>
 		<div style="max-width: 600px; margin: 0 auto; padding: 20px;">
 		<p>Dear ${firstname}</p>
-		<p>Thank you for registering with SmeBud. We'd like to remind you to complete your profile by adding more information about yourself. This will help us better tailor our services to meet your needs.</p>
-		<p>Here's the link to continue adding your profile:</p>
-		<a href=${link} class="button">Continue Adding Profile</a>
-		<p>If you have any questions or concerns, please don't hesitate to reach out to us.</p>
+		<p>Thank you for registering as a distributor on MXFLIFE. 
+		We'd like to remind you to complete your profile verifiying your email address. 
+		This will help us better tailor our services to meet your needs.</p>
+		<p>Here's the link to verify your email:</p>
+		<a href=${link} class="button">verify email</a>
+		<p>If you did not request this, please ignore this email or contact our support team immediately.</p>
 		<p>Thank you for your time.</p>
 		<p>Best regards,</p>
-		<p>The SmeBud Team</p>
+		<p>The MXGLIFE Team</p>
 	</div>
 	</body>
 	</html>

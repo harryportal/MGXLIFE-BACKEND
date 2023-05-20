@@ -65,8 +65,3 @@ export class AddResetPassword {
     confirmPasswor: string;
 
 }
-
-export class RefreshToken {
-    @IsString()
-    refreshToken: string
-}

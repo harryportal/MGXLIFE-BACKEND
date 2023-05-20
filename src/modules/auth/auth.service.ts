@@ -2,10 +2,11 @@ import Cloudinary from "../cloud/cloudinary.service";
 import shortid from "shortid";
 import AuthRepository from "./auth.repositories";
 import { AuthError, BadRequestError } from "../../common/error";
-import { comparePassword, createAcessToken, createRefreshToken, hashPassword, verifyJWT } from "../../utils/jwtAuth/jwt";
+import { comparePassword, createAcessToken, createRefreshToken, createVerificationToken, hashPassword, verifyJWT } from "../../utils/jwtAuth/jwt";
 import { Distributor } from "@prisma/client";
 import MailService from "../mail/mail.service";
 import { createresetTemplate } from "../../utils/mailTemplates/resetPassword";
+import { completeprofileTemplate } from "../../utils/mailTemplates/completeProfile";
 
 export default class AuthService {
     private cloudinaryService;
@@ -31,6 +32,15 @@ export default class AuthService {
         return `mg#${randomString}`;
     }
 
+    public verifyEmail = async(verificationToken:string)=>{
+        const verifiedPayload = verifyJWT(verificationToken)
+        if(verifiedPayload.type != "verify") {
+            throw new BadRequestError("Please provide a valid verification token")
+        }
+        const { email } = verifiedPayload;
+        await this.authRepository.verifyDistributor(email);
+    }
+
     public signIn = async(email:string, password:string)=>{
         const distributor = await this.authRepository.getDistributor(email);
         if(!distributor) { throw new AuthError("Invalid Login Credentials")}
@@ -39,7 +49,7 @@ export default class AuthService {
         if(!checkPassword) { throw new AuthError("Invalid Login Credentials") }
         
         const accessToken =  createAcessToken(distributor);
-        const refreshToken = createRefreshToken(distributor.id);
+        const refreshToken = createRefreshToken(distributor);
 
         // creates a date 15 days from now.
         const refreshTokenExpiresAt = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000); 
@@ -65,15 +75,17 @@ export default class AuthService {
 
     public getAccessToken = async(refreshToken:string)=>{
         const verifiedPayload = verifyJWT(refreshToken);
+
         const token = await this.authRepository.getRefreshToken(refreshToken)
         if (!token || token.expiresAt < new Date) { throw new AuthError("Invalid Refresh Token") };
-        const user = await this.authRepository.getDistributor(verifiedPayload.email) as Distributor;
+        const email = verifiedPayload.email;
+        const user = await this.authRepository.getDistributor(email) as Distributor;
         const acessToken = createAcessToken(user);
         return acessToken;
     }
 
     public createDistributor = async(distributorData: Omit<Distributor, "id">, refferalId:string)=>{
-        const {email, password} = distributorData;
+        let {email, password} = distributorData;
         const checkEmail = await this.authRepository.getDistributor(email);
         if (checkEmail){ throw new AuthError("Email Already Exists!. Please use another Email Address")}
         const refferingId = this.generateReferralLink();
@@ -82,17 +94,39 @@ export default class AuthService {
        
         let distributor: Distributor;
         if(refferalId) {
+            // first check if a distributor with that referal id exist
+            await this.verifyReferralId(refferalId);
             distributor = await this.authRepository.createDistributorwithReferral(distributorData, refferalId)
         }else {
             distributor = await this.authRepository.createDistributorwithoutReferral(distributorData);
         }
+        await this.sendVerificationMail(distributor.firstName, distributor.email)
+        distributor = this.removePassword(distributor) as Distributor;
         return distributor;
+    }
+
+    private verifyReferralId = async(refferingId:string)=>{
+        const distributor = await this.authRepository.getDistributorwithReferalId(refferingId);
+        if (!distributor) { throw new BadRequestError("No Distributor with the referral Id provided")}
+    }
+
+    public sendVerificationMail = async(firstname:string, email:string)=>{
+        const verificationToken = createVerificationToken(email);
+        const verifyEmailUrl = `${process.env.FRONTENDURL}/verifyemail/?token=${verificationToken}`;
+        const mailtemplate = completeprofileTemplate(firstname, verifyEmailUrl);
+        await this.mailService.sendMail({to:email, subject: "Verify Your Email Address", html:mailtemplate})
+    }
+
+    private removePassword = (distributor: Distributor)=>{
+        const { password, ...sanitizedData } = distributor;
+        return sanitizedData;
     }
 
     public forgotPassword = async(email:string)=>{
         const user = await this.authRepository.getDistributor(email) as Distributor;
         if(!user) { throw new AuthError("No Email with associated Account!")}
-        const userToken = createAcessToken(user, false);
+        if(!user.verified) {throw new AuthError("Please verify your email first!")}
+        const userToken = createAcessToken(user);
 
         const addPasswordUrl = `${process.env.FRONTENDURL}/reset-password?token=${userToken}`;
         const mailtemplate = createresetTemplate(user.firstName, addPasswordUrl);
