@@ -14,7 +14,7 @@ export const comparePassword = (password: string, hash:string) => {
   return bcrypt.compare(password, hash);
 };
 
-
+console.log(process.env.JWT_SECRET);
 const secret: string | undefined = process.env.JWT_SECRET;
 
 if(!secret) { throw new InternalServerError("JWT SECRET HAS NO VALUE!")}
