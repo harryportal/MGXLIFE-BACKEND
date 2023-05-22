@@ -50,7 +50,7 @@ export class AuthController {
 
     static forgotPassword = async(req:Request, res:Response)=>{
         const email = req.query.email as string;
-;       await this.authService.forgotPassword(email);
+        await this.authService.forgotPassword(email);
         return res.json({success:true, message:"Check Your Inbox!"})
     }
     
