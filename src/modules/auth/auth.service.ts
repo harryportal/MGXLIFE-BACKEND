@@ -38,7 +38,9 @@ export default class AuthService {
             throw new BadRequestError("Please provide a valid verification token")
         }
         const { email } = verifiedPayload;
-        await this.authRepository.verifyDistributor(email);
+        // should first check if the distributor has been verified before performing the verification again.
+        const distributor = await this.authRepository.getDistributor(email) as Distributor;
+        if (!distributor.verified) { await this.authRepository.verifyDistributor(email) };
     }
 
     public signIn = async(email:string, password:string)=>{
