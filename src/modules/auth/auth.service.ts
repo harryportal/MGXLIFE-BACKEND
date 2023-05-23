@@ -101,9 +101,7 @@ export default class AuthService {
             distributor = await this.authRepository.createDistributorwithoutReferral(distributorData);
         }
         await this.sendVerificationMail(distributor.firstName, distributor.email)
-        distributor = this.removePassword(distributor) as Distributor;
-        return distributor;
-    }
+        }
 
     private verifyReferralId = async(refferingId:string)=>{
         const distributor = await this.authRepository.getDistributorwithReferalId(refferingId);

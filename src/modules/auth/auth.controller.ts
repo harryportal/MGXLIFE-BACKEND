@@ -8,7 +8,7 @@ export class AuthController {
     static signUp = async(req:Request, res:Response)=>{
         const {referringId, ...userData }= req.body;
         const distributor = await this.authService.createDistributor(userData, referringId)
-        return res.status(201).json({success:true, data:distributor});
+        return res.status(201).json({success:true, message:"Check your inbox for a verification Mail"});
     }
 
     static resetPassword = async(req:Request, res:Response)=>{
@@ -26,7 +26,7 @@ export class AuthController {
     static getVerificationMail = async(req:AuthRequest, res:Response)=>{
         const {firstname, email} = req.user as distributorPayload;
         await this.authService.sendVerificationMail(firstname, email);
-        return res.status(200).json({success:true, message:"Check Your Email for Verification!"});
+        return res.status(200).json({success:true, message:"Check your inbox for a verification Mail"});
     }
 
     static deleteRefreshToken = async(req:Request, res:Response)=>{
