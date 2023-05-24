@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsPhoneNumber, IsOptional, IsNumberString, IsBooleanString, IsBoolean, IsNumber } from "class-validator";
+import { IsEmail, IsString, IsOptional, IsNumberString, IsBooleanString } from "class-validator";
 
 
 export class SignIn {
@@ -54,7 +54,7 @@ export class Profile {
     aboutCompany: string
 }
 
-export class AddResetPassword {
+export class ResetPassword {
     @IsString()
     token:string;
 
