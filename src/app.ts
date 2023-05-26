@@ -13,11 +13,11 @@ app.use(morgan('dev'));
 
 /* Placing the payment webhook router above the body parser to overide 
 .json and .raw instead for buffer */
-app.use("/payment", paymentRouter) 
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use("/payment", paymentRouter) 
 app.use("/auth", authRouter);
 
 
