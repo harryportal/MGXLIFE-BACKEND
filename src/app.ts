@@ -5,6 +5,7 @@ import { ErrorHandler } from './common/error';
 import { Application } from 'express';
 import authRouter from "./modules/auth/auth.router";
 import paymentRouter from "./modules/payment/payment.router";
+import distributorRouter from "./modules/distributor/distributor.router";
 
 const app: Application = express();
 
@@ -17,7 +18,8 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/payment", paymentRouter) 
+app.use("/payment", paymentRouter);
+app.use("/distributor", distributorRouter);
 app.use("/auth", authRouter);
 
 

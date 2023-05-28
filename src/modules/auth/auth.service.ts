@@ -7,15 +7,18 @@ import { Distributor } from "@prisma/client";
 import MailService from "../mail/mail.service";
 import { createresetTemplate } from "../../utils/mailTemplates/resetPassword";
 import { completeprofileTemplate } from "../../utils/mailTemplates/completeProfile";
+import PaymentRepository from "../payment/payment.repository";
 
 export default class AuthService {
     private cloudinaryService;
     private authRepository;
     private mailService;
+    private paymentRepository;
     constructor(){
         this.cloudinaryService = new Cloudinary();
         this.authRepository = new AuthRepository();
         this.mailService = new MailService();
+        this.paymentRepository = new PaymentRepository()
     }
 
     /* Logic for uploading the image */
@@ -89,11 +92,12 @@ export default class AuthService {
     public createDistributor = async(distributorData: Omit<Distributor, "id">, refferalId:string)=>{
         let {email, password} = distributorData;
         const checkEmail = await this.authRepository.getDistributor(email);
-        if (checkEmail){ throw new AuthError("Email Already Exists!. Please use another Email Address")}
+        if (checkEmail){ throw new AuthError("Email Already Exists!. Please use another Email Address")};
+        const stripeCustomerId = await this.paymentRepository.createCustomer(email);
         const refferingId = this.generateReferralLink();
         distributorData.referringId = refferingId;
         distributorData.password = await hashPassword(password);
-       
+        distributorData.stripeCustomerId = stripeCustomerId;
         let distributor: Distributor;
         if(refferalId) {
             // first check if a distributor with that referal id exist
@@ -102,6 +106,7 @@ export default class AuthService {
         }else {
             distributor = await this.authRepository.createDistributorwithoutReferral(distributorData);
         }
+        // create the stripe customer for this new distributor instantly
         await this.sendVerificationMail(distributor.firstName, distributor.email)
         }
 

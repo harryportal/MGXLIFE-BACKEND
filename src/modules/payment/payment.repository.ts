@@ -1,21 +1,35 @@
 import Stripe from "stripe";
 import { BadRequestError, InternalServerError } from "../../common/error";
+import AuthRepository from "../auth/auth.repositories";
 
 export default class PaymentRepository{
     private stripe:Stripe;
-    private secretKey = process.env.STRIPE_SECRETKEY!;
-    private signingKey = process.env.STRIPE_SIGNINGKEY!;
+    private secretKey;
+    private signingKey;
+    private distributorRepository;  // find a better way to do this!
     constructor(){
+        this.distributorRepository = new AuthRepository();
+        this.secretKey = process.env.STRIPE_SECRETKEY!;
+        this.signingKey = process.env.STRIPE_SIGNINGKEY!
         this.stripe =  new Stripe(this.secretKey,
             {apiVersion: '2022-11-15',  maxNetworkRetries: 3,  timeout: 1000})
     }
 
+    public createPortalSession = async(email:string)=>{
+      const distributor = await this.distributorRepository.getDistributor(email);
+      const portalSession = await this.stripe.billingPortal.sessions.create({
+        customer:distributor!.stripeCustomerId
+        //return_url: returnUrl,
+      });
+      return portalSession;
+    }
 
     public createCheckOutSession = async(email:string):Promise<string>=>{
-      const priceId = "prctbl_1NBpDgB7eY2bXlKvFIDmJjKo";
+      const priceId = "price_1NBpCIB7eY2bXlKvxEIK2GJ3";
+      const distributor = await this.distributorRepository.getDistributor(email);
       try{
           const session = await this.stripe.checkout.sessions.create({
-              customer_email: email,
+              customer: distributor!.stripeCustomerId,
               payment_method_types: ["card"],
               mode: "subscription",
               line_items:[{

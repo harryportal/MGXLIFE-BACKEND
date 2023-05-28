@@ -18,6 +18,7 @@ model Distributor {
   email              String        @unique
   password           String
   subscriptionStatus Boolean       @default(false)
+  stripeCustomerId   String        @unique
   referringId        String        @unique
   imageUrl           String?       
   commissionEarned   Float?  @default(0.0)

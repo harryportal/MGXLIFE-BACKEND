@@ -7,7 +7,7 @@ export class AuthController {
 
     static signUp = async(req:Request, res:Response)=>{
         const {referringId, ...userData }= req.body;
-        const distributor = await this.authService.createDistributor(userData, referringId)
+        await this.authService.createDistributor(userData, referringId)
         return res.status(201).json({success:true, message:"Check your inbox for a verification Mail"});
     }
 
