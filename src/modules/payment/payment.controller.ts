@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import PaymentRepository from "./payment.repository";
 import { AuthRequest } from "../auth/auth.interface";
 
@@ -17,7 +17,11 @@ export default class PaymentController {
         res.status(200).json({success:true, data: portalSessionUrl})
     }
 
-
-
-
+    static subscriptionWebhook = async(req:AuthRequest, res:Response)=>{
+        let payload = req.body as Buffer;
+        const signature = req.headers['stripe-signature'] as string;
+        await this.paymentService.handleSubscriptionEvents(payload, signature)
+        return res.status(200);
+    }
+    
 }

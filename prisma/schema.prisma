@@ -10,6 +10,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum SubscriptionStatus{
+  NOT_PAID
+  PAID
+  PENDING
+}
+
 // schema.prisma
 model Distributor {
   id                 String        @id @default(uuid())
@@ -17,7 +23,7 @@ model Distributor {
   lastName           String
   email              String        @unique
   password           String
-  subscriptionStatus Boolean       @default(false)
+  subscriptionStatus SubscriptionStatus  @default(NOT_PAID)
   stripeCustomerId   String        @unique
   referringId        String        @unique
   imageUrl           String?       

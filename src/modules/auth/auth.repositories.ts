@@ -1,5 +1,3 @@
-import { Distributor } from "@prisma/client";
-import { BadRequestError } from "../../common/error";
 import {prisma} from "../../utils/db/prisma";
 import { DistributorwithoutReferral } from "./auth.interface";
 

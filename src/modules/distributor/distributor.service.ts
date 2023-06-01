@@ -1,3 +1,4 @@
+import { Distributor } from "@prisma/client";
 import { NotFoundError } from "../../common/error";
 import DistributorRepository from "./distributor.repository";
 
@@ -9,6 +10,8 @@ export default class DistributorService {
 
     public getDistributor = async(distributorId:string)=>{
         const distributor = await this.distributorRepository.getProfile(distributorId);
+        let {password, ...disitributorData} = distributor as Distributor;
         if(!distributor) { throw new NotFoundError("No Distributor with Id Found!")};
+        return disitributorData;
     }
 }

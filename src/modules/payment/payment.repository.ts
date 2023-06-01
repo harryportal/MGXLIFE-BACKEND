@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import { BadRequestError, InternalServerError } from "../../common/error";
-import AuthRepository from "../auth/auth.repositories";
+import DistributorRepository from "../distributor/distributor.repository";
+import { SubscriptionStatus } from "@prisma/client";
 
 export default class PaymentRepository{
     private stripe:Stripe;
@@ -8,7 +9,7 @@ export default class PaymentRepository{
     private signingKey;
     private distributorRepository;  // find a better way to do this!
     constructor(){
-        this.distributorRepository = new AuthRepository();
+        this.distributorRepository = new DistributorRepository();
         this.secretKey = process.env.STRIPE_SECRETKEY!;
         this.signingKey = process.env.STRIPE_SIGNINGKEY!
         this.stripe =  new Stripe(this.secretKey,
@@ -16,7 +17,7 @@ export default class PaymentRepository{
     }
 
     public createPortalSession = async(email:string)=>{
-      const distributor = await this.distributorRepository.getDistributor(email);
+      const distributor = await this.distributorRepository.getDistributorwithEmail(email);
       const portalSession = await this.stripe.billingPortal.sessions.create({
         customer:distributor!.stripeCustomerId
         //return_url: returnUrl,
@@ -26,7 +27,7 @@ export default class PaymentRepository{
 
     public createCheckOutSession = async(email:string):Promise<string>=>{
       const priceId = "price_1NBpCIB7eY2bXlKvxEIK2GJ3";
-      const distributor = await this.distributorRepository.getDistributor(email);
+      const distributor = await this.distributorRepository.getDistributorwithEmail(email);
       try{
           const session = await this.stripe.checkout.sessions.create({
               customer: distributor!.stripeCustomerId,
@@ -57,49 +58,6 @@ export default class PaymentRepository{
     }
 
 
-    public createPaymentMethod = async(cardToken: string): Promise<Stripe.PaymentMethod>=>{
-        try {
-          const paymentMethod = await this.stripe.paymentMethods.create({
-            type: 'card',
-            card: {
-             /*This card token is gotten when the client uses stripe.js to tokenise the 
-             card details actually: should have used in the other project lol!*/
-              token: cardToken,  
-            },
-          });
-    
-          return paymentMethod;
-        } catch (err:any) {
-          throw new Error(`Failed to create payment method: ${err.message}`);
-        }
-      }
-    
-      public attachPaymentMethodToCustomer = async(paymentMethodId: string, customerId: string): Promise<void>=>{
-        try {
-          await this.stripe.paymentMethods.attach(paymentMethodId, {
-            customer: customerId,
-          });
-        } catch (err:any) {
-          throw new Error(`Failed to attach payment method to customer: ${err.message}`);
-        }
-      }
-    
-    
-    public createSubscription = async(customerId: string, priceId: string): Promise<Stripe.Subscription>=>{
-    try {
-      const subscription = await this.stripe.subscriptions.create({
-        customer: customerId,
-        items: [
-          { price: priceId },
-        ],
-      });
-
-      return subscription;
-    } catch (error:any) {
-      throw new Error(`Failed to create subscription: ${error.message}`);
-    }
-  }
-
     public retrieveSubscription = async(subscriptionId: string): Promise<Stripe.Subscription>=>{
     try {
       const subscription = await this.stripe.subscriptions.retrieve(subscriptionId);
@@ -108,19 +66,25 @@ export default class PaymentRepository{
     } catch (error:any) {
       throw new Error(`Failed to retrieve subscription: ${error.message}`);
     }
-  }
-
-   public cancelSubscription = async(subscriptionId: string): Promise<Stripe.Subscription>=>{
-    try {
-      const canceledSubscription = await this.stripe.subscriptions.update(subscriptionId, {
-        cancel_at_period_end: true,
-      });
-
-      return canceledSubscription;
-    } catch (error:any) {
-      throw new Error(`Failed to cancel subscription: ${error.message}`);
     }
-  }
+
+    public handleSubscriptionEvents = async(payload:any, signature:string)=>{
+        const event = this.getEvent(payload, signature)
+        const session = event.data.object as Stripe.Checkout.Session;
+        const distributorStripeId = session.customer as string;
+        switch(event.type){
+            case("checkout.session.completed" || "invoice.paid" || "invoice.payment_succeeded"):
+                await this.distributorRepository.updateDistributorSubscriptionStatus(distributorStripeId, 
+                    SubscriptionStatus.PAID)
+                break;
+            case("invoice.payment_failed"):
+                /*update the distributor subscription status ... optionally add the logic to redirect the user to 
+                their subscription portal*/
+                await this.distributorRepository.updateDistributorSubscriptionStatus(distributorStripeId, 
+                    SubscriptionStatus.NOT_PAID)
+                break;    
+        }
+    }
 
     public getEvent = (payload:any, signature:string):Stripe.Event=>{
         let event;
