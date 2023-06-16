@@ -7,6 +7,7 @@ import authRouter from "./modules/auth/auth.router";
 import paymentRouter from "./modules/payment/payment.router";
 import distributorRouter from "./modules/distributor/distributor.router";
 import PaymentController from "./modules/payment/payment.controller";
+import shopifywebhookRouter from "./modules/shopify/shopify.router";
 
 const app: Application = express();
 
@@ -22,6 +23,7 @@ app.post("/subscription/webhook", express.raw({ type: 'application/json' }), Pay
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use("/shopify", shopifywebhookRouter);
 app.use("/payment", paymentRouter);
 app.use("/distributor", distributorRouter);
 app.use("/auth", authRouter);

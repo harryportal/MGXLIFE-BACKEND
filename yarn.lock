@@ -171,6 +171,11 @@
     "@types/mime" "*"
     "@types/node" "*"
 
+"@types/shopify-buy@^2.17.1":
+  version "2.17.1"
+  resolved "https://registry.yarnpkg.com/@types/shopify-buy/-/shopify-buy-2.17.1.tgz#c2f1a94d615ca83d1127135a098bd73cda57939c"
+  integrity sha512-R/LzVK/Beqsex2dccSY2rfm4AFAVuqJ177LVl18bVNtxQO78WGTgsVZKDEOaugW9ap3hm+w2XvGFBFp3XeMRvw==
+
 "@types/shortid@^0.0.29":
   version "0.0.29"
   resolved "https://registry.yarnpkg.com/@types/shortid/-/shortid-0.0.29.tgz#8093ee0416a6e2bf2aa6338109114b3fbffa0e9b"

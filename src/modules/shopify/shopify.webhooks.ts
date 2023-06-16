@@ -1,13 +1,12 @@
 import { Request, Response } from "express"
 import ShopifyService from "./shopify.service";
 
-export default class ShopifyWebhook {
-    private shopifyService;
-    constructor(){
-        this.shopifyService =  new ShopifyService();
-    }
-    static productCreation = async(req:Request, res:Response)=>{
-        //await this.shopifyService.
-    }
+export default class ShopifyWebhookController {
+    private static shopifyService = new ShopifyService();
 
+    static addSingleproduct= async(req:Request, res:Response)=>{
+        const productData = req.body 
+        await this.shopifyService.addSingleProduct(productData);
+        return res.status(200);
+    };
 }
