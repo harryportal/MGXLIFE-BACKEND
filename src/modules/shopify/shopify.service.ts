@@ -19,7 +19,6 @@ export default class ShopifyService {
     public addSingleProduct = async(product:Product)=>{
         const productObject = this.retrieveProductData(product);
         const productId = await this.productService.addProduct(productObject);
-        console.log(productId);
         logger.info("A new Shopify Product Added with Id", productId);
     }
 

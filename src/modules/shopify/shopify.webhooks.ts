@@ -4,9 +4,16 @@ import ShopifyService from "./shopify.service";
 export default class ShopifyWebhookController {
     private static shopifyService = new ShopifyService();
 
-    static addSingleproduct= async(req:Request, res:Response)=>{
+    static addSingleProduct= async(req:Request, res:Response)=>{
         const productData = req.body 
-        const product = await this.shopifyService.addSingleProduct(productData);
+        await this.shopifyService.addSingleProduct(productData);
         return res.status(200);
     };
+
+    static addMultipleProduct= async(req:Request, res:Response)=>{
+        const productData = req.body 
+        await this.shopifyService.addMultipleProduct(productData);
+        return res.status(200);
+    };
+
 }
