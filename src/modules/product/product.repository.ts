@@ -12,16 +12,16 @@ export default class ProductRepository{
         const product = await this.product.findUnique({
           where: {
             productId: shopifyId
-          }
-        });
+          } });
         return product;
     }
 
     public addProduct = async(productData:SingleProduct):Promise<string>=>{
-      const product =  await prisma.product.create({
+      const productId = await prisma.product.create({
             data: { ...productData  },
+            select:{ id: true }
         });
-      return product.id;
+      return productId.id;
     }
 
 }

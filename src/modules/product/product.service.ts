@@ -10,7 +10,7 @@ export default class ProductService {
 
     public addProduct = async(productData:SingleProduct):Promise<string | undefined>=>{
         // first check if the product does not exist already.
-        const product = this.productRepository.getProduct(productData.productId);
+        const product = await this.productRepository.getProduct(productData.productId);
         if(!product){
             const productId = await this.productRepository.addProduct(productData);
             return productId;
