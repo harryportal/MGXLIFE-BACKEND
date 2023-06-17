@@ -117,7 +117,7 @@ export default class AuthService {
 
     public sendVerificationMail = async(firstname:string, email:string)=>{
         const verificationToken = createVerificationToken(email);
-        const verifyEmailUrl = `${process.env.FRONTENDURL}/verifyemail/?token=${verificationToken}`;
+        const verifyEmailUrl = `${process.env.FRONTENDURL}/verify_email.php/?token=${verificationToken}`;
         const mailtemplate = completeprofileTemplate(firstname, verifyEmailUrl);
         await this.mailService.sendMail({to:email, subject: "Verify Your Email Address", html:mailtemplate})
     }
@@ -133,7 +133,7 @@ export default class AuthService {
         if(!user.verified) {throw new BadRequestError("Please verify your email first!")}
         const userToken = createAcessToken(user);
 
-        const addPasswordUrl = `${process.env.FRONTENDURL}/reset-password?token=${userToken}`;
+        const addPasswordUrl = `${process.env.FRONTENDURL}/reset_page.php?token=${userToken}`;
         const mailtemplate = createresetTemplate(user.firstName, addPasswordUrl);
         await this.mailService.sendMail({to:email, subject: "Reset Your Password", html:mailtemplate})
 }}
