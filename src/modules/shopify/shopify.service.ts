@@ -12,18 +12,22 @@ export default class ShopifyService {
         for(const product of productData){
             const productObject = this.retrieveProductData(product);
             const productId = await this.productService.addProduct(productObject);
-            if(productId){
-                logger.info("A new Shopify Product Added with Id", productId)
-            }else{
-                logger.error("Duplicate webhook sent! for Product Id", productObject.productId)
-            }
+            this.logProductInfo(productId)
         }
     }
 
     public addSingleProduct = async(product:Product)=>{
         const productObject = this.retrieveProductData(product);
         const productId = await this.productService.addProduct(productObject);
-        logger.info("A new Shopify Product Added with Id", productId);
+        this.logProductInfo(productId)
+    }
+
+    private logProductInfo = (productId:string|undefined)=>{
+        if(productId){
+            logger.info("A new Shopify Product Added with Id", productId)
+        }else{
+            logger.error("Duplicate webhook sent! for Product Id")
+        }
     }
 
     private retrieveProductData = (product:Product):SingleProduct=>{
