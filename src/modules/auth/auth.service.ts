@@ -66,7 +66,7 @@ export default class AuthService {
         if (password !== confirmPassword){
             throw new BadRequestError("Passwords do not match!")
         }
-        let distributor = verifyJWT(token);
+        let distributor = verifyJWT(token);  // make token case insensitive
         const hashedPassword = await hashPassword(password);
         await this.authRepository.resetPassword(distributor.id, hashedPassword);
     }
@@ -98,6 +98,7 @@ export default class AuthService {
         distributorData.referringId = refferingId;
         distributorData.password = await hashPassword(password);
         distributorData.stripeCustomerId = stripeCustomerId;
+        distributorData.email = distributorData.email.toLowerCase();  // make case insensitive
         let distributor: Distributor;
         if(refferalId) {
             // first check if a distributor with that referal id exist
