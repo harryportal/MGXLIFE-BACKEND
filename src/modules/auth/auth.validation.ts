@@ -62,6 +62,6 @@ export class ResetPassword {
     password: string;
 
     @IsString()
-    confirmPasswor: string;
+    confirmPassword: string;
 
 }
