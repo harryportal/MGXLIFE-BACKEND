@@ -1,6 +1,5 @@
-import { NotFoundError } from "../../common/error";
 import { prisma } from "../../utils/db/prisma";
-import { SubscriptionStatus } from "@prisma/client";
+import { Distributor, SubscriptionStatus } from "@prisma/client";
 
 export default class DistributorRepository {
     private distributor;
@@ -15,6 +14,18 @@ export default class DistributorRepository {
             }
         });
         return distributor;
+    }
+
+    public getRefferedUsers = async(distributorId:string)=>{
+        const refferedUsers = await this.distributor.findMany({
+            where:{
+                id:distributorId
+            }, select:{
+                referredUsers:true
+            }
+        })
+        return refferedUsers;
+
     }
 
     public getDistributorwithEmail = async(email:string)=> {
@@ -37,6 +48,18 @@ export default class DistributorRepository {
             data:{ subscriptionStatus: status }
         })
         return distributor;
+    }
+
+    public updateProfile = async(distributorId:string, profileData:Partial<Distributor>)=>{
+        const {firstName, lastName, imageUrl} = profileData;
+        const updatedDistributor = await this.distributor.update({
+            where:{
+                id: distributorId
+            }, data:{
+                firstName, lastName, imageUrl
+            }
+        });
+        return updatedDistributor;
     }
 
 

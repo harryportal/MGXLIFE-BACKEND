@@ -1,5 +1,1 @@
-import { Distributor } from "@prisma/client";
-
-export interface RefferedUsers {
-    refferedUsers: Distributor[]
-}
+export type File = Express.Multer.File
