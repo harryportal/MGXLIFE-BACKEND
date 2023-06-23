@@ -47,7 +47,7 @@ export default class AuthService {
     }
 
     public signIn = async(email:string, password:string)=>{
-        const distributor = await this.authRepository.getDistributor(email);
+        const distributor = await this.authRepository.getDistributor(email.toLowerCase());
         if(!distributor) { throw new AuthError("Invalid Login Credentials")}
 
         const checkPassword = await comparePassword(password, distributor.password!)
@@ -129,7 +129,7 @@ export default class AuthService {
     }
 
     public forgotPassword = async(email:string)=>{
-        const user = await this.authRepository.getDistributor(email) as Distributor;
+        const user = await this.authRepository.getDistributor(email.toLowerCase()) as Distributor;
         if(!user) { throw new BadRequestError("No Email with associated Account!")}
         if(!user.verified) {throw new BadRequestError("Please verify your email first!")}
         const userToken = createAcessToken(user);

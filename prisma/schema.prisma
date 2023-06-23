@@ -30,21 +30,23 @@ model Distributor {
   commissionEarned   Float?  @default(0.0)
   referredBy         Distributor?  @relation(name:"ReferredBy", fields: [referredById], references: [id])
   referredById       String?
-  verified           Boolean @default(false)
+  verified           Boolean @default(false)        
   referredUsers      Distributor[] @relation(name:"ReferredBy")
   payments           Payment[]
-  orders             Order[]
   refreshtokens      RefreshToken[]
 }
 
 model Order {
   id           String @id @default(uuid())
-  shopifyId    String  @unique
-  orderNumber  String
+  shopifyId    Int  @unique
+  orderNumber  Int
   amountPaid   Float
+  quantity     Int
+  customerFirstName String
+  customerLastName  String
+  customerEmail String
   createdAt    DateTime   @default(now())
-  distributor  Distributor? @relation(fields: [distributorId], references: [id])
-  distributorId String?
+  
 }
 
 enum BonusType {
@@ -54,7 +56,7 @@ enum BonusType {
 
 model Product {
   id          String @id @default(uuid())
-  productId    String @unique
+  productId   Int @unique
   title       String
   price       Float
   image       String?

@@ -7,3 +7,4 @@ export class UpdateProfile {
     @IsString()
     lastname:string
 }
+

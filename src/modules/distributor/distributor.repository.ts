@@ -16,6 +16,15 @@ export default class DistributorRepository {
         return distributor;
     }
 
+    public updateDistributorCommission = async(distributorId:string, commission:number)=>{
+        await this.distributor.update({
+            where:{ id: distributorId },
+            data:{ commissionEarned:{
+                increment: commission
+            }}
+        })
+    }
+
     public getRefferedUsers = async(distributorId:string)=>{
         const refferedUsers = await this.distributor.findMany({
             where:{

@@ -16,4 +16,10 @@ export default class ShopifyWebhookController {
         return res.status(200);
     };
 
+    static orderPayment = async(req:Request, res:Response)=>{
+        const orderData = req.body;
+        await this.shopifyService.proccessOrder(orderData);
+        return res.status(200);
+    }
+
 }

@@ -8,17 +8,22 @@ export default class ProductRepository{
         this.product = prisma.product;
     }
 
-    public getProduct = async(shopifyId:string):Promise<Product | null>=>{
+    public getProduct = async(shopifyId:number):Promise<Product | null>=>{
         const product = await this.product.findUnique({
           where: {
             productId: shopifyId
           } });
         return product;
     }
+    
+    public getAllProduct = async():Promise<Product[]>=>{
+      const products = await this.product.findMany();
+      return products;
+    }
 
     public addProduct = async(productData:SingleProduct):Promise<string>=>{
       const productId = await prisma.product.create({
-            data: { ...productData  },
+            data: { ...productData },
             select:{ id: true }
         });
       return productId.id;

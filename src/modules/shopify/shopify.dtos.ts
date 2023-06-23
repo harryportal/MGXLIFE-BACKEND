@@ -237,7 +237,7 @@ interface Variant {
     // Define fulfillment properties here
   }
   
-  interface LineItem {
+  export interface LineItem {
     id: number;
     admin_graphql_api_id: string;
     fulfillable_quantity: number;
