@@ -30,7 +30,8 @@ model Distributor {
   commissionEarned   Float?  @default(0.0)
   referredBy         Distributor?  @relation(name:"ReferredBy", fields: [referredById], references: [id])
   referredById       String?
-  verified           Boolean @default(false)        
+  verified           Boolean @default(false)     
+  orders             Order[]   // This displays the order that were made through their refferal code
   referredUsers      Distributor[] @relation(name:"ReferredBy")
   payments           Payment[]
   refreshtokens      RefreshToken[]
@@ -45,6 +46,8 @@ model Order {
   customerFirstName String
   customerLastName  String
   customerEmail String
+  distributorId String? 
+  distributor   Distributor? @relation(fields: [distributorId], references: [referringId])
   createdAt    DateTime   @default(now())
   
 }

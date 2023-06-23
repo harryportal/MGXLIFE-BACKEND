@@ -29,8 +29,11 @@ export default class DistributorRepository {
         const refferedUsers = await this.distributor.findMany({
             where:{
                 id:distributorId
-            }, select:{
-                referredUsers:true
+            }, select:{ 
+                referredUsers:{ select: {
+                    id:true, firstName:true, lastName:true, email:true, password:true, subscriptionStatus:true,
+                    stripeCustomerId:true, imageUrl:true, commissionEarned:true, verified:true
+                }}
             }
         })
         return refferedUsers;

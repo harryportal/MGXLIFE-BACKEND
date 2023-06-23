@@ -62,7 +62,7 @@ export default class ShopifyService {
     public proccessOrder = async(orderData:Order)=>{
         /* This would first verify the webhook is from shopify 
         extract the relevant information from the webhook, then send the product data to the produt repository*/
-        const refferingId = orderData.landing_site_ref;
+        const refferingId = orderData.landing_site_ref ?? null;
         if(refferingId){
             await this.findAndUpdateDistributorCommission(refferingId, orderData)
         };
@@ -71,12 +71,14 @@ export default class ShopifyService {
         const {amount, quantity} = this.calculateOrderAmountandQuantity(line_items);
         // Simply update the Order DB for the admin client
         const order:AddOrder = { shopifyId:id, orderNumber:order_number, customerEmail:email,
-            amountPaid:amount, quantity, customerFirstName:first_name, customerLastName:last_name}
+            amountPaid:amount, quantity, customerFirstName:first_name, customerLastName:last_name,
+            distributorId:refferingId}
         const createOrder = await this.orderRepository.addOrder(order);
-        logger.info(`An Order with ID ${createOrder.id} has been added`)
+        logger.info(`An Order with ID ${createOrder.id} has been added`);
 
+        
     }
-
+    
     public addSingleProduct = async(product:Product)=>{
         const productObject = this.retrieveProductData(product);
         const productId = await this.productService.addProduct(productObject);

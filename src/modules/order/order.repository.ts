@@ -1,5 +1,4 @@
 import { prisma } from "../../utils/db/prisma";
-import logger from "../../utils/logging/winston";
 import { AddOrder } from "./order.dtos";
 
 export class OrderRepository{
