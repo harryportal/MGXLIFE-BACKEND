@@ -71,7 +71,7 @@ export default class DistributorRepository {
         return updatedDistributor;
     };
 
-    public getDistributorwithReferralId = async(refferalId:string){
+    public getDistributorwithReferralId = async(refferalId:string)=>{
         const distributor = await this.distributor.findUnique({
             where: {referringId: refferalId}
         });
