@@ -31,8 +31,8 @@ export default class DistributorRepository {
                 id:distributorId
             }, select:{ 
                 referredUsers:{ select: {
-                    id:true, firstName:true, lastName:true, email:true, password:true, subscriptionStatus:true,
-                    stripeCustomerId:true, imageUrl:true, commissionEarned:true, verified:true
+                    firstName:true, lastName:true, email:true, subscriptionStatus:true,
+                    imageUrl:true, commissionEarned:true, verified:true
                 }}
             }
         })
@@ -45,6 +45,15 @@ export default class DistributorRepository {
             where: {email}
         });
         return distributor;
+    }
+
+    public getOrders = async(distributorId:string)=>{
+        /* returns the orders that were gotten with the current distributor refferal Id
+           This should be in the orders module but omo i want to avoid stress 
+        */
+        const orders = await this.distributor.findUnique({
+            where:{ id: distributorId }, select:{ orders:true } });
+        return orders;
     }
 
     public getDistributorwithStripeId = async(stripeId:string)=> {
@@ -71,7 +80,8 @@ export default class DistributorRepository {
                 firstName, lastName, imageUrl
             }
         });
-        return updatedDistributor;
+        const {password,  ...distributor} = updatedDistributor;
+        return distributor;
     };
 
     public getDistributorwithReferralId = async(refferalId:string)=>{

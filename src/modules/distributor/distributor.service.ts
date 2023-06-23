@@ -24,6 +24,11 @@ export default class DistributorService {
         return refferedUsers;
     }
 
+    public getOrders = async(distributorId:string)=>{
+        const orders = await this.distributorRepository.getOrders(distributorId);
+        return orders;
+    }
+
     public getDistributorOrThrow = async(distributorId:string)=>{
         const distributor = await this.distributorRepository.getProfile(distributorId);
         if(!distributor) { throw new NotFoundError("No Distributor with Provided ID")};
@@ -34,10 +39,12 @@ export default class DistributorService {
         return imageUrl;
     }
 
-    public updateProfile = async(distributorId:string, profileData:Partial<Distributor>, imageFile:File)=>{
+    public updateProfile = async(distributorId:string, profileData:Partial<Distributor>, imageFile:File | null)=>{
         await this.getDistributorOrThrow(distributorId);
-        const response = await this.uploadImage(imageFile);
-        profileData.imageUrl = response.imageUrl;
+        if(imageFile){
+            const response = await this.uploadImage(imageFile);
+            profileData.imageUrl = response.imageUrl;
+        };
         const updatedProfile = this.distributorRepository.updateProfile(distributorId, profileData);
         return updatedProfile;
     }

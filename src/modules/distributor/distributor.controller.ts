@@ -26,5 +26,12 @@ export default class DistributorController {
         const updatedProfile = await this.distributorService.updateProfile(distributorId, profileData, imageFile);
         return res.status(200).json({success:true, data:updatedProfile})
     }
+
+    static getOrders = async(req:AuthRequest, res:Response)=>{
+        // This returns the orders that were made through the current distributor referral Id
+        const distributorId = req.user!.id;
+        const orders = await this.distributorService.getOrders(distributorId);
+        return res.status(200).json({success:true, data:orders});
+    }
     
 }

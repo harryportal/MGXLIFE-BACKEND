@@ -9,5 +9,6 @@ const distributorRouter = Router();
 distributorRouter.get("/profile", protect, DistributorController.getProfile)
 distributorRouter.put("/profile/update", protect, RequestValidator.validate(UpdateProfile), DistributorController.updateProfile)
 distributorRouter.get("/refferal", protect, DistributorController.getReferrals)
+distributorRouter.get("/orders", protect, DistributorController.getOrders);
 
 export default distributorRouter;
