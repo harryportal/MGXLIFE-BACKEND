@@ -21,7 +21,7 @@ if(!secret) { throw new InternalServerError("JWT SECRET HAS NO VALUE!")}
 
 export const createAcessToken = (user: Distributor) => {
 
-  const token = jwt.sign({ id: user.id, email: user.email, firstName:user.firstName, lastName:user.lastName, 
+  const token = jwt.sign({ id: user.id, email: user.email, refferalId:user.referringId, firstName:user.firstName, lastName:user.lastName, 
   type:"access"}, secret, { expiresIn: process.env.JWT_EXPIRATION_TIME });
 
   return token;
