@@ -19,6 +19,16 @@ export default class DistributorController {
         return res.status(200).json({success:true, data:referredUsers});
     }
 
+    static getReferralLinks = async(req:AuthRequest, res:Response)=>{
+        /* So there are two referral links:
+        1. One for potential distributors 
+        2. people that just want to buy and go */
+        const {refferalId} = req.user!;
+        const {buyerReferralLink, distributorReferralLink} = await this.distributorService.getReferralLinks(refferalId);
+        return res.status(200).json({success:true, data:{ buyerReferralLink, distributorReferralLink } })
+
+    }
+
     static updateProfile = async(req:AuthRequest, res:Response)=>{
         const distributorId = req.user!.id;
         const imageFile = req.file as File;

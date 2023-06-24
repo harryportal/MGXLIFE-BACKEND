@@ -48,4 +48,10 @@ export default class DistributorService {
         const updatedProfile = this.distributorRepository.updateProfile(distributorId, profileData);
         return updatedProfile;
     }
+
+    public  getReferralLinks = async(refferalId:string)=>{
+        const buyerReferralLink = `${process.env.SHOPIFY_URL}?${refferalId}`
+        const distributorReferralLink =`${process.env.SIGNUP_URL}?${refferalId}` 
+        return {buyerReferralLink, distributorReferralLink}
+    }
 }

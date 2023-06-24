@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import AuthService from "./auth.service";
-import { AuthRequest, distributorPayload } from "./auth.interface";
+import { AuthRequest, jwtPayload } from "./auth.interface";
 
 export class AuthController {
     private static authService = new AuthService();
@@ -24,7 +24,7 @@ export class AuthController {
     }
 
     static getVerificationMail = async(req:AuthRequest, res:Response)=>{
-        const {firstname, email} = req.user as distributorPayload;
+        const {firstname, email} = req.user as jwtPayload;
         await this.authService.sendVerificationMail(firstname, email);
         return res.status(200).json({success:true, message:"Check your inbox for a verification Mail"});
     }

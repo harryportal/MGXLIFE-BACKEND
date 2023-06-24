@@ -3,12 +3,13 @@ import { Distributor } from "@prisma/client";
 
 
 export interface AuthRequest extends Request {
-    user?: distributorPayload
+    user?: jwtPayload
 }
 
-export interface distributorPayload{
+export interface jwtPayload{
     id: string;
     email: string;
+    refferalId:string
     activeStatus: boolean;
     firstname: string;
     lastname: string;
