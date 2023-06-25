@@ -1,9 +1,9 @@
 import * as bcrypt from "bcrypt";
-import jwt, { Secret } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { InternalServerError } from "../../common/error";
 import { AuthError } from "../../common/error";
-import { distributorPayload } from "../../modules/auth/auth.interface";
 import { Distributor } from "@prisma/client";
+import { jwtPayload } from "../../modules/auth/auth.interface";
 
 export const hashPassword = (password: string) => {
   return bcrypt.hash(password, 5);
@@ -41,11 +41,11 @@ export const createVerificationToken = (email:string)=>{
   return token;
 }
 
-export const verifyJWT = (token: string): distributorPayload=>{
+export const verifyJWT = (token: string): jwtPayload=>{
   
   try {
     const payload = jwt.verify(token, secret);
-    return payload as distributorPayload
+    return payload as jwtPayload;
 
   } catch (e) {
     throw new AuthError('Invalid Token Provided');

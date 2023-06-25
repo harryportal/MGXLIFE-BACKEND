@@ -32,7 +32,7 @@ export default class AuthService {
     even though it will not be available to the user until subscription has been payed with stripe*/   
     private generateReferralLink = ():string=>{
         const randomString = shortid.generate();
-        return `mg#${randomString}`;
+        return `mg${randomString}`;
     }
 
     public verifyEmail = async(verificationToken:string)=>{

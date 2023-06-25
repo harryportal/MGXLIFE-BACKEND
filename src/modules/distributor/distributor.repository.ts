@@ -1,5 +1,6 @@
 import { prisma } from "../../utils/db/prisma";
 import { Distributor, SubscriptionStatus } from "@prisma/client";
+import logger from "../../utils/logging/winston";
 
 export default class DistributorRepository {
     private distributor;
@@ -7,7 +8,7 @@ export default class DistributorRepository {
         this.distributor = prisma.distributor;
     }
 
-    public getProfile =async(distributorId:string) => {
+    public getProfile = async(distributorId:string) => {
         const distributor = await this.distributor.findUnique({
             where: {
                 id: distributorId
@@ -17,12 +18,14 @@ export default class DistributorRepository {
     }
 
     public updateDistributorCommission = async(distributorId:string, commission:number)=>{
-        await this.distributor.update({
+        const updatedDistributor = await this.distributor.update({
             where:{ id: distributorId },
             data:{ commissionEarned:{
                 increment: commission
             }}
-        })
+        });
+        console.log(updatedDistributor);
+        logger.info(`Distributor with id ${updatedDistributor} has been updated with commission ${commission}`)
     }
 
     public getRefferedUsers = async(distributorId:string)=>{

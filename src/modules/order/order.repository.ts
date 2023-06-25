@@ -12,4 +12,16 @@ export class OrderRepository{
         });
         return order;  
     }
+
+    public getOrder = async(orderId:number)=>{
+        const order = await this.order.findUnique({
+            where:{ shopifyId: orderId}
+        })
+        return order;
+    }
+
+    public getAllOrders = async()=>{
+        const orders = await this.order.findMany();
+        return orders;
+    }
 }

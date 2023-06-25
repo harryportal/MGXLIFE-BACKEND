@@ -26,6 +26,7 @@ export default class ShopifyService {
 
     private findAndUpdateDistributorCommission = async(refferingId:string, orderData:Order)=>{
         const distributor = await this.distributorRepository.getDistributorwithReferralId(refferingId);
+        console.log(distributor);
         if(distributor){
             // update the distributor's commission for each of the products line items
             for(const productData of orderData.line_items){
@@ -59,10 +60,21 @@ export default class ShopifyService {
 
     }
 
+    private checkOrder = async(shopifyId:number)=>{
+        // This check with a shopify Id if an order already exists
+        const order = await this.orderRepository.getOrder(shopifyId);
+        return order
+    }
+
     public proccessOrder = async(orderData:Order)=>{
         /* This would first verify the webhook is from shopify 
         extract the relevant information from the webhook, then send the product data to the produt repository*/
-        const refferingId = orderData.landing_site_ref ?? null;
+        // We should even try to verify that the webhook has not been sent before due to issues with shopify
+        //console.log(orderData);
+        const checkOrder = await this.checkOrder(orderData.id)
+        if(!checkOrder){
+        const refferingId = orderData.landing_site.substring(2) ?? null;
+        console.log(refferingId);
         if(refferingId){
             await this.findAndUpdateDistributorCommission(refferingId, orderData)
         };
@@ -75,8 +87,7 @@ export default class ShopifyService {
             distributorId:refferingId}
         const createOrder = await this.orderRepository.addOrder(order);
         logger.info(`An Order with ID ${createOrder.id} has been added`);
-
-        
+        }
     }
     
     public addSingleProduct = async(product:Product)=>{

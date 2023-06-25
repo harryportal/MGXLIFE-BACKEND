@@ -39,7 +39,7 @@ model Distributor {
 
 model Order {
   id           String @id @default(uuid())
-  shopifyId    Int  @unique
+  shopifyId    String  @unique
   orderNumber  Int
   amountPaid   Float
   quantity     Int
