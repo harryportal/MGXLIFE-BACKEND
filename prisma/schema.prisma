@@ -28,7 +28,7 @@ model Distributor {
   referringId        String        @unique
   imageUrl           String?       
   commissionEarned   Float?  @default(0.0)
-  refferalCount      Int    
+  refferalCount      Int    @default(0)
   referredBy         Distributor?  @relation(name:"ReferredBy", fields: [referredById], references: [id])
   referredById       String?
   verified           Boolean @default(false)     

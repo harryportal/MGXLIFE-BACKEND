@@ -2,7 +2,7 @@ import * as bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
 import { InternalServerError } from "../../common/error";
 import { AuthError } from "../../common/error";
-import { Distributor } from "@prisma/client";
+import { Admin, Distributor } from "@prisma/client";
 import { jwtPayload } from "../../modules/auth/auth.interface";
 
 export const hashPassword = (password: string) => {
@@ -40,6 +40,13 @@ export const createVerificationToken = (email:string)=>{
   const token = jwt.sign({ email, type: "verify"}, secret );
   return token;
 }
+
+export const createAdminToken = (admin:Admin)=>{
+  const token = jwt.sign({ id: admin.id, email: admin.email, firstname:admin.firstName,
+    lastname:admin.lastName, type:"admin"}, secret, { expiresIn: process.env.ADMIN_JWT_EXPIRATION_TIME });
+
+  return token;
+};
 
 export const verifyJWT = (token: string): jwtPayload=>{
   

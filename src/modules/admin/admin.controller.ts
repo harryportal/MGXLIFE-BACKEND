@@ -22,4 +22,8 @@ export default class AdminController {
         const orders = await this.adminService.getAllOrders(pageNumber);
         return res.status(200).json({success:true, data:orders});
     }
+
+    public static updateProduct = async(req:AuthRequest, res:Response)=>{
+        
+    }
 }

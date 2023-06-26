@@ -13,7 +13,7 @@ export default class ProductRepository{
         const product = await this.product.findUnique({
           where: {
             productId: shopifyId
-          } });
+          }});
         return product;
     }
     

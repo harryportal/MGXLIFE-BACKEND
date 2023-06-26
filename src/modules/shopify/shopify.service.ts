@@ -14,16 +14,6 @@ export default class ShopifyService {
     private productRepository = new ProductRepository();
     private orderRepository =  new OrderRepository();
 
-    public addMultipleProduct = async(productData:Product[])=>{
-        /* This would first verify the webhook is from shopify 
-        extract the relevant information from the webhook, then send the product data to the produt repository*/
-        for(const product of productData){
-            const productObject = this.retrieveProductData(product);
-            const productId = await this.productService.addProduct(productObject);
-            this.logProductInfo(productId);
-        }
-    };
-
     private findAndUpdateDistributorCommission = async(refferingId:string, orderData:Order)=>{
         const distributor = await this.distributorRepository.getDistributorwithReferralId(refferingId);
         console.log(distributor);

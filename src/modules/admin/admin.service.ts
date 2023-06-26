@@ -14,13 +14,13 @@ export default class AdminService {
         return products;
     }
 
-    public getAllDistributors = async()=>{
+    public getAllDistributors = async(pageNumber:string)=>{
         const paginationObject = current_page(pageNumber);
         const distributors = await this.distributorRepository.getAllDistributors(paginationObject);
         return distributors;
     }
 
-    public getAllOrders = async()=>{
+    public getAllOrders = async(pageNumber:string)=>{
         const paginationObject = current_page(pageNumber);
         const orders = await this.orderRepository.getAllOrders(paginationObject);
         return orders;
