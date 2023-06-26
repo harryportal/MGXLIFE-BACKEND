@@ -16,8 +16,7 @@ export default class ShopifyService {
 
     private findAndUpdateDistributorCommission = async(refferingId:string, orderData:Order)=>{
         const distributor = await this.distributorRepository.getDistributorwithReferralId(refferingId);
-        console.log(distributor);
-        if(distributor){
+        if(distributor && distributor.subscriptionStatus){
             // update the distributor's commission for each of the products line items
             for(const productData of orderData.line_items){
                 const commission = await this.calculateCommission(productData);

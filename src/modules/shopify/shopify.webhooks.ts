@@ -7,12 +7,12 @@ export default class ShopifyWebhookController {
     static addSingleProduct= async(req:Request, res:Response)=>{
         const productData = req.body 
         await this.shopifyService.addSingleProduct(productData);
-        return res.status(200);
+        return res.status(200).json({success:true});
     };
 
     static orderPayment = async(req:Request, res:Response)=>{
         const orderData = req.body;
         await this.shopifyService.proccessOrder(orderData);
-        return res.status(200);
+        return res.status(200).json({success:true});
     }
 }

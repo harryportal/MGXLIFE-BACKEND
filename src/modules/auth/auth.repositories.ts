@@ -23,13 +23,28 @@ export default class AuthRepository{
     }
 
     public createDistributorwithReferral = async(distributor:DistributorwithoutReferral,refferedById:string)=>{
-        const userData  = await this.distributor.create({
+        /* 
+        This runs two queries using prisma transaction 
+        1. Create the Distributor Account
+        2. Update the Referall Count of the parent distributora
+        */
+        const  [newDistributor] = await prisma.$transaction([
+            this.distributor.create({
             data:{
                 ...distributor,
                 referredBy: {connect: {referringId: refferedById}}
-            }
-        })
-        return userData;
+            } }),
+
+            this.distributor.update({
+                where: {referringId:refferedById},
+                data:{ 
+                    refferalCount: {
+                        increment: 1
+                    }
+                }
+            })
+        ])
+        return newDistributor;
     }
 
     public getDistributorwithReferalId = async(referringId:string)=>{
