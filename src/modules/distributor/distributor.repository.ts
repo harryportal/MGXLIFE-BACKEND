@@ -1,6 +1,7 @@
 import { prisma } from "../../utils/db/prisma";
 import { Distributor, SubscriptionStatus } from "@prisma/client";
 import logger from "../../utils/logging/winston";
+import IPagination from "../../utils/pagination/pagination.interface";
 
 export default class DistributorRepository {
     private distributor;
@@ -42,8 +43,9 @@ export default class DistributorRepository {
         return refferedUsers;
     }
 
-    public getAllDistributors = async()=>{
-        const distributors = await this.distributor.findMany();
+    public getAllDistributors = async(paginationObject:IPagination)=>{
+        const {take, skip} = paginationObject;
+        const distributors = await this.distributor.findMany({take, skip});
         return distributors;
     }
 

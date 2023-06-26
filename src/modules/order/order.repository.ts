@@ -1,4 +1,5 @@
 import { prisma } from "../../utils/db/prisma";
+import IPagination from "../../utils/pagination/pagination.interface";
 import { AddOrder } from "./order.dtos";
 
 export class OrderRepository{
@@ -20,8 +21,9 @@ export class OrderRepository{
         return order;
     }
 
-    public getAllOrders = async()=>{
-        const orders = await this.order.findMany();
+    public getAllOrders = async(paginationObject:IPagination)=>{
+        const {take, skip} = paginationObject;
+        const orders = await this.order.findMany({take, skip});
         return orders;
     }
 }

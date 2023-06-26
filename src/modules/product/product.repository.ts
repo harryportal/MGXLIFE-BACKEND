@@ -1,6 +1,7 @@
 import { Product } from "@prisma/client";
 import { prisma } from "../../utils/db/prisma";
 import { SingleProduct } from "./product.dtos";
+import IPagination from "../../utils/pagination/pagination.interface";
 
 export default class ProductRepository{
     private product;
@@ -16,8 +17,9 @@ export default class ProductRepository{
         return product;
     }
     
-    public getAllProduct = async():Promise<Product[]>=>{
-      const products = await this.product.findMany();
+    public getAllProduct = async(paginationObject:IPagination):Promise<Product[]>=>{
+      const {take , skip} = paginationObject;
+      const products = await this.product.findMany({ take, skip  });
       return products;
     }
 

@@ -8,18 +8,21 @@ export default class AdminService {
     private productRepository = new ProductRepository();
     private distributorRepository = new DistributorRepository()
 
-    public getAllProducts = async()=>{
-        const products = await this.productRepository.getAllProduct();
+    public getAllProducts = async(pageNumber:string)=>{
+        const paginationObject = current_page(pageNumber); 
+        const products = await this.productRepository.getAllProduct(paginationObject);
         return products;
     }
 
     public getAllDistributors = async()=>{
-        const distributors = await this.distributorRepository.getAllDistributors();
+        const paginationObject = current_page(pageNumber);
+        const distributors = await this.distributorRepository.getAllDistributors(paginationObject);
         return distributors;
     }
 
     public getAllOrders = async()=>{
-        const orders = await this.orderRepository.getAllOrders();
+        const paginationObject = current_page(pageNumber);
+        const orders = await this.orderRepository.getAllOrders(paginationObject);
         return orders;
     }
 
