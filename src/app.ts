@@ -8,6 +8,7 @@ import paymentRouter from "./modules/payment/payment.router";
 import distributorRouter from "./modules/distributor/distributor.router";
 import PaymentController from "./modules/payment/payment.controller";
 import shopifywebhookRouter from "./modules/shopify/shopify.router";
+import adminRouter from "./modules/admin/admin.router";
 
 const app: Application = express();
 
@@ -25,6 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/shopify", shopifywebhookRouter);
 app.use("/payment", paymentRouter);
+app.use("/admin", adminRouter);
 app.use("/distributor", distributorRouter);
 app.use("/auth", authRouter);
 

@@ -40,7 +40,11 @@ export default class DistributorRepository {
             }
         })
         return refferedUsers;
+    }
 
+    public getAllDistributors = async()=>{
+        const distributors = await this.distributor.findMany();
+        return distributors;
     }
 
     public getDistributorwithEmail = async(email:string)=> {

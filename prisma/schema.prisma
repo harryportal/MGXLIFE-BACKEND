@@ -28,6 +28,7 @@ model Distributor {
   referringId        String        @unique
   imageUrl           String?       
   commissionEarned   Float?  @default(0.0)
+  refferalCount      Int    
   referredBy         Distributor?  @relation(name:"ReferredBy", fields: [referredById], references: [id])
   referredById       String?
   verified           Boolean @default(false)     
@@ -59,7 +60,7 @@ enum BonusType {
 
 model Product {
   id          String @id @default(uuid())
-  productId   Int @unique
+  productId   String @unique
   title       String
   price       Float
   image       String?
@@ -85,4 +86,13 @@ model RefreshToken {
   createdAt DateTime @default(now())
   expiresAt DateTime 
   distributor      Distributor    @relation(fields: [distributorId], references: [id])
+}
+
+model Admin {
+  id String @id @default(uuid())
+  email String @unique
+  firstName String 
+  lastName  String
+  imageUrl  String?
+  password String
 }

@@ -8,7 +8,7 @@ export default class ProductRepository{
         this.product = prisma.product;
     }
 
-    public getProduct = async(shopifyId:number):Promise<Product | null>=>{
+    public getProduct = async(shopifyId:string):Promise<Product | null>=>{
         const product = await this.product.findUnique({
           where: {
             productId: shopifyId

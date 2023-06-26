@@ -12,7 +12,7 @@ export default class ShopifyService {
     private productService= new ProductService();
     private distributorRepository = new DistributorRepository();
     private productRepository = new ProductRepository();
-    private orderRepository =  new OrderRepository()
+    private orderRepository =  new OrderRepository();
 
     public addMultipleProduct = async(productData:Product[])=>{
         /* This would first verify the webhook is from shopify 
@@ -22,7 +22,7 @@ export default class ShopifyService {
             const productId = await this.productService.addProduct(productObject);
             this.logProductInfo(productId);
         }
-    }
+    };
 
     private findAndUpdateDistributorCommission = async(refferingId:string, orderData:Order)=>{
         const distributor = await this.distributorRepository.getDistributorwithReferralId(refferingId);
@@ -44,7 +44,7 @@ export default class ShopifyService {
     private calculateCommission = async(orderCommissionDetails:ProductCommission)=>{
         // The real and exact logic for this would be implemented later on
         const {product_id, quantity} = orderCommissionDetails;
-        let product = await this.productRepository.getProduct(product_id);
+        let product = await this.productRepository.getProduct(String(product_id));
         const commission = product!.bonusAmount * quantity;
         return commission;
     }
@@ -60,7 +60,7 @@ export default class ShopifyService {
 
     }
 
-    private checkOrder = async(shopifyId:number)=>{
+    private checkOrder = async(shopifyId:string)=>{
         // This check with a shopify Id if an order already exists
         const order = await this.orderRepository.getOrder(shopifyId);
         return order
@@ -70,21 +70,22 @@ export default class ShopifyService {
         /* This would first verify the webhook is from shopify 
         extract the relevant information from the webhook, then send the product data to the produt repository*/
         // We should even try to verify that the webhook has not been sent before due to issues with shopify
-        //console.log(orderData);
-        const checkOrder = await this.checkOrder(orderData.id)
+        const orderId = String(orderData.id);
+        const checkOrder = await this.checkOrder(orderId);
+
         if(!checkOrder){
-        const refferingId = orderData.landing_site.substring(2) ?? null;
-        console.log(refferingId);
+            const refferingId = orderData.landing_site.substring(2) ?? null;
         if(refferingId){
-            await this.findAndUpdateDistributorCommission(refferingId, orderData)
+            await this.findAndUpdateDistributorCommission(refferingId, orderData);
         };
-        const {id, order_number, line_items} = orderData;
+
+        const {order_number, line_items} = orderData;
         const {first_name, last_name, email } = orderData.customer;
         const {amount, quantity} = this.calculateOrderAmountandQuantity(line_items);
-        // Simply update the Order DB for the admin client
-        const order:AddOrder = { shopifyId:id, orderNumber:order_number, customerEmail:email,
+        // Simply update the Order DB for the admin client!
+        const order:AddOrder = { shopifyId:orderId, orderNumber:order_number, customerEmail:email,
             amountPaid:amount, quantity, customerFirstName:first_name, customerLastName:last_name,
-            distributorId:refferingId}
+            distributorId:refferingId };
         const createOrder = await this.orderRepository.addOrder(order);
         logger.info(`An Order with ID ${createOrder.id} has been added`);
         }
@@ -107,7 +108,7 @@ export default class ShopifyService {
     private retrieveProductData = (product:Product):SingleProduct=>{
         const price = parseFloat(product.variants[0]. price);
         const image = product.image.src;
-        const productId = product.id;
+        const productId = String(product.id);
         const title = product.title;
         const productObject:SingleProduct = {productId, title, image, price};
         return productObject;

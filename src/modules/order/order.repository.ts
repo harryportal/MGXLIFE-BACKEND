@@ -13,7 +13,7 @@ export class OrderRepository{
         return order;  
     }
 
-    public getOrder = async(orderId:number)=>{
+    public getOrder = async(orderId:string)=>{
         const order = await this.order.findUnique({
             where:{ shopifyId: orderId}
         })

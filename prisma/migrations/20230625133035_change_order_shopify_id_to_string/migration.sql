@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Order" ALTER COLUMN "shopifyId" SET DATA TYPE TEXT;
