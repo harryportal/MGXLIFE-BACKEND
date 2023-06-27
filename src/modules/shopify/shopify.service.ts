@@ -66,7 +66,6 @@ export default class ShopifyService {
         if(!checkOrder){
             const refferingId = orderData.landing_site_ref ?? null;
             if(refferingId){
-                console.log(refferingId)
                 await this.findAndUpdateDistributorCommission(refferingId, orderData);
             };
 
