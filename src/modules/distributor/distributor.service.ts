@@ -15,7 +15,7 @@ export default class DistributorService {
     public getDistributor = async(distributorId:string)=>{
         const distributor = await this.distributorRepository.getProfile(distributorId);
         let {password, ...disitributorData} = distributor as Distributor;
-        disitributorData.commissionEarned?.toPrecision(4);
+        disitributorData.commissionEarned =  Number(disitributorData.commissionEarned!.toPrecision(4));
         if(!distributor) { throw new NotFoundError("No Distributor with Id Found!")};
         return disitributorData;
     }
