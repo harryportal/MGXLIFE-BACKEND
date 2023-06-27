@@ -34,7 +34,7 @@ export default class ShopifyService {
         // The real and exact logic for this would be implemented later on
         const {product_id, quantity} = orderCommissionDetails;
         let product = await this.productRepository.getProduct(String(product_id));
-        const commission = product!.bonusAmount * quantity;
+        const commission = product!.price * (20/100) * quantity;
         return commission;
     }
 
