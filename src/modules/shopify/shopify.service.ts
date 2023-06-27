@@ -59,24 +59,26 @@ export default class ShopifyService {
         /* This would first verify the webhook is from shopify 
         extract the relevant information from the webhook, then send the product data to the produt repository*/
         // We should even try to verify that the webhook has not been sent before due to issues with shopify
+        console.log(orderData);
         const orderId = String(orderData.id);
         const checkOrder = await this.checkOrder(orderId);
 
         if(!checkOrder){
-            const refferingId = orderData.landing_site.substring(2) ?? null;
-        if(refferingId){
-            await this.findAndUpdateDistributorCommission(refferingId, orderData);
-        };
+            const refferingId = orderData.landing_site_ref ?? null;
+            if(refferingId){
+                console.log(refferingId)
+                await this.findAndUpdateDistributorCommission(refferingId, orderData);
+            };
 
-        const {order_number, line_items} = orderData;
-        const {first_name, last_name, email } = orderData.customer;
-        const {amount, quantity} = this.calculateOrderAmountandQuantity(line_items);
-        // Simply update the Order DB for the admin client!
-        const order:AddOrder = { shopifyId:orderId, orderNumber:order_number, customerEmail:email,
-            amountPaid:amount, quantity, customerFirstName:first_name, customerLastName:last_name,
-            distributorId:refferingId };
-        const createOrder = await this.orderRepository.addOrder(order);
-        logger.info(`An Order with ID ${createOrder.id} has been added`);
+            const {order_number, line_items} = orderData;
+            const {first_name, last_name, email } = orderData.customer;
+            const {amount, quantity} = this.calculateOrderAmountandQuantity(line_items);
+            // Simply update the Order DB for the admin client!
+            const order:AddOrder = { shopifyId:orderId, orderNumber:order_number, customerEmail:email,
+                amountPaid:amount, quantity, customerFirstName:first_name, customerLastName:last_name,
+                distributorId:refferingId };
+            const createOrder = await this.orderRepository.addOrder(order);
+            logger.info(`An Order with ID ${createOrder.id} has been added`);
         }
     }
     

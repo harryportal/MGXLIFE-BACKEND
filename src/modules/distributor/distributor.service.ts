@@ -50,7 +50,7 @@ export default class DistributorService {
     }
 
     public  getReferralLinks = async(refferalId:string)=>{
-        const buyerReferralLink = `${process.env.SHOPIFY_URL}?${refferalId}`
+        const buyerReferralLink = `${process.env.SHOPIFY_URL}?ref=${refferalId}`
         const distributorReferralLink =`${process.env.SIGNUP_URL}?${refferalId}` 
         return {buyerReferralLink, distributorReferralLink}
     }
