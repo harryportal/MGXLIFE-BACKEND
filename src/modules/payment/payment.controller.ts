@@ -14,7 +14,7 @@ export default class PaymentController {
     static getCustomerPortal = async(req:AuthRequest, res:Response)=>{
         let {email} = req.user!;
         const portalSessionUrl = await this.paymentService.createPortalSession(email);
-        res.status(200).json({success:true, data: portalSessionUrl})
+        res.status(200).json({success:true, data: portalSessionUrl.url})
     }
 
     static subscriptionWebhook = async(req:AuthRequest, res:Response)=>{
