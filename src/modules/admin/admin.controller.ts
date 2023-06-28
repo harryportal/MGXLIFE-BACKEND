@@ -2,6 +2,7 @@ import AdminService from "./admin.service";
 import { Response } from "express";
 import { AuthRequest } from "../auth/auth.interface";
 
+
 export default class AdminController {
     private static adminService = new AdminService();
 
@@ -9,6 +10,13 @@ export default class AdminController {
         let {email, password} = req.body;
         const accessToken = await this.adminService.signIn(email,password);
         return res.status(200).json({success:true, data:{accessToken}});
+    }
+
+    public static updateProfile = async(req:AuthRequest, res:Response)=>{
+        const profileData = req.body;
+        const adminId = req.user!.id;
+        const updatedProfile = await this.adminService.updateAdmin(profileData, adminId);
+        return res.status(200).json({success:true, data:updatedProfile})
     }
 
     public static getAllProducts = async(req:AuthRequest, res:Response)=>{
