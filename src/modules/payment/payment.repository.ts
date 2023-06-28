@@ -18,21 +18,19 @@ export default class PaymentRepository{
     }
 
     public createPortalSession = async(email:string)=>{
-      const distributor = await this.getDistributorandThrow(email);
+      const distributor = await this.distributorRepository.getDistributorwithEmail(email);
       const portalSession = await this.stripe.billingPortal.sessions.create({
         customer:distributor!.stripeCustomerId
-
-      });
+    });
       return portalSession;
     }
-
+    
+    // will use this once the front end fix card not displaying for a subscribed user
     private getDistributorandThrow = async(email:string)=>{
-      const distributor = await this.distributorRepository.getDistributorwithEmail(email);
-      // need to check if the distributor is not already subscribed
-      if(distributor!.subscriptionStatus = "PAID"){
-        throw new BadRequestError("You are already Subscribed as a MxgLife Distributor!")
-      }
-      return distributor;
+        const distributor = await this.distributorRepository.getDistributorwithEmail(email);
+        if(distributor!.subscriptionStatus == "PAID"){
+            throw new BadRequestError("You are already subscribed!");
+        }
     }
 
     public createCheckOutSession = async(email:string):Promise<string>=>{
