@@ -1,6 +1,7 @@
 import AdminService from "./admin.service";
 import { Response } from "express";
 import { AuthRequest } from "../auth/auth.interface";
+import { File } from "./admin.dtos";
 
 
 export default class AdminController {
@@ -15,7 +16,8 @@ export default class AdminController {
     public static updateProfile = async(req:AuthRequest, res:Response)=>{
         const profileData = req.body;
         const adminId = req.user!.id;
-        const updatedProfile = await this.adminService.updateAdmin(profileData, adminId);
+        const imageFile = req.file as File;
+        const updatedProfile = await this.adminService.updateAdmin(profileData, adminId, imageFile);
         return res.status(200).json({success:true, data:updatedProfile})
     }
 
