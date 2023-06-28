@@ -49,7 +49,7 @@ model Order {
   customerEmail String
   distributorId String? 
   distributor   Distributor? @relation(fields: [distributorId], references: [referringId])
-  createdAt    DateTime   @default(now())
+  createdAt     String 
   
 }
 

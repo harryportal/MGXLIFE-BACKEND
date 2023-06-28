@@ -5,6 +5,12 @@ import { AuthRequest } from "../auth/auth.interface";
 export default class AdminController {
     private static adminService = new AdminService();
 
+    public static signIn = async(req:AuthRequest, res:Response)=>{
+        let {email, password} = req.body;
+        const accessToken = await this.adminService.signIn(email,password);
+        return res.status(200).json({success:true, data:{accessToken}});
+    }
+
     public static getAllProducts = async(req:AuthRequest, res:Response)=>{
         const pageNumber = req.params.page;
         const products = await this.adminService.getAllProducts(pageNumber);

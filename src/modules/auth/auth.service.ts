@@ -48,7 +48,7 @@ export default class AuthService {
 
     public signIn = async(email:string, password:string)=>{
         const distributor = await this.authRepository.getDistributor(email.toLowerCase());
-        if(!distributor) { throw new AuthError("Invalid Login Credentials")}
+        if(!distributor) { throw new AuthError("Invalid Login Credentials") }
 
         const checkPassword = await comparePassword(password, distributor.password!)
         if(!checkPassword) { throw new AuthError("Invalid Login Credentials") }
