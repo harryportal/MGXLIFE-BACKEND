@@ -8,6 +8,15 @@ export default class AdminService {
     private productRepository = new ProductRepository();
     private distributorRepository = new DistributorRepository()
 
+    public signIn = async(email:string, password:string)=>{
+
+    }
+
+    public getAdminorThrow = async(email:string)=>{
+
+
+    }
+
     public getAllProducts = async(pageNumber:string)=>{
         const paginationObject = current_page(pageNumber); 
         const products = await this.productRepository.getAllProduct(paginationObject);
