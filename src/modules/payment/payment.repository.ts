@@ -37,8 +37,9 @@ export default class PaymentRepository{
                   price:priceId,
                   quantity:1,
               }],
-              success_url: "https://smebud.onrender.com",
-              cancel_url: "https://smebud.onrender.com" })
+              success_url: process.env.HOMEPAGE_URL!,
+              cancel_url:  process.env.HOMEPAGE_URL!
+             })
           return session.url as string;
       }catch(error){
           throw new InternalServerError(`Failed to create a checkout session, ${error}`);
