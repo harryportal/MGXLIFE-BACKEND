@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import { BadRequestError, InternalServerError } from "../../common/error";
 import DistributorRepository from "../distributor/distributor.repository";
 import { SubscriptionStatus } from "@prisma/client";
+import logger from "../../utils/logging/winston";
 
 export default class PaymentRepository{
     private stripe:Stripe;
@@ -17,12 +18,21 @@ export default class PaymentRepository{
     }
 
     public createPortalSession = async(email:string)=>{
-      const distributor = await this.distributorRepository.getDistributorwithEmail(email);
+      const distributor = await this.getDistributorandThrow(email);
       const portalSession = await this.stripe.billingPortal.sessions.create({
         customer:distributor!.stripeCustomerId
-        //return_url: returnUrl,
+
       });
       return portalSession;
+    }
+
+    private getDistributorandThrow = async(email:string)=>{
+      const distributor = await this.distributorRepository.getDistributorwithEmail(email);
+      // need to check if the distributor is not already subscribed
+      if(distributor!.subscriptionStatus = "PAID"){
+        throw new BadRequestError("You are already Subscribed as a MxgLife Distributor!")
+      }
+      return distributor;
     }
 
     public createCheckOutSession = async(email:string):Promise<string>=>{
@@ -92,7 +102,7 @@ export default class PaymentRepository{
         try{
             event = this.stripe.webhooks.constructEvent(payload, signature, this.signingKey)
         }catch(err:any){
-            console.log({err})
+            logger.error("Stripe Webhook Failure", err.message);
             throw new BadRequestError(`WebHook Error ${err.message}`)
         }
         return event;
