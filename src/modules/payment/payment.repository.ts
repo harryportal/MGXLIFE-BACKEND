@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import { BadRequestError, InternalServerError } from "../../common/error";
 import DistributorRepository from "../distributor/distributor.repository";
 import { SubscriptionStatus } from "@prisma/client";
+import logger from "../../utils/logging/winston";
 
 export default class PaymentRepository{
     private stripe:Stripe;
@@ -20,9 +21,16 @@ export default class PaymentRepository{
       const distributor = await this.distributorRepository.getDistributorwithEmail(email);
       const portalSession = await this.stripe.billingPortal.sessions.create({
         customer:distributor!.stripeCustomerId
-        //return_url: returnUrl,
-      });
+    });
       return portalSession;
+    }
+    
+    // will use this once the front end fix card not displaying for a subscribed user
+    private getDistributorandThrow = async(email:string)=>{
+        const distributor = await this.distributorRepository.getDistributorwithEmail(email);
+        if(distributor!.subscriptionStatus == "PAID"){
+            throw new BadRequestError("You are already subscribed!");
+        }
     }
 
     public createCheckOutSession = async(email:string):Promise<string>=>{
@@ -37,8 +45,9 @@ export default class PaymentRepository{
                   price:priceId,
                   quantity:1,
               }],
-              success_url: "https://smebud.onrender.com",
-              cancel_url: "https://smebud.onrender.com" })
+              success_url: process.env.HOMEPAGE_URL!,
+              cancel_url:  process.env.HOMEPAGE_URL!
+             })
           return session.url as string;
       }catch(error){
           throw new InternalServerError(`Failed to create a checkout session, ${error}`);
@@ -91,7 +100,7 @@ export default class PaymentRepository{
         try{
             event = this.stripe.webhooks.constructEvent(payload, signature, this.signingKey)
         }catch(err:any){
-            console.log({err})
+            logger.error("Stripe Webhook Failure", err.message);
             throw new BadRequestError(`WebHook Error ${err.message}`)
         }
         return event;

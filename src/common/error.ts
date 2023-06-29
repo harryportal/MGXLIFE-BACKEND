@@ -11,12 +11,17 @@ export class ErrorHandler {
   static handle() {
     return (err: ApiError, req: Request, res: Response, next: NextFunction) => {
       const statusCode = err.statusCode || 500;
+      let message = err.message;
+      if(process.env.NODE_ENV=="production" && statusCode == 500){
+        message = "Something went wrong, Please try again later!"
+      }
       let errorStack = {};
       if (process.env.NODE_ENV == 'development') {
         errorStack = { stack: err.stack };
       }
+
       res.status(statusCode).json({
-        message: err.message,
+        message,
         success: false,
         errorStack,
         rawErrors: err.rawErrors ?? [],

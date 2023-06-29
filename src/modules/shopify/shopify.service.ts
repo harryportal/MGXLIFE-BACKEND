@@ -92,10 +92,11 @@ export default class ShopifyService {
             const {order_number, line_items} = orderData;
             const {first_name, last_name, email } = orderData.customer;
             const {amount, quantity} = this.calculateOrderAmountandQuantity(line_items);
+            const createdAt = new Date().toLocaleString();
             // Simply update the Order DB for the admin client!
             const order:AddOrder = { shopifyId:orderId, orderNumber:order_number, customerEmail:email,
                 amountPaid:amount, quantity, customerFirstName:first_name, customerLastName:last_name,
-                distributorId:refferingId };
+                distributorId:refferingId, createdAt };
             const createOrder = await this.orderRepository.addOrder(order);
             logger.info(`An Order with ID ${createOrder.id} has been added`);
         }

@@ -21,7 +21,7 @@ export default class PaymentController {
         let payload = req.body as Buffer;
         const signature = req.headers['stripe-signature'] as string;
         await this.paymentService.handleSubscriptionEvents(payload, signature)
-        return res.status(200);
+        return res.status(200).json({success:true})
     }
     
 }

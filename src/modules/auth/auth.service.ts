@@ -10,22 +10,13 @@ import { completeprofileTemplate } from "../../utils/mailTemplates/completeProfi
 import PaymentRepository from "../payment/payment.repository";
 
 export default class AuthService {
-    private cloudinaryService;
     private authRepository;
     private mailService;
     private paymentRepository;
     constructor(){
-        this.cloudinaryService = new Cloudinary();
         this.authRepository = new AuthRepository();
         this.mailService = new MailService();
         this.paymentRepository = new PaymentRepository()
-    }
-
-    /* Logic for uploading the image */
-    private uploadImage = async(imagepath:string):Promise<string | undefined>=>{
-        if (!imagepath) { return "" };
-        const { imageUrl } = await this.cloudinaryService.uploadImage(imagepath); 
-        return imageUrl;
     }
 
     /* create the referal link using shortID and prepend the id with mg#.
@@ -48,7 +39,7 @@ export default class AuthService {
 
     public signIn = async(email:string, password:string)=>{
         const distributor = await this.authRepository.getDistributor(email.toLowerCase());
-        if(!distributor) { throw new AuthError("Invalid Login Credentials")}
+        if(!distributor) { throw new AuthError("Invalid Login Credentials") }
 
         const checkPassword = await comparePassword(password, distributor.password!)
         if(!checkPassword) { throw new AuthError("Invalid Login Credentials") }

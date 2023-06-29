@@ -40,17 +40,18 @@ model Distributor {
 }
 
 model Order {
-  id                String       @id @default(uuid())
-  shopifyId         String       @unique
+  id                String @id @default(uuid())
+  shopifyId         String @unique
   orderNumber       Int
   amountPaid        Float
   quantity          Int
   customerFirstName String
   customerLastName  String
-  customerEmail     String
-  distributorId     String?
-  distributor       Distributor? @relation(fields: [distributorId], references: [referringId])
-  createdAt         DateTime     @default(now())
+
+  customerEmail String
+  distributorId String?
+  distributor   Distributor? @relation(fields: [distributorId], references: [referringId])
+  createdAt     String
 }
 
 enum BonusType {

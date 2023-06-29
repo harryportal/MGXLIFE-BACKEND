@@ -1,9 +1,25 @@
 import AdminService from "./admin.service";
 import { Response } from "express";
 import { AuthRequest } from "../auth/auth.interface";
+import { File } from "./admin.dtos";
+
 
 export default class AdminController {
     private static adminService = new AdminService();
+
+    public static signIn = async(req:AuthRequest, res:Response)=>{
+        let {email, password} = req.body;
+        const accessToken = await this.adminService.signIn(email,password);
+        return res.status(200).json({success:true, data:{accessToken}});
+    }
+
+    public static updateProfile = async(req:AuthRequest, res:Response)=>{
+        const profileData = req.body;
+        const adminId = req.user!.id;
+        const imageFile = req.file as File;
+        const updatedProfile = await this.adminService.updateAdmin(profileData, adminId, imageFile);
+        return res.status(200).json({success:true, data:updatedProfile})
+    }
 
     public static getAllProducts = async(req:AuthRequest, res:Response)=>{
         const pageNumber = req.params.page;
