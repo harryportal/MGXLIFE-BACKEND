@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import DistributorService from "./distributor.service";
 import { AuthRequest } from "../auth/auth.interface";
 import { File } from "./distributor.dtos";
