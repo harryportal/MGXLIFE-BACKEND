@@ -1,27 +1,36 @@
 import { Distributor } from "@prisma/client";
 import { NotFoundError } from "../../common/error";
-import DistributorRepository from "./distributor.repository";
-import { File } from "./distributor.dtos";
+import { File, IDistributorRepository, IDistributorService, TYPES } from "./distributor.dtos";
 import uploadImage from "../../utils/upload/uploadImage";
+import { injectable, inject } from "inversify";
 
-export default class DistributorService {
-    private distributorRepository = new DistributorRepository();
+@injectable()
+export default class DistributorService implements IDistributorService{
+    private readonly distributorRepository:IDistributorRepository;
+    constructor(@inject(TYPES.IDistributorRepository)distributorRepository: IDistributorRepository){
+        this.distributorRepository = distributorRepository;
+    }
     
     public getDistributor = async(distributorId:string)=>{
         const distributor = await this.distributorRepository.getProfile(distributorId);
-        let {password, ...disitributorData} = distributor as Distributor;
-        disitributorData.commissionEarned =  Number(disitributorData.commissionEarned!.toPrecision(4));
         if(!distributor) { throw new NotFoundError("No Distributor with Id Found!")};
+        const distributorData = this.removePassword(distributor);
+        distributorData.commissionEarned =  Number(distributorData.commissionEarned!.toPrecision(4));
+        return distributorData;
+    }
+
+    private removePassword = (distributor:Distributor)=>{
+        const {password, ...disitributorData} = distributor;
         return disitributorData;
     }
 
     public getRefferedUsers = async(distributorId:string)=>{
-        const refferedUsers = await this.distributorRepository.getRefferedUsers(distributorId);
+        const refferedUsers = await this.distributorRepository.getReferredUsers(distributorId);
         return refferedUsers;
     }
 
-    public getOrders = async(distributorId:string)=>{
-        const orders = await this.distributorRepository.getOrders(distributorId);
+    public getDistributorOrders = async(distributorId:string)=>{
+        const orders = await this.distributorRepository.getDistributorOrders(distributorId);
         return orders;
     }
 
@@ -37,11 +46,12 @@ export default class DistributorService {
             const response = await uploadImage(imageFile);
             profileData.imageUrl = response.imageUrl;
         };
-        const updatedProfile = this.distributorRepository.updateProfile(distributorId, profileData);
-        return updatedProfile;
+        const updatedProfile = await this.distributorRepository.updateProfile(distributorId, profileData);
+        const updatedProfileData = this.removePassword(updatedProfile);
+        return updatedProfileData;
     }
 
-    public  getReferralLinks = async(refferalId:string)=>{
+    public  getReferralLinks = (refferalId:string)=>{
         const buyerReferralLink = `${process.env.SHOPIFY_URL}?ref=${refferalId}`
         const distributorReferralLink =`${process.env.SIGNUP_URL}?${refferalId}` 
         return {buyerReferralLink, distributorReferralLink}

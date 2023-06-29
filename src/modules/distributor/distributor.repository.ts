@@ -2,9 +2,12 @@ import { prisma } from "../../utils/db/prisma";
 import { Distributor, SubscriptionStatus } from "@prisma/client";
 import logger from "../../utils/logging/winston";
 import IPagination from "../../utils/pagination/pagination.interface";
+import { injectable } from "inversify";
+import { IDistributorRepository } from "./distributor.dtos";
 
-export default class DistributorRepository {
-    private distributor;
+@injectable()
+export default class DistributorRepository implements IDistributorRepository{
+    private readonly distributor;
     constructor(){
         this.distributor = prisma.distributor;
     }
@@ -29,8 +32,8 @@ export default class DistributorRepository {
         logger.info(`Distributor with id ${updatedDistributor} has been updated with commission ${commission}`)
     }
 
-    public getRefferedUsers = async(distributorId:string)=>{
-        const refferedUsers = await this.distributor.findMany({
+    public getReferredUsers = async(distributorId:string)=>{
+        const referredUsers = await this.distributor.findMany({
             where:{
                 id:distributorId
             }, select:{ 
@@ -40,7 +43,7 @@ export default class DistributorRepository {
                 }}
             }
         })
-        return refferedUsers;
+        return referredUsers;
     }
 
     public getAllDistributors = async(paginationObject:IPagination)=>{
@@ -56,13 +59,10 @@ export default class DistributorRepository {
         return distributor;
     }
 
-    public getOrders = async(distributorId:string)=>{
-        /* returns the orders that were gotten with the current distributor refferal Id
-           This should be in the orders module but omo i want to avoid stress 
-        */
-        const orders = await this.distributor.findUnique({
+    public getDistributorOrders = async(distributorId:string)=>{
+        const distributorOrders = await this.distributor.findUnique({
             where:{ id: distributorId }, select:{ orders:true } });
-        return orders;
+        return distributorOrders;
     }
 
     public getDistributorwithStripeId = async(stripeId:string)=> {
@@ -89,8 +89,7 @@ export default class DistributorRepository {
                 firstName, lastName, imageUrl
             }
         });
-        const {password,  ...distributor} = updatedDistributor;
-        return distributor;
+        return updatedDistributor;
     };
 
     public getDistributorwithReferralId = async(refferalId:string)=>{
