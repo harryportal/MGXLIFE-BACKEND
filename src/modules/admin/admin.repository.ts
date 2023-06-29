@@ -11,10 +11,10 @@ export default class AdminRepository {
         return admin;
     };
 
-    public updateAdmin = async(email:string, updateData:UpdateAdmin)=>{
+    public updateAdmin = async(id:string, updateData:UpdateAdmin)=>{
         const {firstName, lastName, imageUrl } = updateData;
         const admin = await this.admin.update({
-            where:{ email }, 
+            where:{ id }, 
             data: {
                 firstName, lastName, imageUrl
             }
