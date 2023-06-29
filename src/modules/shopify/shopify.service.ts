@@ -30,14 +30,31 @@ export default class ShopifyService {
 
     }
 
-    private calculateCommission = async(orderCommissionDetails:ProductCommission)=>{
-        // The real and exact logic for this would be implemented later on
-        const {product_id, quantity} = orderCommissionDetails;
+    private calculateCommission = async (orderCommissionDetails: ProductCommission) => {
+        const { product_id, quantity } = orderCommissionDetails;
         let product = await this.productRepository.getProduct(String(product_id));
-        const commission = product!.price * (20/100) * quantity;
+        
+        const bonusType = product!.bonusType;
+        const bonusAmount = product!.bonusAmount;
+        let commission: number;
+        // check if product is percentage or flat rate based
+        // use product!.bonus type and product!.bonus amount instead of just 20
+        if (bonusType == "PERCENTAGE") {
+          commission = product!.price * (bonusAmount / 100) * quantity;
+        } else {
+          commission = bonusAmount * quantity;
+        }
+      
         return commission;
+      }
+
+    private addVolumeCredit = async ()=>{
+        
     }
 
+    
+      
+    // new function for parent affiliate.
     private calculateOrderAmountandQuantity = (lineItems:LineItem[])=>{
         let amount:number = 0.0;
         let quantity:number = 0;
@@ -65,8 +82,11 @@ export default class ShopifyService {
 
         if(!checkOrder){
             const refferingId = orderData.landing_site_ref ?? null;
+            //check if a buyer is a distributor=db for email
+            //sponsoring distributor gets 20% of the price after promo code.
             if(refferingId){
                 await this.findAndUpdateDistributorCommission(refferingId, orderData);
+
             };
 
             const {order_number, line_items} = orderData;

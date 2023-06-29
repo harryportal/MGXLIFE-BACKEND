@@ -43,6 +43,37 @@ export default class DistributorRepository {
         return refferedUsers;
     }
 
+    public getSponsoringDistributor = async (distributorId: string) => {
+        //Find sponsoring distibutor to add volume credit
+        const SponsoringDistributor = await this.distributor.findUnique({
+          where: {
+            id: distributorId,
+          },
+          select: {
+            referredBy: {
+              select: {
+                id: true,
+                email: true,
+                subscriptionStatus: true,
+                verified: true,
+              },
+            },
+          },
+        });
+        return SponsoringDistributor?.referredBy;
+      };
+    
+      public updateSponsoringDistributorVolumeCredit = async(SponsoringDistributorId:string, volumeCredit:number)=>{
+        const updatedSponsoringDistributor = await this.distributor.update({
+            where:{ id: SponsoringDistributorId },
+            data:{ volumecredit: {
+                increment: volumeCredit
+            }}
+        });
+        console.log(updatedSponsoringDistributor);
+        logger.info(`Distributor with id ${updatedSponsoringDistributor} has been updated with volumeCredit ${volumeCredit}`)
+    }
+      
     public getAllDistributors = async(paginationObject:IPagination)=>{
         const {take, skip} = paginationObject;
         const distributors = await this.distributor.findMany({take, skip});

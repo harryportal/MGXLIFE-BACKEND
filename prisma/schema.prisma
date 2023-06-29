@@ -10,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum SubscriptionStatus{
+enum SubscriptionStatus {
   NOT_PAID
   PAID
   PENDING
@@ -18,39 +18,39 @@ enum SubscriptionStatus{
 
 // schema.prisma
 model Distributor {
-  id                 String        @id @default(uuid())
+  id                 String             @id @default(uuid())
   firstName          String
   lastName           String
-  email              String        @unique
+  email              String             @unique
   password           String
-  subscriptionStatus SubscriptionStatus  @default(NOT_PAID)
-  stripeCustomerId   String        @unique
-  referringId        String        @unique
-  imageUrl           String?       
-  commissionEarned   Float?  @default(0.0)
-  refferalCount      Int    @default(0)
-  referredBy         Distributor?  @relation(name:"ReferredBy", fields: [referredById], references: [id])
+  subscriptionStatus SubscriptionStatus @default(NOT_PAID)
+  stripeCustomerId   String             @unique
+  referringId        String             @unique
+  imageUrl           String?
+  commissionEarned   Float?             @default(0.0)
+  refferalCount      Int                @default(0)
+  referredBy         Distributor?       @relation(name: "ReferredBy", fields: [referredById], references: [id])
   referredById       String?
-  verified           Boolean @default(false)     
-  orders             Order[]   // This displays the order that were made through their refferal code
-  referredUsers      Distributor[] @relation(name:"ReferredBy")
+  verified           Boolean            @default(false)
+  orders             Order[] // This displays the order that were made through their refferal code
+  referredUsers      Distributor[]      @relation(name: "ReferredBy")
   payments           Payment[]
   refreshtokens      RefreshToken[]
+  volumecredit       Float              @default(0.0)
 }
 
 model Order {
-  id           String @id @default(uuid())
-  shopifyId    String  @unique
-  orderNumber  Int
-  amountPaid   Float
-  quantity     Int
+  id                String       @id @default(uuid())
+  shopifyId         String       @unique
+  orderNumber       Int
+  amountPaid        Float
+  quantity          Int
   customerFirstName String
   customerLastName  String
-  customerEmail String
-  distributorId String? 
-  distributor   Distributor? @relation(fields: [distributorId], references: [referringId])
-  createdAt    DateTime   @default(now())
-  
+  customerEmail     String
+  distributorId     String?
+  distributor       Distributor? @relation(fields: [distributorId], references: [referringId])
+  createdAt         DateTime     @default(now())
 }
 
 enum BonusType {
@@ -59,40 +59,40 @@ enum BonusType {
 }
 
 model Product {
-  id          String @id @default(uuid())
-  productId   String @unique
+  id          String    @id @default(uuid())
+  productId   String    @unique
   title       String
   price       Float
   image       String?
   bonusType   BonusType @default(PERCENTAGE)
-  bonusAmount Float @default(10.0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  bonusAmount Float     @default(20.0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
 }
 
 model Payment {
-  id           String @id @default(uuid())
-  amount       Float
-  status       String
-  createdAt    DateTime @default(now())
-  distributor  Distributor @relation(fields: [distributorId], references: [id])
+  id            String      @id @default(uuid())
+  amount        Float
+  status        String
+  createdAt     DateTime    @default(now())
+  distributor   Distributor @relation(fields: [distributorId], references: [id])
   distributorId String
 }
 
 model RefreshToken {
-  id        String @id @default(uuid())
-  distributorId    String 
-  token     String @unique
-  createdAt DateTime @default(now())
-  expiresAt DateTime 
-  distributor      Distributor    @relation(fields: [distributorId], references: [id])
+  id            String      @id @default(uuid())
+  distributorId String
+  token         String      @unique
+  createdAt     DateTime    @default(now())
+  expiresAt     DateTime
+  distributor   Distributor @relation(fields: [distributorId], references: [id])
 }
 
 model Admin {
-  id String @id @default(uuid())
-  email String @unique
-  firstName String 
+  id        String  @id @default(uuid())
+  email     String  @unique
+  firstName String
   lastName  String
   imageUrl  String?
-  password String
+  password  String
 }
