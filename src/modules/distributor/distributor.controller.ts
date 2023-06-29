@@ -10,7 +10,6 @@ export default class DistributorController {
         this.distributorService = distributorService;
     }
     
-
     public getProfile = async(req:AuthRequest, res:Response)=>{
         let {id} = req.user!;
         const profile = await this.distributorService.getDistributor(id);
@@ -23,12 +22,9 @@ export default class DistributorController {
         return res.status(200).json({success:true, data:referredUsers});
     }
 
-    public getReferralLinks = async(req:AuthRequest, res:Response)=>{
-        /* So there are two referral links:
-        1. One for potential distributors 
-        2. people that just want to buy and go */
+    public getReferralLinks = (req:AuthRequest, res:Response)=>{
         const {refferalId} = req.user!;
-        const {buyerReferralLink, distributorReferralLink} = await this.distributorService.getReferralLinks(refferalId);
+        const {buyerReferralLink, distributorReferralLink} = this.distributorService.getReferralLinks(refferalId);
         return res.status(200).json({success:true, data:{ buyerReferralLink, distributorReferralLink } })
 
     }
