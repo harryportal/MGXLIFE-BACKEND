@@ -1,18 +1,18 @@
-import { AuthError, BadRequestError } from "../../common/error";
-import { comparePassword, createAcessToken, createAdminToken } from "../../utils/jwtAuth/jwt";
+import { AuthError } from "../../common/error";
+import { comparePassword, createAdminToken } from "../../utils/jwtAuth/jwt";
 import current_page from "../../utils/pagination/page";
 import uploadImage from "../../utils/upload/uploadImage";
-import Cloudinary from "../cloud/cloudinary.service";
 import DistributorRepository from "../distributor/distributor.repository";
 import { OrderRepository } from "../order/order.repository";
-import ProductRepository from "../product/product.repository";
+import ProductService from "../product/product.service";
 import { File, UpdateAdmin } from "./admin.dtos";
 import AdminRepository from "./admin.repository";
+import { UpdateProduct } from "./admin.validation";
 
 export default class AdminService {
     private adminRepository = new AdminRepository();
     private orderRepository = new OrderRepository();
-    private productRepository = new ProductRepository();
+    private productService = new ProductService();
     private distributorRepository = new DistributorRepository()
 
     public signIn = async(email:string, password:string)=>{
@@ -37,7 +37,7 @@ export default class AdminService {
 
     public getAllProducts = async(pageNumber:string)=>{
         const paginationObject = current_page(pageNumber); 
-        const products = await this.productRepository.getAllProduct(paginationObject);
+        const products = await this.productService.getAllProducts(paginationObject);
         return products;
     }
 
@@ -53,7 +53,8 @@ export default class AdminService {
         return orders;
     }
 
-
-
-
+    public updateProduct = async(productId:string, updateData:UpdateProduct)=>{
+        const updatedProduct = await this.productService.updateProduct(updateData, productId);
+        return updatedProduct;
+    }
 }

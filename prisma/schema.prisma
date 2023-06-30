@@ -47,7 +47,6 @@ model Order {
   quantity          Int
   customerFirstName String
   customerLastName  String
-
   customerEmail String
   distributorId String?
   distributor   Distributor? @relation(fields: [distributorId], references: [referringId])
