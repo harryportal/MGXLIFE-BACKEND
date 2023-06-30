@@ -1,4 +1,3 @@
-import Cloudinary from "../cloud/cloudinary.service";
 import shortid from "shortid";
 import AuthRepository from "./auth.repositories";
 import { AuthError, BadRequestError } from "../../common/error";

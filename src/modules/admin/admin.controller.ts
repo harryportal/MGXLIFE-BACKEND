@@ -1,20 +1,21 @@
 import AdminService from "./admin.service";
-import { Response } from "express";
 import { AuthRequest } from "../auth/auth.interface";
-import { File } from "./admin.dtos";
+import { File, UpdateAdmin } from "./admin.dtos";
+import { Response } from "express";
+import { SignIn, UpdateProduct } from "./admin.validation";
 
 
 export default class AdminController {
     private static adminService = new AdminService();
 
     public static signIn = async(req:AuthRequest, res:Response)=>{
-        let {email, password} = req.body;
+        let {email, password} = req.body as SignIn;
         const accessToken = await this.adminService.signIn(email,password);
         return res.status(200).json({success:true, data:{accessToken}});
     }
 
     public static updateProfile = async(req:AuthRequest, res:Response)=>{
-        const profileData = req.body;
+        const profileData = req.body as UpdateAdmin;
         const adminId = req.user!.id;
         const imageFile = req.file as File;
         const updatedProfile = await this.adminService.updateAdmin(profileData, adminId, imageFile);
@@ -40,6 +41,9 @@ export default class AdminController {
     }
 
     public static updateProduct = async(req:AuthRequest, res:Response)=>{
-        
+        const productId = req.params.id;
+        const updateData = req.body as UpdateProduct;
+        const updatedProduct = await this.adminService.updateProduct(productId, updateData);
+        return res.status(200).json({success:true, data:updatedProduct})
     }
 }
