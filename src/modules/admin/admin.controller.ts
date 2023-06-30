@@ -1,15 +1,15 @@
 import AdminService from "./admin.service";
-import { Response } from "express";
 import { AuthRequest } from "../auth/auth.interface";
 import { File, UpdateAdmin } from "./admin.dtos";
-import { UpdateProduct } from "./admin.validation";
+import { Response } from "express";
+import { SignIn, UpdateProduct } from "./admin.validation";
 
 
 export default class AdminController {
     private static adminService = new AdminService();
 
     public static signIn = async(req:AuthRequest, res:Response)=>{
-        let {email, password} = req.body;
+        let {email, password} = req.body as SignIn;
         const accessToken = await this.adminService.signIn(email,password);
         return res.status(200).json({success:true, data:{accessToken}});
     }

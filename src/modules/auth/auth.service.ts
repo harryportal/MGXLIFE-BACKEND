@@ -1,4 +1,3 @@
-import Cloudinary from "../cloud/cloudinary.service";
 import shortid from "shortid";
 import AuthRepository from "./auth.repositories";
 import { AuthError, BadRequestError } from "../../common/error";
@@ -83,7 +82,7 @@ export default class AuthService {
     public createDistributor = async(distributorData: Omit<Distributor, "id">, refferalId:string)=>{
         let {email, password} = distributorData;
         const checkEmail = await this.authRepository.getDistributor(email);
-        if (checkEmail){ throw new AuthError("Email Already Exists!. Please use another Email Address")};
+        //if (checkEmail){ throw new AuthError("Email Already Exists!. Please use another Email Address")};
         const stripeCustomerId = await this.paymentRepository.createCustomer(email);
         const refferingId = this.generateReferralLink();
         distributorData.referringId = refferingId;
