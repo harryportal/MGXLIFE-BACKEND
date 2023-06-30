@@ -32,7 +32,6 @@
     "prisma": "^4.12.0",
     "reflect-metadata": "^0.1.13",
     "sharp": "^0.32.0",
-    "shopify-typed-node-api": "^2.1.0",
     "shortid": "^2.2.16",
     "stripe": "^12.1.1",
     "typescript": "^5.1.6",
