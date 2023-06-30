@@ -12,7 +12,7 @@ adminRouter.get("/distributors",adminProtect, AdminController.getAllDistributors
 adminRouter.get("/orders", adminProtect, AdminController.getAllOrders);
 adminRouter.get("/products", adminProtect, AdminController.getAllProducts);
 adminRouter.post("/signin", AdminController.signIn);
-adminRouter.post("/profile/update", adminProtect, RequestValidator.validate(UpdateProfile), AdminController.updateProfile);
+adminRouter.put("/profile/update", adminProtect, RequestValidator.validate(UpdateProfile), AdminController.updateProfile);
 adminRouter.put("products/:id", adminProtect, RequestValidator.validate(UpdateProduct), AdminController.updateProduct)
 
 

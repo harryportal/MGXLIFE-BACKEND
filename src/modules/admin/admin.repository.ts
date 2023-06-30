@@ -4,9 +4,10 @@ import { UpdateAdmin } from "./admin.dtos";
 export default class AdminRepository {
     private admin = prisma.admin;
 
-    public getAdmin = async(id:string)=>{
+    public getAdmin = async(email:string)=>{
+        console.log(email);
         const admin = await this.admin.findUnique({
-            where: {id}
+            where: {email}
         });
         return admin;
     };
