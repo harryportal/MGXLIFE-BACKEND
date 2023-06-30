@@ -1,6 +1,8 @@
 import {prisma} from "../../utils/db/prisma";
 import { DistributorwithoutReferral } from "./auth.interface";
+import { injectable } from "inversify";
 
+@injectable()
 export default class AuthRepository{
     private refreshToken;
     private distributor;
