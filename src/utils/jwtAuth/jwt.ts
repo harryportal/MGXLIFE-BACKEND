@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { InternalServerError } from "../../common/error";
 import { AuthError } from "../../common/error";
 import { Admin, Distributor } from "@prisma/client";
-import { jwtPayload } from "../../modules/auth/auth.interface";
+import { jwtPayload } from "../../modules/auth/auth.dto";
 
 export const hashPassword = (password: string) => {
   return bcrypt.hash(password, 5);

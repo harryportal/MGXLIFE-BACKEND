@@ -1,21 +1,20 @@
 import shortid from "shortid";
-import AuthRepository from "./auth.repositories";
 import { AuthError, BadRequestError } from "../../common/error";
 import { comparePassword, createAcessToken, createRefreshToken, createVerificationToken, hashPassword, verifyJWT } from "../../utils/jwtAuth/jwt";
 import { Distributor } from "@prisma/client";
-import MailService from "../mail/mail.service";
 import { createresetTemplate } from "../../utils/mailTemplates/resetPassword";
 import { completeprofileTemplate } from "../../utils/mailTemplates/completeProfile";
-import PaymentRepository from "../payment/payment.repository";
+import { injectable } from "inversify";
+import { IAuthRepository } from "./auth.dto";
+import { IMailService } from "../mail/mail.dto";
 
+
+@injectable()
 export default class AuthService {
-    private authRepository;
-    private mailService;
-    private paymentRepository;
+    private authRepository:IAuthRepository;
+    private mailService:IMailService;
+    private paymentService:any;
     constructor(){
-        this.authRepository = new AuthRepository();
-        this.mailService = new MailService();
-        this.paymentRepository = new PaymentRepository()
     }
 
     /* create the referal link using shortID and prepend the id with mg#.

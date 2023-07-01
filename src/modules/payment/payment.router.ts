@@ -1,10 +1,11 @@
 import {Router} from "express";
 import { protect } from "../../common/auth";
 import PaymentController from "./payment.controller";
+import container from "../../di/invesify.config";
 
-const paymentRouter = Router();
-//paymentRouter.post("/webhook", express.raw({ type: 'application/json' }),)// PaymentController.eventHandler)
-paymentRouter.get("/subscription", protect, PaymentController.createCheckoutSession)
-paymentRouter.get("/customerportal", protect, PaymentController.getCustomerPortal);
+export const paymentController = container.resolve<PaymentController>(PaymentController);
 
-export default paymentRouter;
+export const paymentRouter = Router();
+paymentRouter.get("/subscription", protect, paymentController.createCheckoutSession)
+paymentRouter.get("/customerportal", protect, paymentController.getCustomerPortal);
+

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import AuthService from "./auth.service";
-import { AuthRequest, jwtPayload } from "./auth.interface";
+import { AuthRequest, jwtPayload } from "./auth.dto";
 
 export class AuthController {
     private static authService = new AuthService();

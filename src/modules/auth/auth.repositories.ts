@@ -1,12 +1,14 @@
-import {prisma} from "../../utils/db/prisma";
-import { DistributorwithoutReferral } from "./auth.interface";
+import { PrismaClient} from "@prisma/client";
+import { DistributorNoReferral, IAuthRepository } from "./auth.dto";
 import { injectable } from "inversify";
 
 @injectable()
-export default class AuthRepository{
+export default class AuthRepository implements IAuthRepository{
     private refreshToken;
     private distributor;
-    constructor(){
+    private prisma;
+    constructor(prisma:PrismaClient){
+        this.prisma = prisma;
         this.distributor = prisma.distributor;
         this.refreshToken = prisma.refreshToken;
     }
@@ -24,13 +26,13 @@ export default class AuthRepository{
         })
     }
 
-    public createDistributorwithReferral = async(distributor:DistributorwithoutReferral,refferedById:string)=>{
+    public createDistributorwithReferral = async(distributor:DistributorNoReferral,refferedById:string)=>{
         /* 
         This runs two queries using prisma transaction 
         1. Create the Distributor Account
         2. Update the Referall Count of the parent distributora
         */
-        const  [newDistributor] = await prisma.$transaction([
+        const  [newDistributor] = await this.prisma.$transaction([
             this.distributor.create({
             data:{
                 ...distributor,
@@ -56,7 +58,7 @@ export default class AuthRepository{
         return distributor;
     }
 
-    public createDistributorwithoutReferral = async(distributor:DistributorwithoutReferral)=>{
+    public createDistributorwithoutReferral = async(distributor:DistributorNoReferral)=>{
         const userData  = await this.distributor.create({ data:{ ...distributor } });
         return userData;
     }

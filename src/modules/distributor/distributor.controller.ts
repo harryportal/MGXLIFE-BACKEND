@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { AuthRequest } from "../auth/auth.interface";
+import { AuthRequest } from "../auth/auth.dto";
 import { File, IDistributorService, TYPES } from "./distributor.dtos";
 import {injectable, inject} from "inversify";
 

@@ -1,5 +1,5 @@
 import AdminService from "./admin.service";
-import { AuthRequest } from "../auth/auth.interface";
+import { AuthRequest } from "../auth/auth.dto";
 import { File, UpdateAdmin } from "./admin.dtos";
 import { Response } from "express";
 import { SignIn, UpdateProduct } from "./admin.validation";

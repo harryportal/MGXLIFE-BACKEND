@@ -1,23 +1,28 @@
 import { Response } from "express";
-import PaymentRepository from "./payment.repository";
-import { AuthRequest } from "../auth/auth.interface";
+import { AuthRequest } from "../auth/auth.dto";
+import { IPaymentService, PTypes } from "./payment.dtos";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export default class PaymentController {
-    private static paymentService = new PaymentRepository();
+    private paymentService:IPaymentService;
+    constructor(@inject(PTypes.IPaymentService)paymentService:IPaymentService){
+        this.paymentService = paymentService;
+    }
 
-    static createCheckoutSession = async(req:AuthRequest, res:Response)=>{
+    public createCheckoutSession = async(req:AuthRequest, res:Response)=>{
         let {email} = req.user!;
         const checkouturl = await this.paymentService.createCheckOutSession(email);
         res.status(200).json({success:true, data: checkouturl})
     }
 
-    static getCustomerPortal = async(req:AuthRequest, res:Response)=>{
+    public getCustomerPortal = async(req:AuthRequest, res:Response)=>{
         let {email} = req.user!;
         const portalSessionUrl = await this.paymentService.createPortalSession(email);
         res.status(200).json({success:true, data: portalSessionUrl.url})
     }
 
-    static subscriptionWebhook = async(req:AuthRequest, res:Response)=>{
+    public subscriptionWebhook = async(req:AuthRequest, res:Response)=>{
         let payload = req.body as Buffer;
         const signature = req.headers['stripe-signature'] as string;
         await this.paymentService.handleSubscriptionEvents(payload, signature)

@@ -26,6 +26,7 @@ export interface IDistributorRepository{
     updateDistributorSubscriptionStatus(id:string, status:SubscriptionStatus):Promise<Distributor>;
     getDistributorwithStripeId(id:string):Promise<Distributor|null>;
     getDistributorwithReferralId(id:string):Promise<Distributor|null>;
+    getDistributorwithEmail(email:string):Promise<Distributor | null>;
 }
 
 export const TYPES = {
