@@ -1,20 +1,24 @@
 import AdminService from "./admin.service";
 import { AuthRequest } from "../auth/auth.dto";
-import { File, UpdateAdmin } from "./admin.dtos";
+import { AdTypes, File, IAdminService, UpdateAdmin } from "./admin.dtos";
 import { Response } from "express";
 import { SignIn, UpdateProduct } from "./admin.validation";
+import { inject } from "inversify";
 
 
 export default class AdminController {
-    private static adminService = new AdminService();
+    private adminService;
+    constructor(@inject(AdTypes.IAdminService)adminService:IAdminService){
+        this.adminService = adminService;
+    }
 
-    public static signIn = async(req:AuthRequest, res:Response)=>{
+    public signIn = async(req:AuthRequest, res:Response)=>{
         let {email, password} = req.body as SignIn;
         const accessToken = await this.adminService.signIn(email,password);
         return res.status(200).json({success:true, data:{accessToken}});
     }
 
-    public static updateProfile = async(req:AuthRequest, res:Response)=>{
+    public updateProfile = async(req:AuthRequest, res:Response)=>{
         const profileData = req.body as UpdateAdmin;
         const adminId = req.user!.id;
         const imageFile = req.file as File;
@@ -22,25 +26,25 @@ export default class AdminController {
         return res.status(200).json({success:true, data:updatedProfile})
     }
 
-    public static getAllProducts = async(req:AuthRequest, res:Response)=>{
+    public getAllProducts = async(req:AuthRequest, res:Response)=>{
         const pageNumber = req.params.page;
         const products = await this.adminService.getAllProducts(pageNumber);
         return res.status(200).json({success:true, data:products});
     }
 
-    public static getAllDistributors = async(req:AuthRequest, res:Response)=>{
+    public getAllDistributors = async(req:AuthRequest, res:Response)=>{
         const pageNumber = req.params.page;
         const distributors = await this.adminService.getAllDistributors(pageNumber);
         return res.status(200).json({success:true, data:distributors});
     }   
 
-    public static getAllOrders = async(req:AuthRequest, res:Response)=>{
+    public  getAllOrders = async(req:AuthRequest, res:Response)=>{
         const pageNumber = req.params.page;
         const orders = await this.adminService.getAllOrders(pageNumber);
         return res.status(200).json({success:true, data:orders});
     }
 
-    public static updateProduct = async(req:AuthRequest, res:Response)=>{
+    public updateProduct = async(req:AuthRequest, res:Response)=>{
         const productId = req.params.id;
         const updateData = req.body as UpdateProduct;
         const updatedProduct = await this.adminService.updateProduct(productId, updateData);

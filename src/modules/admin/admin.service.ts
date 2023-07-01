@@ -1,19 +1,30 @@
+import { inject } from "inversify";
 import { AuthError } from "../../common/error";
 import { comparePassword, createAdminToken } from "../../utils/jwtAuth/jwt";
 import current_page from "../../utils/pagination/page";
 import uploadImage from "../../utils/upload/uploadImage";
-import DistributorRepository from "../distributor/distributor.repository";
-import { OrderRepository } from "../order/order.repository";
-import ProductService from "../product/product.service";
-import { File, UpdateAdmin } from "./admin.dtos";
-import AdminRepository from "./admin.repository";
+import { AdTypes, File, IAdminRepository, UpdateAdmin, IAdminService } from "./admin.dtos";
 import { UpdateProduct } from "./admin.validation";
+import { IOrderRepository, OTypes } from "../order/order.dtos";
+import { IProductService, PdTypes } from "../product/product.dtos";
+import { DTypes, IDistributorRepository } from "../distributor/distributor.dtos";
 
-export default class AdminService {
-    private adminRepository = new AdminRepository();
-    private orderRepository = new OrderRepository();
-    private productService = new ProductService();
-    private distributorRepository = new DistributorRepository()
+
+export default class AdminService implements IAdminService{
+    private adminRepository;
+    private orderRepository;
+    private productService;
+    private distributorRepository;
+    constructor(@inject(AdTypes.IAdminRepository)adminRepository:IAdminRepository,
+    @inject(OTypes.IOrderRepository)orderRepository:IOrderRepository,
+    @inject(PdTypes.IProductService)productService:IProductService,
+    @inject(DTypes.IDistributorRepository)distributorRepository:IDistributorRepository
+    ){
+        this.adminRepository = adminRepository;
+        this.orderRepository = orderRepository;
+        this.productService = productService;
+        this.distributorRepository = distributorRepository;
+    }
 
     public signIn = async(email:string, password:string)=>{
         const admin = await this.adminRepository.getAdmin(email.toLocaleLowerCase());

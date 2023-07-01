@@ -1,8 +1,12 @@
-import { prisma } from "../../utils/db/prisma";
-import { UpdateAdmin } from "./admin.dtos";
+import { inject } from "inversify";
+import { IPrismaClient, PrismaType} from "../../utils/db/prisma";
+import { IAdminRepository, UpdateAdmin } from "./admin.dtos";
 
-export default class AdminRepository {
-    private admin = prisma.admin;
+export default class AdminRepository implements IAdminRepository {
+    private admin;
+    constructor(@inject(PrismaType.IPrismaClient)prisma:IPrismaClient){
+        this.admin = prisma.admin;
+    }
 
     public getAdmin = async(email:string)=>{
         console.log(email);
