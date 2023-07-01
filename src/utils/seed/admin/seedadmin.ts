@@ -11,7 +11,7 @@ const seedAdmin = async()=>{
           password: await hashPassword(process.env.ADMIN_PASSWORD!)
         }
       });
-      console.log('Admin seeded successfully:', admin);
+      console.log('Admin seeded successfully:', admin.id);
     } catch (error) {
       console.error('Error seeding admin:', error);
     } finally {
