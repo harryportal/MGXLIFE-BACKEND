@@ -4,16 +4,17 @@ import { adminProtect } from "./admin.middleware";
 import RequestValidator from "../../common/validation";
 import { UpdateProduct, UpdateProfile } from "./admin.validation";
 import seedAdmin from "../../utils/seed/admin/seedadmin";
+import container from "../../di/invesify.config";
 
-
+const adminController = container.resolve<AdminController>(AdminController);
 const adminRouter = Router();
 
-adminRouter.get("/distributors",adminProtect, AdminController.getAllDistributors);
-adminRouter.get("/orders", adminProtect, AdminController.getAllOrders);
-adminRouter.get("/products", adminProtect, AdminController.getAllProducts);
-adminRouter.post("/signin", AdminController.signIn);
-adminRouter.put("/profile/update", adminProtect, RequestValidator.validate(UpdateProfile), AdminController.updateProfile);
-adminRouter.put("products/:id", adminProtect, RequestValidator.validate(UpdateProduct), AdminController.updateProduct)
+adminRouter.get("/distributors",adminProtect, adminController.getAllDistributors);
+adminRouter.get("/orders", adminProtect, adminController.getAllOrders);
+adminRouter.get("/products", adminProtect, adminController.getAllProducts);
+adminRouter.post("/signin", adminController.signIn);
+adminRouter.put("/profile/update", adminProtect, RequestValidator.validate(UpdateProfile), adminController.updateProfile);
+adminRouter.put("products/:id", adminProtect, RequestValidator.validate(UpdateProduct), adminController.updateProduct)
 
 
 // A route for seeding the Admin Db: might switch to ssh into the server for a better secuirity

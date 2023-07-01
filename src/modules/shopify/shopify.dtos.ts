@@ -314,5 +314,5 @@ export interface IShopifyService {
 }
 
 export const STypes = {
-  IShopifyService:Symbol("IShopifyService");
+  IShopifyService:Symbol("IShopifyService")
 }

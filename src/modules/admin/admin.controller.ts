@@ -1,4 +1,3 @@
-import AdminService from "./admin.service";
 import { AuthRequest } from "../auth/auth.dto";
 import { AdTypes, File, IAdminService, UpdateAdmin } from "./admin.dtos";
 import { Response } from "express";

@@ -1,5 +1,5 @@
 import {Container} from "inversify";
-import { IDistributorService, IDistributorRepository, TYPES } from "../modules/distributor/distributor.dtos";
+import { IDistributorService, IDistributorRepository, DTypes} from "../modules/distributor/distributor.dtos";
 import DistributorRepository from "../modules/distributor/distributor.repository";
 import DistributorService from "../modules/distributor/distributor.service";
 import AuthRepository from "../modules/auth/auth.repositories";
@@ -9,14 +9,33 @@ import { IPrismaClient, PrismaType } from "../utils/db/prisma";
 import { PrismaClient } from "@prisma/client";
 import { IMailService, MTypes } from "../modules/mail/mail.dto";
 import MailService from "../modules/mail/mail.service";
+import { AdTypes, IAdminRepository, IAdminService } from "../modules/admin/admin.dtos";
+import AdminRepository from "../modules/admin/admin.repository";
+import AdminService from "../modules/admin/admin.service";
+import { IOrderRepository, OTypes } from "../modules/order/order.dtos";
+import { OrderRepository } from "../modules/order/order.repository";
+import { IPaymentService, PTypes } from "../modules/payment/payment.dtos";
+import PaymentService from "../modules/payment/payment.service";
+import { IProductRepository, IProductService, PdTypes } from "../modules/product/product.dtos";
+import ProductService from "../modules/product/product.service";
+import ProductRepository from "../modules/product/product.repository";
+import { IShopifyService, STypes } from "../modules/shopify/shopify.dtos";
+import ShopifyService from "../modules/shopify/shopify.service";
 
 const container  = new Container();
 
 container.bind<IPrismaClient>(PrismaType.IPrismaClient).to(PrismaClient);
-container.bind<IDistributorService>(TYPES.IDistributorService).to(DistributorService);
-container.bind<IDistributorRepository>(TYPES.IDistributorRepository).to(DistributorRepository);
+container.bind<IDistributorService>(DTypes.IDistributorService).to(DistributorService);
+container.bind<IDistributorRepository>(DTypes.IDistributorRepository).to(DistributorRepository);
 container.bind<IAuthRepository>(ATypes.IAuthRepository).to(AuthRepository);
 container.bind<IAuthService>(ATypes.IAuthService).to(AuthService);
 container.bind<IMailService>(MTypes.IMailService).to(MailService);
+container.bind<IAdminRepository>(AdTypes.IAdminRepository).to(AdminRepository);
+container.bind<IAdminService>(AdTypes.IAdminService).to(AdminService);
+container.bind<IOrderRepository>(OTypes.IOrderRepository).to(OrderRepository);
+container.bind<IPaymentService>(PTypes.IPaymentService).to(PaymentService);
+container.bind<IProductService>(PdTypes.IProductService).to(ProductService);
+container.bind<IProductRepository>(PdTypes.IProductRepository).to(ProductRepository);
+container.bind<IShopifyService>(STypes.IShopifyService).to(ShopifyService);
 
 export default container;
