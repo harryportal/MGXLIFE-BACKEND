@@ -1,12 +1,13 @@
 import { Response } from "express";
 import { AuthRequest } from "../auth/auth.dto";
-import { IPaymentService, PTypes } from "./payment.dtos";
+import { IPaymentService } from "./payment.dtos";
 import { inject, injectable } from "inversify";
+import { TYPES } from "../../di/types";
 
 @injectable()
 export default class PaymentController {
     private paymentService:IPaymentService;
-    constructor(@inject(PTypes.IPaymentService)paymentService:IPaymentService){
+    constructor(@inject(TYPES.IPaymentService)paymentService:IPaymentService){
         this.paymentService = paymentService;
     }
 

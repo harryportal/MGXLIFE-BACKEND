@@ -20,5 +20,5 @@ export interface IPaymentService {
 }
 
 export const PTypes = {
-    IPaymentService: Symbol("IPaymentService")
-}
+    IPaymentService:Symbol("IPaymentService")
+};

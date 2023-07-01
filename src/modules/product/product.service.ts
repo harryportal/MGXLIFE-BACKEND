@@ -1,13 +1,14 @@
+import { inject, injectable } from "inversify";
 import { BadRequestError } from "../../common/error";
 import IPagination from "../../utils/pagination/pagination.interface";
-import { SingleProduct, updateProduct } from "./product.dtos";
+import { IProductRepository, PdTypes, SingleProduct, updateProduct } from "./product.dtos";
 import ProductRepository from "./product.repository";
 
+@injectable()
 export default class ProductService {
-    private productRepository;
-
-    constructor(){
-        this.productRepository = new ProductRepository;
+    private productRepository:IProductRepository;
+    constructor(@inject(PdTypes.IProductRepository)productRepository:IProductRepository){
+        this.productRepository = productRepository;
     }
 
     public addProduct = async(productData:SingleProduct):Promise<string | undefined>=>{
@@ -21,7 +22,7 @@ export default class ProductService {
 
     public getAllProducts = async(paginationObject:IPagination)=>{
         const {take, skip} = paginationObject;
-        const products = await this.productRepository.getAllProduct(take, skip);
+        const products = await this.productRepository.getAllProducts(take, skip);
         return products;
     }
 

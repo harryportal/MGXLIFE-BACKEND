@@ -29,7 +29,7 @@ export interface IDistributorRepository{
     getDistributorwithEmail(email:string):Promise<Distributor | null>;
 }
 
-export const TYPES = {
+export const DTypes = {
     IDistributorRepository: Symbol("IDistributorRepository"),
     IDistributorService: Symbol("IDistributorService")
 }

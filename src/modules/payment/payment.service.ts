@@ -3,7 +3,7 @@ import { BadRequestError, InternalServerError } from "../../common/error";
 import { SubscriptionStatus } from "@prisma/client";
 import logger from "../../utils/logging/winston";
 import { injectable, inject } from "inversify";
-import { IDistributorRepository, TYPES } from "../distributor/distributor.dtos";
+import { IDistributorRepository, DTypes} from "../distributor/distributor.dtos";
 import { IPaymentService } from "./payment.dtos";
 
 
@@ -13,7 +13,7 @@ export default class PaymentService implements IPaymentService{
     private secretKey;
     private signingKey;
     private distributorRepository:IDistributorRepository;  // find a better way to do this!
-    constructor(@inject(TYPES.IDistributorRepository)distributorRepository:IDistributorRepository){
+    constructor(@inject(DTypes.IDistributorRepository)distributorRepository:IDistributorRepository){
         this.distributorRepository = distributorRepository;
         this.secretKey = process.env.STRIPE_SECRETKEY!;
         this.signingKey = process.env.STRIPE_SIGNINGKEY!

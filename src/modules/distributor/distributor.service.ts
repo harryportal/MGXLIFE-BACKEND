@@ -1,13 +1,13 @@
 import { Distributor } from "@prisma/client";
 import { NotFoundError } from "../../common/error";
-import { File, IDistributorRepository, IDistributorService, TYPES } from "./distributor.dtos";
+import { DTypes, File, IDistributorRepository, IDistributorService} from "./distributor.dtos";
 import uploadImage from "../../utils/upload/uploadImage";
 import { injectable, inject } from "inversify";
 
 @injectable()
 export default class DistributorService implements IDistributorService{
     private readonly distributorRepository:IDistributorRepository;
-    constructor(@inject(TYPES.IDistributorRepository)distributorRepository: IDistributorRepository){
+    constructor(@inject(DTypes.IDistributorRepository)distributorRepository: IDistributorRepository){
         this.distributorRepository = distributorRepository;
     }
     

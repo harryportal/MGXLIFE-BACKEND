@@ -1,12 +1,12 @@
 import { Response } from "express";
 import { AuthRequest } from "../auth/auth.dto";
-import { File, IDistributorService, TYPES } from "./distributor.dtos";
+import { File, IDistributorService, DTypes} from "./distributor.dtos";
 import {injectable, inject} from "inversify";
 
 @injectable()
 export default class DistributorController {
     private readonly distributorService:IDistributorService;
-    constructor(@inject(TYPES.IDistributorService)distributorService:IDistributorService){
+    constructor(@inject(DTypes.IDistributorService)distributorService:IDistributorService){
         this.distributorService = distributorService;
     }
     

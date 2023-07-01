@@ -1,9 +1,9 @@
 import { Product } from "@prisma/client";
 import { prisma } from "../../utils/db/prisma";
-import { SingleProduct, updateProduct } from "./product.dtos";
+import { IProductRepository, SingleProduct, updateProduct } from "./product.dtos";
 
 
-export default class ProductRepository{
+export default class ProductRepository implements IProductRepository{
     private product;
     constructor(){
         this.product = prisma.product;
@@ -17,7 +17,7 @@ export default class ProductRepository{
         return product;
     }
     
-    public getAllProduct = async(take:number, skip:number):Promise<Product[]>=>{
+    public getAllProducts = async(take:number, skip:number):Promise<Product[]>=>{
       const products = await this.product.findMany({ take, skip  });
       return products;
     }
@@ -30,7 +30,7 @@ export default class ProductRepository{
       return productId.id;
     }
 
-    public updateProduct = async(productData:updateProduct, productId:string)=>{
+    public updateProduct = async(productData:updateProduct, productId:string):Promise<Product>=>{
         // reserverd for the admin to only update the the product bonus amount and bonus type
         const {bonusAmount, bonusType} = productData;
         const updatedProduct = await this.product.update({

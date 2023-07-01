@@ -8,3 +8,14 @@ export interface SingleProduct {
 }
 
 export type updateProduct = Pick<Product, "bonusAmount" | "bonusType">;
+
+export interface IProductRepository {
+  getProduct(shopifyId: string): Promise<Product | null>;
+  getAllProducts(take: number, skip: number): Promise<Product[]>;
+  addProduct(productData: SingleProduct): Promise<string>;
+  updateProduct(productData: updateProduct, productId: string): Promise<Product>;
+}
+
+export const PdTypes = {
+  IProductRepository:Symbol("IProductRepository")
+}
