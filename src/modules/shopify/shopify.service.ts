@@ -1,18 +1,22 @@
 import logger from "../../utils/logging/winston";
-import { SingleProduct } from "../product/product.dtos";
-import ProductService from "../product/product.service";
-import Product, { LineItem, Order, ProductCommission } from "./shopify.dtos";
-import DistributorRepository from "../distributor/distributor.repository";
-import ProductRepository from "../product/product.repository";
-import { AddOrder } from "../order/order.dtos";
-import { OrderRepository } from "../order/order.repository";
+import { IProductService, PdTypes, SingleProduct } from "../product/product.dtos";
+import Product, { IShopifyService, LineItem, Order, ProductCommission } from "./shopify.dtos";
+import { AddOrder, IOrderRepository, OTypes } from "../order/order.dtos";
+import { inject, injectable } from "inversify";
+import { DTypes, IDistributorRepository } from "../distributor/distributor.dtos";
 
-
-export default class ShopifyService {
-    private productService= new ProductService();
-    private distributorRepository = new DistributorRepository();
-    private productRepository = new ProductRepository();
-    private orderRepository =  new OrderRepository();
+@injectable()
+export default class ShopifyService implements IShopifyService{
+    private productService;
+    private distributorRepository;
+    private orderRepository;
+    constructor(@inject(OTypes.IOrderRepository)orderRepository:IOrderRepository, 
+    @inject(DTypes.IDistributorRepository)distributorRepository:IDistributorRepository, 
+    @inject(PdTypes.IProductService)productService:IProductService){
+            this.orderRepository = orderRepository;
+            this.distributorRepository = distributorRepository;
+            this.productService = productService;
+    }
 
     private findAndUpdateDistributorCommission = async(refferingId:string, orderData:Order)=>{
         const distributor = await this.distributorRepository.getDistributorwithReferralId(refferingId);
@@ -32,7 +36,7 @@ export default class ShopifyService {
 
     private calculateCommission = async (orderCommissionDetails: ProductCommission) => {
         const { product_id, quantity } = orderCommissionDetails;
-        let product = await this.productRepository.getProduct(String(product_id));
+        let product = await this.productService.getProduct(String(product_id));
         
         const bonusType = product!.bonusType;
         const bonusAmount = product!.bonusAmount;

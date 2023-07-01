@@ -1,4 +1,5 @@
 import { Product } from "@prisma/client";
+import IPagination from "../../utils/pagination/pagination.interface";
 
 export interface SingleProduct {
   productId: string;
@@ -16,6 +17,14 @@ export interface IProductRepository {
   updateProduct(productData: updateProduct, productId: string): Promise<Product>;
 }
 
+export interface IProductService {
+  addProduct(productData: SingleProduct): Promise<string | undefined>;
+  getAllProducts(paginationObject: IPagination): Promise<Product[]>;
+  updateProduct(productData: updateProduct, productId: string): Promise<Product>;
+  getProduct(shopifyId: string): Promise<Product>;
+}
+
 export const PdTypes = {
-  IProductRepository:Symbol("IProductRepository")
+  IProductRepository:Symbol("IProductRepository"),
+  IProductService:Symbol("IProductService")
 }

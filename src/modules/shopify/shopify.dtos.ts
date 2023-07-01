@@ -307,3 +307,12 @@ interface Variant {
   
   
 export type ProductCommission =  Pick<LineItem, "price" | "quantity" | "product_id">
+
+export interface IShopifyService {
+  proccessOrder(orderData: Order): Promise<void>;
+  addSingleProduct(product: Product): Promise<void>;
+}
+
+export const STypes = {
+  IShopifyService:Symbol("IShopifyService");
+}

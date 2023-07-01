@@ -1,9 +1,12 @@
 import {Router} from "express";
 import ShopifyWebhookController from "./shopify.webhooks";
+import container from "../../di/invesify.config";
 
 const shopifywebhookRouter = Router();
 
-shopifywebhookRouter.post("/webhook/product-creation", ShopifyWebhookController.addSingleProduct);
-shopifywebhookRouter.post("/webhook/order-payment", ShopifyWebhookController.orderPayment)
+const shopifyWebhookController = container.resolve<ShopifyWebhookController>(ShopifyWebhookController);
+
+shopifywebhookRouter.post("/webhook/product-creation", shopifyWebhookController.addSingleProduct);
+shopifywebhookRouter.post("/webhook/order-payment", shopifyWebhookController.orderPayment)
 
 export default shopifywebhookRouter;

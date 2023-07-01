@@ -1,11 +1,13 @@
 import { Product } from "@prisma/client";
-import { prisma } from "../../utils/db/prisma";
+import { IPrismaClient, PrismaType } from "../../utils/db/prisma";
 import { IProductRepository, SingleProduct, updateProduct } from "./product.dtos";
+import { inject, injectable } from "inversify";
 
 
+@injectable()
 export default class ProductRepository implements IProductRepository{
     private product;
-    constructor(){
+    constructor(@inject(PrismaType.IPrismaClient)prisma:IPrismaClient){
         this.product = prisma.product;
     }
 
@@ -23,7 +25,7 @@ export default class ProductRepository implements IProductRepository{
     }
 
     public addProduct = async(productData:SingleProduct):Promise<string>=>{
-      const productId = await prisma.product.create({
+      const productId = await this.product.create({
             data: { ...productData },
             select:{ id: true }
         });

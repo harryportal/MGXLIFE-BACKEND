@@ -1,11 +1,11 @@
 import { inject, injectable } from "inversify";
 import { BadRequestError } from "../../common/error";
 import IPagination from "../../utils/pagination/pagination.interface";
-import { IProductRepository, PdTypes, SingleProduct, updateProduct } from "./product.dtos";
-import ProductRepository from "./product.repository";
+import { IProductRepository, IProductService, PdTypes, SingleProduct, updateProduct } from "./product.dtos";
+import { Product } from "@prisma/client";
 
 @injectable()
-export default class ProductService {
+export default class ProductService implements IProductService{
     private productRepository:IProductRepository;
     constructor(@inject(PdTypes.IProductRepository)productRepository:IProductRepository){
         this.productRepository = productRepository;
@@ -18,6 +18,11 @@ export default class ProductService {
             const productId = await this.productRepository.addProduct(productData);
             return productId;
         };
+    }
+
+    public getProduct = async(shopifyId:string):Promise<Product>=>{
+        const product = await this.productRepository.getProduct(shopifyId);
+        return product as Product;
     }
 
     public getAllProducts = async(paginationObject:IPagination)=>{
