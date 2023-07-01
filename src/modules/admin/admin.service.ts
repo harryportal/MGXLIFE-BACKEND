@@ -28,6 +28,7 @@ export default class AdminService implements IAdminService{
 
     public signIn = async(email:string, password:string)=>{
         const admin = await this.adminRepository.getAdmin(email.toLocaleLowerCase());
+        console.log(admin);
         if(!admin) { throw new AuthError("Invalid Login Credentials") }
 
         const checkPassword = await comparePassword(password, admin.password!)

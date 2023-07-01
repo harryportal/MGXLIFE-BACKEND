@@ -1,4 +1,5 @@
 import { prisma } from "../../db/prisma";
+import { hashPassword } from "../../jwtAuth/jwt";
 
 const seedAdmin = async()=>{
     try {
@@ -7,7 +8,7 @@ const seedAdmin = async()=>{
           firstName: process.env.ADMIN_FIRSTNAME!,
           lastName: process.env.ADMIN_LASTNAME!,
           email: process.env.ADMIN_EMAIL!,
-          password: process.env.ADMIN_PASSWORD!
+          password: await hashPassword(process.env.ADMIN_PASSWORD!)
         }
       });
       console.log('Admin seeded successfully:', admin);

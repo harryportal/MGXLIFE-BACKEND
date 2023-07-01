@@ -13,6 +13,7 @@ export default class AdminController {
 
     public signIn = async(req:AuthRequest, res:Response)=>{
         let {email, password} = req.body as SignIn;
+        console.log({email, password});
         const accessToken = await this.adminService.signIn(email,password);
         return res.status(200).json({success:true, data:{accessToken}});
     }
