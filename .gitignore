@@ -1,7 +1,8 @@
+.env.development
 yarn-error.log
 node_modules
 dist
 logs
 .env
-.env.development
 .env.test
+.env.sample
