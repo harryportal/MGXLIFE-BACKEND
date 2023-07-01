@@ -33,4 +33,20 @@ export interface IAuthRepository {
     createRefreshToken(refreshToken:string, expiresAt:Date, distributorId:string):Promise<void>;
 }
 
+export interface IAuthService {
+  verifyEmail(verificationToken: string): Promise<void>;
+  signIn(email: string, password: string): Promise<{ accessToken: string; refreshToken: string }>;
+  resetPassword(token: string, password: string, confirmPassword: string): Promise<void>;
+  deleteRefreshToken(refreshToken: string): Promise<void>;
+  getAccessToken(refreshToken: string): Promise<string>;
+  createDistributor(distributorData: Omit<Distributor, "id">, refferalId: string): Promise<void>;
+  sendVerificationMail(firstname: string, email: string): Promise<void>;
+  forgotPassword(email: string): Promise<void>;
+}
+
+export const ATypes = {
+    IAuthRepository:Symbol("IAuthRepository"),
+    IAuthService:Symbol("IAuthService")
+}
+
 export type DistributorNoReferral = Omit<Distributor, "id" | "referredById">

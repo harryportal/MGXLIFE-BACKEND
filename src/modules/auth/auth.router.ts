@@ -4,18 +4,20 @@ import { ResetPassword, SignIn, SignUp } from "./auth.validation";
 import RequestValidator from "../../common/validation";
 import "express-async-errors";
 import { protect } from "../../common/auth";
+import container from "../../di/invesify.config";
 
 
 const authRouter = Router();
+const authController = container.resolve<AuthController>(AuthController);
 
-authRouter.post("/signup", RequestValidator.validate(SignUp), AuthController.signUp);
-authRouter.post("/login", RequestValidator.validate(SignIn), AuthController.SignIn)
-authRouter.get("/access-token", AuthController.getAccessToken)
-authRouter.post("/logout", AuthController.deleteRefreshToken)
-authRouter.post("/reset-password", RequestValidator.validate(ResetPassword), AuthController.resetPassword)
-authRouter.post("/forgot-password", AuthController.forgotPassword)
-authRouter.post("/verifyemail", AuthController.verifyEmail)
-authRouter.get("/verifyemail", protect, AuthController.getVerificationMail)
+authRouter.post("/signup", RequestValidator.validate(SignUp), authController.signUp);
+authRouter.post("/login", RequestValidator.validate(SignIn), authController.SignIn)
+authRouter.get("/access-token", authController.getAccessToken)
+authRouter.post("/logout", authController.deleteRefreshToken)
+authRouter.post("/reset-password", RequestValidator.validate(ResetPassword), authController.resetPassword)
+authRouter.post("/forgot-password", authController.forgotPassword)
+authRouter.post("/verifyemail", authController.verifyEmail)
+authRouter.get("/verifyemail", protect, authController.getVerificationMail)
 
 
 export default authRouter;

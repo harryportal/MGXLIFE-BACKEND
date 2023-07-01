@@ -4,17 +4,23 @@ import { comparePassword, createAcessToken, createRefreshToken, createVerificati
 import { Distributor } from "@prisma/client";
 import { createresetTemplate } from "../../utils/mailTemplates/resetPassword";
 import { completeprofileTemplate } from "../../utils/mailTemplates/completeProfile";
-import { injectable } from "inversify";
-import { IAuthRepository } from "./auth.dto";
-import { IMailService } from "../mail/mail.dto";
+import { inject, injectable } from "inversify";
+import { ATypes, IAuthRepository, IAuthService } from "./auth.dto";
+import { IMailService, MTypes } from "../mail/mail.dto";
+import { IPaymentService, PTypes } from "../payment/payment.dtos";
 
 
 @injectable()
-export default class AuthService {
+export default class AuthService implements IAuthService{
     private authRepository:IAuthRepository;
     private mailService:IMailService;
-    private paymentService:any;
-    constructor(){
+    private paymentService:IPaymentService;
+    constructor(@inject(MTypes.IMailService)mailService:IMailService, 
+    @inject(ATypes.IAuthRepository)authRepository:IAuthRepository, 
+    @inject(PTypes.IPaymentService)paymentService:IPaymentService){
+        this.paymentService = paymentService;
+        this.authRepository = authRepository;
+        this.mailService = mailService;
     }
 
     /* create the referal link using shortID and prepend the id with mg#.
@@ -82,7 +88,7 @@ export default class AuthService {
         let {email, password} = distributorData;
         const checkEmail = await this.authRepository.getDistributor(email);
         if (checkEmail){ throw new AuthError("Email Already Exists!. Please use another Email Address")};
-        const stripeCustomerId = await this.paymentRepository.createCustomer(email);
+        const stripeCustomerId = await this.paymentService.createCustomer(email);
         const refferingId = this.generateReferralLink();
         distributorData.referringId = refferingId;
         distributorData.password = await hashPassword(password);
@@ -111,12 +117,7 @@ export default class AuthService {
         const mailtemplate = completeprofileTemplate(firstname, verifyEmailUrl);
         await this.mailService.sendMail({to:email, subject: "Verify Your Email Address", html:mailtemplate})
     }
-
-    private removePassword = (distributor: Distributor)=>{
-        const { password, ...sanitizedData } = distributor;
-        return sanitizedData;
-    }
-
+ 
     public forgotPassword = async(email:string)=>{
         const user = await this.authRepository.getDistributor(email.toLowerCase()) as Distributor;
         if(!user) { throw new BadRequestError("No Email with associated Account!")}

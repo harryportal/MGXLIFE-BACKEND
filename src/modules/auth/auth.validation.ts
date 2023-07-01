@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsOptional, IsNumberString, IsBooleanString } from "class-validator";
+import { IsEmail, IsString, IsOptional } from "class-validator";
 
 
 export class SignIn {

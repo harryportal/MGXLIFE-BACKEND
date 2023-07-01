@@ -9,3 +9,7 @@ export interface MailInterface {
 export interface IMailService {
     sendMail(options: MailInterface):Promise<any>;
 }
+
+export const MTypes = {
+    IMailService:Symbol("IMailService")
+}
