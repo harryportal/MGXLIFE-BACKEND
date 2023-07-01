@@ -7,6 +7,14 @@ type DistributorData = Omit<Distributor, "password">;
 type ReferredUsers = Pick<Distributor,  "firstName" | "lastName" | "email" | 
     "subscriptionStatus" | "imageUrl" | "commissionEarned" | "verified">
 
+interface AllDistributors extends Partial<Distributor>{
+    referredBy:{
+        firstName:string,
+        lastName:string,
+        email:string
+    } | null
+}
+
 export interface IDistributorService {
     getDistributor(id:string): Promise<DistributorData>;
     getRefferedUsers(param:string): Promise<any>;
@@ -21,7 +29,7 @@ export interface IDistributorRepository{
     updateDistributorCommission(id:string, commission:number):Promise<void>;
     getReferredUsers(id:string):Promise<{referredUsers: ReferredUsers[]}[]>;
     getDistributorOrders(id:string): Promise<{orders:Order[]} | null>;
-    getAllDistributors(paginationObject:IPagination):Promise<Distributor[]>;
+    getAllDistributors(paginationObject:IPagination):Promise<AllDistributors[]>;
     updateProfile(id:string,profile:Partial<Distributor>):Promise<Distributor>;
     updateDistributorSubscriptionStatus(id:string, status:SubscriptionStatus):Promise<Distributor>;
     getDistributorwithStripeId(id:string):Promise<Distributor|null>;

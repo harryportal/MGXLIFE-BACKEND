@@ -78,7 +78,16 @@ export default class DistributorRepository implements IDistributorRepository{
       
     public getAllDistributors = async(paginationObject:IPagination)=>{
         const {take, skip} = paginationObject;
-        const distributors = await this.distributor.findMany({take, skip});
+        const distributors = await this.distributor.findMany({
+            take, skip, select:{
+                firstName:true, lastName:true, email:true,
+                subscriptionStatus:true, referredBy:{
+                    select: {
+                        firstName:true, lastName:true, email:true
+                    }}, commissionEarned:true, refferalCount:true, imageUrl:true, referringId:true,
+                    volumecredit:true, verified:true
+                }
+            });
         return distributors;
     }
 
