@@ -1,5 +1,4 @@
 import { Request, Response } from "express"
-import ShopifyService from "./shopify.service";
 import { inject } from "inversify";
 import { IShopifyService, STypes } from "./shopify.dtos";
 
