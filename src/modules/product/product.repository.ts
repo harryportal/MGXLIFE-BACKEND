@@ -31,11 +31,11 @@ export default class ProductRepository implements IProductRepository{
       return productId.id;
     }
 
-    public updateProduct = async(productData:updateProduct, productId:string):Promise<Product>=>{
+    public updateProduct = async(productData:updateProduct, shopifyId:string):Promise<Product>=>{
         // reserverd for the admin to only update the the product bonus amount and bonus type
         const {bonusAmount, bonusType} = productData;
         const updatedProduct = await this.product.update({
-          where:{ id: productId}, 
+          where:{ productId: shopifyId},
           data:{ 
             bonusAmount, bonusType
           }

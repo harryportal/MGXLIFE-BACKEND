@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import { BadRequestError } from "../../common/error";
 import IPagination from "../../utils/pagination/pagination.interface";
 import { IProductRepository, IProductService, PdTypes, SingleProduct, updateProduct } from "./product.dtos";
-import { Product } from "@prisma/client";
+import { BonusType, Product } from "@prisma/client";
 
 @injectable()
 export default class ProductService implements IProductService{
@@ -31,15 +31,10 @@ export default class ProductService implements IProductService{
         return products;
     }
 
-    public updateProduct = async(productData:updateProduct, productId:string)=>{
-        const product = await this.productRepository.getProduct(productId);
-        if(!product){ throw new BadRequestError("No Product with Id found!"); }
-        const {bonusAmount} = productData;
-        // An Extra check for the client!
-        if(bonusAmount > product.price){
-            throw new BadRequestError("Product Bonus Amount can not be more than half of product Price")
-        }
-        const updatedProduct = await this.productRepository.updateProduct(productData, productId);
+    public updateProduct = async(productData:updateProduct, shopifyId:string)=>{
+        const product = await this.productRepository.getProduct(shopifyId);
+        if(!product){ throw new BadRequestError("No Product with Shopify Id found!") };
+        const updatedProduct = await this.productRepository.updateProduct(productData, shopifyId);
         return updatedProduct;
     }
 

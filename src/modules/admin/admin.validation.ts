@@ -1,5 +1,5 @@
 import { BonusType } from "@prisma/client";
-import { IsString, IsDecimal, IsEnum, IsEmail } from "class-validator";
+import { IsString, IsDecimal, IsEnum, IsEmail, IsNumber } from "class-validator";
 
 
 export class SignIn {
@@ -23,6 +23,6 @@ export class UpdateProduct{
     @IsEnum(BonusType)
     bonusType:BonusType;
 
-    @IsDecimal()
+    @IsNumber()
     bonusAmount:number;
 }
