@@ -18,12 +18,6 @@ class Prisma{
     }
 };
 
-export interface IPrismaClient extends PrismaClient {};
-
-export const PrismaType = {
-    IPrismaClient:Symbol("IPrismClient")
-}
-
 const prisma = new Prisma().prisma;
 export {prisma, Prisma};
 

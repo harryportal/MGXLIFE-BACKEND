@@ -1,4 +1,4 @@
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 import { AuthError } from "../../common/error";
 import { comparePassword, createAdminToken } from "../../utils/jwtAuth/jwt";
 import current_page from "../../utils/pagination/page";
@@ -9,7 +9,7 @@ import { IOrderRepository, OTypes } from "../order/order.dtos";
 import { IProductService, PdTypes } from "../product/product.dtos";
 import { DTypes, IDistributorRepository } from "../distributor/distributor.dtos";
 
-
+@injectable()
 export default class AdminService implements IAdminService{
     private adminRepository;
     private orderRepository;

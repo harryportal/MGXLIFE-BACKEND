@@ -1,10 +1,11 @@
-import { inject } from "inversify";
-import { IPrismaClient, PrismaType} from "../../utils/db/prisma";
+import { injectable } from "inversify";
 import { IAdminRepository, UpdateAdmin } from "./admin.dtos";
+import { PrismaClient } from "@prisma/client";
 
+@injectable()
 export default class AdminRepository implements IAdminRepository {
     private admin;
-    constructor(@inject(PrismaType.IPrismaClient)prisma:IPrismaClient){
+    constructor(prisma:PrismaClient){
         this.admin = prisma.admin;
     }
 

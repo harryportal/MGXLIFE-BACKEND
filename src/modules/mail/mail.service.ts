@@ -2,11 +2,12 @@ import nodemailer from 'nodemailer';
 import { IMailService, MailInterface }from './mail.dto';
 import logger from '../../utils/logging/winston';
 import * as dotenv from "dotenv";
+import { injectable } from 'inversify';
 
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
-
+@injectable()
 export default class MailService implements IMailService{
     private transporter: nodemailer.Transporter;
     constructor(){

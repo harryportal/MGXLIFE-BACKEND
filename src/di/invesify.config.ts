@@ -5,7 +5,6 @@ import DistributorService from "../modules/distributor/distributor.service";
 import AuthRepository from "../modules/auth/auth.repositories";
 import AuthService from "../modules/auth/auth.service";
 import { ATypes, IAuthRepository, IAuthService } from "../modules/auth/auth.dto";
-import { IPrismaClient, PrismaType } from "../utils/db/prisma";
 import { PrismaClient } from "@prisma/client";
 import { IMailService, MTypes } from "../modules/mail/mail.dto";
 import MailService from "../modules/mail/mail.service";
@@ -24,7 +23,7 @@ import ShopifyService from "../modules/shopify/shopify.service";
 
 const container  = new Container();
 
-container.bind<IPrismaClient>(PrismaType.IPrismaClient).to(PrismaClient);
+container.bind(PrismaClient).toConstantValue(new PrismaClient());
 container.bind<IDistributorService>(DTypes.IDistributorService).to(DistributorService);
 container.bind<IDistributorRepository>(DTypes.IDistributorRepository).to(DistributorRepository);
 container.bind<IAuthRepository>(ATypes.IAuthRepository).to(AuthRepository);

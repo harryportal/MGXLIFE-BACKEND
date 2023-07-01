@@ -1,7 +1,8 @@
 import { Request, Response } from "express"
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 import { IShopifyService, STypes } from "./shopify.dtos";
 
+@injectable()
 export default class ShopifyWebhookController {
     private shopifyService;
     constructor(@inject(STypes.IShopifyService)shopifyService:IShopifyService){

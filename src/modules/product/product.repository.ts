@@ -1,5 +1,4 @@
-import { Product } from "@prisma/client";
-import { IPrismaClient, PrismaType } from "../../utils/db/prisma";
+import { PrismaClient, Product } from "@prisma/client";
 import { IProductRepository, SingleProduct, updateProduct } from "./product.dtos";
 import { inject, injectable } from "inversify";
 
@@ -7,7 +6,7 @@ import { inject, injectable } from "inversify";
 @injectable()
 export default class ProductRepository implements IProductRepository{
     private product;
-    constructor(@inject(PrismaType.IPrismaClient)prisma:IPrismaClient){
+    constructor(@inject(PrismaClient)prisma:PrismaClient){
         this.product = prisma.product;
     }
 

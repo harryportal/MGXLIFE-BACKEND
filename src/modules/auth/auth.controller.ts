@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { ATypes, AuthRequest, IAuthService, jwtPayload } from "./auth.dto";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class AuthController {
     private authService:IAuthService;
     constructor(@inject(ATypes.IAuthService)authService:IAuthService){

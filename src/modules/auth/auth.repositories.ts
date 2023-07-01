@@ -1,13 +1,13 @@
 import { DistributorNoReferral, IAuthRepository } from "./auth.dto";
 import { inject, injectable } from "inversify";
-import { IPrismaClient, PrismaType } from "../../utils/db/prisma";
+import { PrismaClient } from "@prisma/client";
 
 @injectable()
 export default class AuthRepository implements IAuthRepository{
     private refreshToken;
     private distributor;
     private prisma;
-    constructor(@inject(PrismaType.IPrismaClient)prisma:IPrismaClient){
+    constructor(@inject(PrismaClient)prisma:PrismaClient){
         this.prisma = prisma;
         this.distributor = prisma.distributor;
         this.refreshToken = prisma.refreshToken;

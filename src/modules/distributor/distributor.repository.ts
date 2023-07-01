@@ -1,14 +1,13 @@
-import { Distributor, SubscriptionStatus } from "@prisma/client";
+import { Distributor, PrismaClient, SubscriptionStatus } from "@prisma/client";
 import logger from "../../utils/logging/winston";
 import IPagination from "../../utils/pagination/pagination.interface";
 import { injectable, inject } from "inversify";
 import { IDistributorRepository } from "./distributor.dtos";
-import { IPrismaClient, PrismaType } from "../../utils/db/prisma";
 
 @injectable()
 export default class DistributorRepository implements IDistributorRepository{
     private readonly distributor;
-    constructor(@inject(PrismaType.IPrismaClient)prisma:IPrismaClient){
+    constructor(@inject(PrismaClient)prisma:PrismaClient){
         this.distributor = prisma.distributor;
     }
     

@@ -2,9 +2,9 @@ import { AuthRequest } from "../auth/auth.dto";
 import { AdTypes, File, IAdminService, UpdateAdmin } from "./admin.dtos";
 import { Response } from "express";
 import { SignIn, UpdateProduct } from "./admin.validation";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 
-
+@injectable()
 export default class AdminController {
     private adminService;
     constructor(@inject(AdTypes.IAdminService)adminService:IAdminService){
