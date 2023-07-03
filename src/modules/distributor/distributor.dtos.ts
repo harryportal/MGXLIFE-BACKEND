@@ -15,6 +15,11 @@ interface AllDistributors extends Partial<Distributor>{
     } | null
 }
 
+export interface UpdateDistributor{
+    firstname:string,
+    lastname:string,
+    imageUrl?: string 
+}
 export interface IDistributorService {
     getDistributor(id:string): Promise<DistributorData>;
     getRefferedUsers(param:string): Promise<any>;
@@ -30,7 +35,7 @@ export interface IDistributorRepository{
     getReferredUsers(id:string):Promise<{referredUsers: ReferredUsers[]}[]>;
     getDistributorOrders(id:string): Promise<{orders:Order[]} | null>;
     getAllDistributors(paginationObject:IPagination):Promise<AllDistributors[]>;
-    updateProfile(id:string,profile:Partial<Distributor>):Promise<Distributor>;
+    updateProfile(id:string,profile:UpdateDistributor):Promise<Distributor>;
     updateDistributorSubscriptionStatus(id:string, status:SubscriptionStatus):Promise<Distributor>;
     getDistributorwithStripeId(id:string):Promise<Distributor|null>;
     getDistributorwithReferralId(id:string):Promise<Distributor|null>;

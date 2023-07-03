@@ -2,7 +2,7 @@ import { Distributor, PrismaClient, SubscriptionStatus } from "@prisma/client";
 import logger from "../../utils/logging/winston";
 import IPagination from "../../utils/pagination/pagination.interface";
 import { injectable, inject } from "inversify";
-import { IDistributorRepository } from "./distributor.dtos";
+import { IDistributorRepository, UpdateDistributor } from "./distributor.dtos";
 
 @injectable()
 export default class DistributorRepository implements IDistributorRepository{
@@ -27,7 +27,6 @@ export default class DistributorRepository implements IDistributorRepository{
                 increment: commission
             }}
         });
-        console.log(updatedDistributor);
         logger.info(`Distributor with id ${updatedDistributor} has been updated with commission ${commission}`)
     }
 
@@ -119,13 +118,13 @@ export default class DistributorRepository implements IDistributorRepository{
         return distributor;
     }
 
-    public updateProfile = async(distributorId:string, profileData:Partial<Distributor>)=>{
-        const {firstName, lastName, imageUrl} = profileData;
+    public updateProfile = async(distributorId:string, profileData:UpdateDistributor)=>{
+        const {firstname, lastname, imageUrl} = profileData;
         const updatedDistributor = await this.distributor.update({
             where:{
                 id: distributorId
             }, data:{
-                firstName, lastName, imageUrl
+                firstName:firstname, lastName:lastname, imageUrl
             }
         });
         return updatedDistributor;
