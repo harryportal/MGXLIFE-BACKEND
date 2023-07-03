@@ -13,9 +13,9 @@ adminRouter.get("/distributors",adminProtect, adminController.getAllDistributors
 adminRouter.get("/orders", adminProtect, adminController.getAllOrders);
 adminRouter.get("/products", adminProtect, adminController.getAllProducts);
 adminRouter.post("/signin", adminController.signIn);
-adminRouter.put("/profile/update", adminProtect, RequestValidator.validate(UpdateProfile), adminController.updateProfile);
+adminRouter.put("/profile", adminProtect, RequestValidator.validate(UpdateProfile), adminController.updateProfile);
 adminRouter.put("/products/:id", adminProtect, RequestValidator.validate(UpdateProduct), adminController.updateProduct)
-
+adminRouter.get("/profile", adminProtect, adminController.updateProfile)
 
 // A route for seeding the Admin Db: might switch to ssh into the server for a better secuirity
 adminRouter.post("/seed/adminDatabase", seedAdmin)

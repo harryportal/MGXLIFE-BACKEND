@@ -8,6 +8,8 @@ import { UpdateProduct } from "./admin.validation";
 import { IOrderRepository, OTypes } from "../order/order.dtos";
 import { IProductService, PdTypes } from "../product/product.dtos";
 import { DTypes, IDistributorRepository } from "../distributor/distributor.dtos";
+import exclude from "../../utils/db/excludeKey";
+import { Admin } from "@prisma/client";
 
 @injectable()
 export default class AdminService implements IAdminService{
@@ -45,6 +47,12 @@ export default class AdminService implements IAdminService{
         };
         const updatedAdmin = await this.adminRepository.updateAdmin(adminId, updateData);
         return updatedAdmin;
+    }
+
+    public getProfile = async(adminEmail:string)=>{
+        const profileData = await this.adminRepository.getAdmin(adminEmail) as Admin;
+        const {password, ...profile} = profileData;
+        return profile;
     }
 
     public getAllProducts = async(pageNumber:string)=>{

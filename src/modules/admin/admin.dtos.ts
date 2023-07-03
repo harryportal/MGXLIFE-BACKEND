@@ -16,6 +16,7 @@ export interface IAdminService {
   getAllDistributors(pageNumber: string): Promise<any>; // Update the return type as needed
   getAllOrders(pageNumber: string): Promise<any>; // Update the return type as needed
   updateProduct(productId: string, updateData: UpdateProduct): Promise<any>; // Update the return type as needed
+  getProfile(adminEmail:string):Promise<Omit<Admin, "password">>;
 }
 
 

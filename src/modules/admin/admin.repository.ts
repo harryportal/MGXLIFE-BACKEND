@@ -10,7 +10,6 @@ export default class AdminRepository implements IAdminRepository {
     }
 
     public getAdmin = async(email:string)=>{
-        console.log(email);
         const admin = await this.admin.findUnique({
             where: {email}
         });

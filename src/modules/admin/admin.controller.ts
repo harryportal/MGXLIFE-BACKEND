@@ -18,6 +18,12 @@ export default class AdminController {
         return res.status(200).json({success:true, data:{accessToken}});
     }
 
+    public getProfile = async(req:AuthRequest, res:Response)=>{
+        const email = req.user!.email;
+        const profile = await this.adminService.getProfile(email);
+        return res.status(200).json({success:true, data:profile});
+    }
+
     public updateProfile = async(req:AuthRequest, res:Response)=>{
         const profileData = req.body as UpdateAdmin;
         const adminId = req.user!.id;
