@@ -1,6 +1,6 @@
 import { Distributor } from "@prisma/client";
 import { NotFoundError } from "../../common/error";
-import { DTypes, File, IDistributorRepository, IDistributorService} from "./distributor.dtos";
+import { DTypes, File, IDistributorRepository, IDistributorService, UpdateDistributor} from "./distributor.dtos";
 import uploadImage from "../../utils/upload/uploadImage";
 import { injectable, inject } from "inversify";
 
@@ -40,7 +40,7 @@ export default class DistributorService implements IDistributorService{
     }
 
 
-    public updateProfile = async(distributorId:string, profileData:Partial<Distributor>, imageFile:File | null)=>{
+    public updateProfile = async(distributorId:string, profileData:UpdateDistributor, imageFile:File | null)=>{
         await this.getDistributorOrThrow(distributorId);
         if(imageFile){
             const response = await uploadImage(imageFile);
