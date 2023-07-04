@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { AuthError, BadRequestError } from "../../common/error";
-import { comparePassword, createAdminToken } from "../../utils/jwtAuth/jwt";
+import { comparePassword, createAdminToken, hashPassword } from "../../utils/jwtAuth/jwt";
 import current_page from "../../utils/pagination/page";
 import uploadImage from "../../utils/upload/uploadImage";
 import { AdTypes, File, IAdminRepository, UpdateAdmin, IAdminService } from "./admin.dtos";
@@ -80,7 +80,8 @@ export default class AdminService implements IAdminService{
         if(password != confirmPassword){
             throw new BadRequestError("Passwords do not match!")
         }
-        await this.adminRepository.resetPassword(id, password);
+        const hashedPassword = await hashPassword(password);
+        await this.adminRepository.resetPassword(id, hashedPassword);
     }   
 
     public updateProduct = async(productId:string, updateData:UpdateProduct)=>{
