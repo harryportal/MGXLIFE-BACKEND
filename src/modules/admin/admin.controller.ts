@@ -56,4 +56,12 @@ export default class AdminController {
         const updatedProduct = await this.adminService.updateProduct(productId, updateData);
         return res.status(200).json({success:true, data:updatedProduct})
     }
+
+    public resetPassword = async(req:AuthRequest, res:Response)=>{
+        const adminId = req.user!.id;
+        const {password, confirmPassword, secret} = req.body;
+        await this.adminService.resetPassword(secret, password, confirmPassword, adminId);
+        return res.status(200).json({success:true, message:"Password Updated Successfully"})
+    }
+
 }

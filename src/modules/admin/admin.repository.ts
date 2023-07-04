@@ -28,4 +28,11 @@ export default class AdminRepository implements IAdminRepository {
         return updatedAdmin;
     }
 
+    public resetPassword = async(id:string, newPassword:string)=>{
+        await this.admin.update({
+            where: {id},
+            data: {password:newPassword}
+        })
+    }
+
 }

@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { AuthError } from "../../common/error";
+import { AuthError, BadRequestError } from "../../common/error";
 import { comparePassword, createAdminToken } from "../../utils/jwtAuth/jwt";
 import current_page from "../../utils/pagination/page";
 import uploadImage from "../../utils/upload/uploadImage";
@@ -72,6 +72,16 @@ export default class AdminService implements IAdminService{
         const orders = await this.orderRepository.getAllOrders(paginationObject);
         return orders;
     }
+    
+    public resetPassword = async(secret:string, password:string, confirmPassword:string, id:string)=>{
+        if(secret != process.env.ADMIN_SECRET){
+            throw new BadRequestError("Invalid Admin Secret!")
+        }
+        if(password != confirmPassword){
+            throw new BadRequestError("Passwords do not match!")
+        }
+        await this.adminRepository.resetPassword(id, password);
+    }   
 
     public updateProduct = async(productId:string, updateData:UpdateProduct)=>{
         const updatedProduct = await this.productService.updateProduct(updateData, productId);

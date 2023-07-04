@@ -7,6 +7,7 @@ export type File = Express.Multer.File;
 export interface IAdminRepository {
     getAdmin(email: string): Promise<Admin | null>;
     updateAdmin(id: string, updateData: UpdateAdmin): Promise<Partial<Admin>>;
+    resetPassword(id:string, newPassword:string):Promise<void>;
 }
 
 export interface IAdminService {
@@ -17,6 +18,7 @@ export interface IAdminService {
   getAllOrders(pageNumber: string): Promise<any>; // Update the return type as needed
   updateProduct(productId: string, updateData: UpdateProduct): Promise<any>; // Update the return type as needed
   getProfile(adminEmail:string):Promise<Omit<Admin, "password">>;
+  resetPassword(secret:string, password:string, confirmPassword:string, id:string):Promise<void>;
 }
 
 
