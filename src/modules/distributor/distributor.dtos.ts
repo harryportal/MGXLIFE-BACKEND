@@ -31,7 +31,7 @@ export interface IDistributorService {
 
 export interface IDistributorRepository{
     getProfile(id:string):Promise<Distributor | null>;
-    getDistributor(email:string):Promise<Distributor>;
+    getDistributor(email:string):Promise<Distributor | null>;
     updateDistributorCommission(id:string, commission:number):Promise<void>;
     getReferredUsers(id:string):Promise<{referredUsers: ReferredUsers[]}[]>;
     getDistributorOrders(id:string): Promise<{orders:Order[]} | null>;
@@ -48,3 +48,4 @@ export const DTypes = {
     IDistributorRepository: Symbol("IDistributorRepository"),
     IDistributorService: Symbol("IDistributorService")
 }
+

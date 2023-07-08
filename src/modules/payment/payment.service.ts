@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import { BadRequestError, InternalServerError } from "../../common/error";
-import { SubscriptionStatus } from "@prisma/client";
+import { Distributor, SubscriptionStatus } from "@prisma/client";
 import logger from "../../utils/logging/winston";
 import { injectable, inject } from "inversify";
 import { IDistributorRepository, DTypes} from "../distributor/distributor.dtos";
@@ -29,14 +29,6 @@ export default class PaymentService implements IPaymentService{
       return portalSession;
     }
     
-    /* ----will use this once the front end fix card not displaying for a subscribed user
-    private getDistributorandThrow = async(email:string)=>{
-        const distributor = await this.distributorRepository.getDistributorwithEmail(email);
-        if(distributor!.subscriptionStatus == "PAID"){
-            throw new BadRequestError("You are already subscribed!");
-        }
-    }*/
-
     public createCheckOutSession = async(email:string):Promise<string>=>{
       const priceId = "price_1NBpCIB7eY2bXlKvxEIK2GJ3";
       const distributor = await this.distributorRepository.getDistributorwithEmail(email);
@@ -72,23 +64,27 @@ export default class PaymentService implements IPaymentService{
 
 
     public retrieveSubscription = async(subscriptionId: string): Promise<Stripe.Subscription>=>{
-    try {
-      const subscription = await this.stripe.subscriptions.retrieve(subscriptionId);
+        try {
+        const subscription = await this.stripe.subscriptions.retrieve(subscriptionId);
 
-      return subscription;
-    } catch (error:any) {
-      throw new Error(`Failed to retrieve subscription: ${error.message}`);
-    }
+        return subscription;
+        } catch (error:any) {
+        throw new Error(`Failed to retrieve subscription: ${error.message}`);
+        }
     }
 
     public handleSubscriptionEvents = async(payload:any, signature:string)=>{
         const event = this.getEvent(payload, signature)
         const session = event.data.object as Stripe.Checkout.Session;
         const distributorStripeId = session.customer as string;
+        const amount = session.amount_total as number;
         switch(event.type){
+            /* For this case, we set the distributor subscription status as true and add 50% of the sign 
+            up to the sponsporing distributor if any*/
             case("checkout.session.completed" || "invoice.paid" || "invoice.payment_succeeded"):
                 await this.distributorRepository.updateDistributorSubscriptionStatus(distributorStripeId, 
-                    SubscriptionStatus.PAID)
+                SubscriptionStatus.PAID);
+                await this.addSignUpFee(distributorStripeId, amount);
                 break;
             case("invoice.payment_failed"):
                 /*update the distributor subscription status ... optionally add the logic to redirect the user to 
@@ -96,6 +92,20 @@ export default class PaymentService implements IPaymentService{
                 await this.distributorRepository.updateDistributorSubscriptionStatus(distributorStripeId, 
                     SubscriptionStatus.NOT_PAID)
                 break;    
+        }
+    }
+
+    /**
+     * Gets the distributor from the stripeId, check
+     * @param distibutorStripeId 
+     * @param amount 
+     */
+    private addSignUpFee = async(stripeId:string, amount:number):Promise<void>=>{
+        const disitributor = await this.distributorRepository.getDistributorwithStripeId(stripeId) as Distributor;
+        const signUpBonus = (50/100) * amount;
+        const sponsoringId = disitributor.referredById;
+        if(sponsoringId){
+            await this.distributorRepository.updateDistributorCommission(sponsoringId, signUpBonus);
         }
     }
 
