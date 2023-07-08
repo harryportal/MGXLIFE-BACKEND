@@ -4,6 +4,7 @@ import Product, { IShopifyService, LineItem, Order, ProductCommission } from "./
 import { AddOrder, IOrderRepository, OTypes } from "../order/order.dtos";
 import { inject, injectable } from "inversify";
 import { DTypes, IDistributorRepository } from "../distributor/distributor.dtos";
+import { Distributor } from "@prisma/client";
 
 @injectable()
 export default class ShopifyService implements IShopifyService{
@@ -20,45 +21,43 @@ export default class ShopifyService implements IShopifyService{
 
     private findAndUpdateDistributorCommission = async(refferingId:string, orderData:Order)=>{
         const distributor = await this.distributorRepository.getDistributorwithReferralId(refferingId);
-        if(distributor && distributor.subscriptionStatus){
+        if(distributor && distributor.subscriptionStatus == "PAID"){
             // update the distributor's commission for each of the products line items
             for(const productData of orderData.line_items){
                 const commission = await this.calculateCommission(productData);
                 await this.distributorRepository.updateDistributorCommission(distributor.id, commission);
             }
+            // get the total amount from the order and update the sponsoring distributor's vplume credit
+            const {amount} = this.calculateOrderAmountandQuantity(orderData.line_items);
+            const SponsoringDistributorId = distributor.referredById;
+            if(SponsoringDistributorId){
+                await this.distributorRepository.addVolumeCredit(SponsoringDistributorId, amount);
+            }
         }
-        /* More logic should come in here:
-        1. Calculate the correct commission
-        2 Update the commmission of the distributor and the parent distributors
-        */
-
     }
 
-    private calculateCommission = async (orderCommissionDetails: ProductCommission) => {
+    /**
+     * Calculates the commission for a single product based on the bonsy Type/Amount and quantity ordered
+     * @param orderCommissionDetails 
+     * @returns 
+     */
+    private calculateCommission = async (orderCommissionDetails: ProductCommission)=>{
         const { product_id, quantity } = orderCommissionDetails;
         let product = await this.productService.getProduct(String(product_id));
-        
         const bonusType = product!.bonusType;
         const bonusAmount = product!.bonusAmount;
         let commission: number;
-        // check if product is percentage or flat rate based
-        // use product!.bonus type and product!.bonus amount instead of just 20
         if (bonusType == "PERCENTAGE") {
           commission = product!.price * (bonusAmount / 100) * quantity;
-        } else {
-          commission = bonusAmount * quantity;
-        }
-      
+        } else { commission = bonusAmount * quantity;  }
         return commission;
-      }
-
-    private addVolumeCredit = async ()=>{
-        
     }
 
     
-      
-    // new function for parent affiliate.
+    /**
+     * Returns the total quantity and amount for the entire order
+     * @param lineItems
+     */
     private calculateOrderAmountandQuantity = (lineItems:LineItem[])=>{
         let amount:number = 0.0;
         let quantity:number = 0;
@@ -67,42 +66,62 @@ export default class ShopifyService implements IShopifyService{
             quantity += orderLineItem.quantity;
         }
         return {amount, quantity};
-
     }
 
-    private checkOrder = async(shopifyId:string)=>{
-        // This check with a shopify Id if an order already exists
-        const order = await this.orderRepository.getOrder(shopifyId);
-        return order
-    }
-
+    
+    /**
+     * 1. Verify the stripe webhook Signature - come back to this 
+     * 2. Take the following steps if refferal Id exists in the payload
+     * 3. Check if the refferal Id exists in database -  done
+     * 4. If true, calculate the product's commision and add to the normal distributor done
+     * 5. Calcualate the Volume Credit and add to the Sponsoring distributor(If any) - i.e the distributor
+     * 6. that reffered the current distributor.
+     * 7. Take the following steps if there is no reffering Id in the payload - This should come first sef
+     * 8. Extract the customer email and check if there is a distributor with that email address
+     * 9. If true, add 20% of the product's price as bonus for the distributor and add 20% of what is left on the price
+     *  to the sponsoring distributor commission
+     * @param orderData 
+     */
     public proccessOrder = async(orderData:Order)=>{
-        /* This would first verify the webhook is from shopify 
-        extract the relevant information from the webhook, then send the product data to the produt repository*/
-        // We should even try to verify that the webhook has not been sent before due to issues with shopify
-        console.log(orderData);
         const orderId = String(orderData.id);
-        const checkOrder = await this.checkOrder(orderId);
+        const checkOrder = await this.orderRepository.getOrder(orderId);
 
         if(!checkOrder){
+            // Check the email that is attached and see if it's a distributor
+            const customerEmail = orderData.customer.email;
             const refferingId = orderData.landing_site_ref ?? null;
-            //check if a buyer is a distributor=db for email
-            //sponsoring distributor gets 20% of the price after promo code.
-            if(refferingId){
+            const distributor = await this.distributorRepository.getDistributor(customerEmail);
+            if(distributor){
+                await this.processDistributorCommission(distributor,orderData);
+            }else if(refferingId){
                 await this.findAndUpdateDistributorCommission(refferingId, orderData);
-
             };
+            await this.proccessOrderData(orderData, orderId, refferingId)
+        }
+    }
 
-            const {order_number, line_items} = orderData;
+    private proccessOrderData = async(orderData:Order, orderId:string, refferingId:string)=>{
+        const {order_number, line_items} = orderData;
             const {first_name, last_name, email } = orderData.customer;
             const {amount, quantity} = this.calculateOrderAmountandQuantity(line_items);
             const createdAt = new Date().toLocaleString();
-            // Simply update the Order DB for the admin client!
+            
             const order:AddOrder = { shopifyId:orderId, orderNumber:order_number, customerEmail:email,
                 amountPaid:amount, quantity, customerFirstName:first_name, customerLastName:last_name,
                 distributorId:refferingId, createdAt };
             const createOrder = await this.orderRepository.addOrder(order);
             logger.info(`An Order with ID ${createOrder.id} has been added`);
+    }
+    
+    private processDistributorCommission = async(distributor:Distributor, orderData:Order)=>{
+        const {amount} = this.calculateOrderAmountandQuantity(orderData.line_items);
+        const interest = (20/100) * amount;
+        await this.distributorRepository.updateDistributorCommission(distributor.id, interest);
+        // Add 20% of the amount left to the commission of the sponsoring distributor
+        if(distributor.referredById){
+            const sponsoringId = distributor.referredById;
+            const sponsoringInterest = (20/100 * (80/100 *  amount));
+            await this.distributorRepository.updateDistributorCommission(sponsoringId, sponsoringInterest);
         }
     }
     

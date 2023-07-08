@@ -20,6 +20,15 @@ export default class DistributorRepository implements IDistributorRepository{
         return distributor;
     }
 
+    public getDistributor = async(email:string)=>{
+        const distributor = await this.distributor.findUnique({
+            where: {
+                email
+            }
+        });
+        return distributor;
+ 
+    }
     public updateDistributorCommission = async(distributorId:string, commission:number)=>{
         const updatedDistributor = await this.distributor.update({
             where:{ id: distributorId },
@@ -135,6 +144,18 @@ export default class DistributorRepository implements IDistributorRepository{
             where: {referringId: refferalId}
         });
         return distributor;
+    };
+
+    public addVolumeCredit = async(distributorId:string, amount:number)=>{
+        await this.distributor.update({
+            where:{
+                id: distributorId
+            }, data:{
+                volumecredit: {
+                    increment: amount
+                }
+            }
+        })
     }
 
 

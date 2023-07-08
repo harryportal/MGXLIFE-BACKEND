@@ -31,6 +31,7 @@ export interface IDistributorService {
 
 export interface IDistributorRepository{
     getProfile(id:string):Promise<Distributor | null>;
+    getDistributor(email:string):Promise<Distributor>;
     updateDistributorCommission(id:string, commission:number):Promise<void>;
     getReferredUsers(id:string):Promise<{referredUsers: ReferredUsers[]}[]>;
     getDistributorOrders(id:string): Promise<{orders:Order[]} | null>;
@@ -38,6 +39,7 @@ export interface IDistributorRepository{
     updateProfile(id:string,profile:UpdateDistributor):Promise<Distributor>;
     updateDistributorSubscriptionStatus(id:string, status:SubscriptionStatus):Promise<Distributor>;
     getDistributorwithStripeId(id:string):Promise<Distributor|null>;
+    addVolumeCredit(distributorId:string, amount:number):Promise<void>;
     getDistributorwithReferralId(id:string):Promise<Distributor|null>;
     getDistributorwithEmail(email:string):Promise<Distributor | null>;
 }
