@@ -1,14 +1,11 @@
 import { Response } from "express";
 import { AuthRequest } from "../auth/auth.dto";
-import { File, IDistributorService, DTypes} from "./distributor.dtos";
+import { File, IDistributorService, Types} from "./distributor.interface";
 import {injectable, inject} from "inversify";
 
 @injectable()
 export default class DistributorController {
-    private readonly distributorService:IDistributorService;
-    constructor(@inject(DTypes.IDistributorService)distributorService:IDistributorService){
-        this.distributorService = distributorService;
-    }
+    constructor(@inject(Types.IDistributorService)private readonly distributorService:IDistributorService){}
     
     public getProfile = async(req:AuthRequest, res:Response)=>{
         let {id} = req.user!;

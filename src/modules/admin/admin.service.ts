@@ -7,7 +7,7 @@ import { AdTypes, File, IAdminRepository, UpdateAdmin, IAdminService } from "./a
 import { UpdateProduct } from "./admin.validation";
 import { IOrderRepository, OTypes } from "../order/order.dtos";
 import { IProductService, PdTypes } from "../product/product.dtos";
-import { DTypes, IDistributorRepository } from "../distributor/distributor.dtos";
+import { DTypes, IDistributorRepository } from "../distributor/distributor.interface";
 import exclude from "../../utils/db/excludeKey";
 import { Admin } from "@prisma/client";
 

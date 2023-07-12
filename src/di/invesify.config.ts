@@ -1,5 +1,5 @@
 import {Container} from "inversify";
-import { IDistributorService, IDistributorRepository, DTypes} from "../modules/distributor/distributor.dtos";
+import { IDistributorService, IDistributorRepository, Types as DistributorTypes} from "../modules/distributor/distributor.interface";
 import DistributorRepository from "../modules/distributor/distributor.repository";
 import DistributorService from "../modules/distributor/distributor.service";
 import AuthRepository from "../modules/auth/auth.repositories";
@@ -24,8 +24,8 @@ import ShopifyService from "../modules/shopify/shopify.service";
 const container  = new Container();
 
 container.bind(PrismaClient).toConstantValue(new PrismaClient());
-container.bind<IDistributorService>(DTypes.IDistributorService).to(DistributorService);
-container.bind<IDistributorRepository>(DTypes.IDistributorRepository).to(DistributorRepository);
+container.bind<IDistributorService>(DistributorTypes.IDistributorService).to(DistributorService);
+container.bind<IDistributorRepository>(DistributorTypes.IDistributorRepository).to(DistributorRepository);
 container.bind<IAuthRepository>(ATypes.IAuthRepository).to(AuthRepository);
 container.bind<IAuthService>(ATypes.IAuthService).to(AuthService);
 container.bind<IMailService>(MTypes.IMailService).to(MailService);
