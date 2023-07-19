@@ -3,7 +3,7 @@ import { IProductService, PdTypes, SingleProduct } from "../product/product.dtos
 import Product, { IShopifyService, LineItem, Order, ProductCommission } from "./shopify.dtos";
 import { AddOrder, IOrderRepository, OTypes } from "../order/order.dtos";
 import { inject, injectable } from "inversify";
-import { DTypes, IDistributorRepository } from "../distributor/distributor.interface";
+import { Types as DTypes, IDistributorRepository } from "../distributor/distributor.interface";
 import { Distributor } from "@prisma/client";
 
 @injectable()
