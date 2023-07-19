@@ -7,26 +7,16 @@ import { AdTypes, File, IAdminRepository, UpdateAdmin, IAdminService } from "./a
 import { UpdateProduct } from "./admin.validation";
 import { IOrderRepository, OTypes } from "../order/order.dtos";
 import { IProductService, PdTypes } from "../product/product.dtos";
-import { DTypes, IDistributorRepository } from "../distributor/distributor.interface";
-import exclude from "../../utils/db/excludeKey";
+import { Types, IDistributorRepository } from "../distributor/distributor.interface";
 import { Admin } from "@prisma/client";
 
 @injectable()
 export default class AdminService implements IAdminService{
-    private adminRepository;
-    private orderRepository;
-    private productService;
-    private distributorRepository;
-    constructor(@inject(AdTypes.IAdminRepository)adminRepository:IAdminRepository,
-    @inject(OTypes.IOrderRepository)orderRepository:IOrderRepository,
-    @inject(PdTypes.IProductService)productService:IProductService,
-    @inject(DTypes.IDistributorRepository)distributorRepository:IDistributorRepository
-    ){
-        this.adminRepository = adminRepository;
-        this.orderRepository = orderRepository;
-        this.productService = productService;
-        this.distributorRepository = distributorRepository;
-    }
+    constructor(@inject(AdTypes.IAdminRepository)private readonly adminRepository:IAdminRepository,
+    @inject(OTypes.IOrderRepository)private readonly orderRepository:IOrderRepository,
+    @inject(PdTypes.IProductService)private readonly productService:IProductService,
+    @inject(Types.IDistributorRepository)private readonly distributorRepository:IDistributorRepository
+    ){}
 
     public signIn = async(email:string, password:string)=>{
         const admin = await this.adminRepository.getAdmin(email.toLocaleLowerCase());
