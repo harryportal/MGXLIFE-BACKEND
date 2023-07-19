@@ -46,7 +46,12 @@ export default class DistributorRepository implements IDistributorRepository{
             }, select:{ 
                 referredUsers:{ select: {
                     firstName:true, lastName:true, email:true, subscriptionStatus:true,
-                    imageUrl:true, commissionEarned:true, verified:true
+                    imageUrl:true, commissionEarned:true, verified:true, referredUsers: {
+                        select: {
+                            firstName:true, lastName:true, email:true, subscriptionStatus:true,
+                            imageUrl:true, commissionEarned:true, verified:true
+                        }
+                    }
                 }}
             }
         })
