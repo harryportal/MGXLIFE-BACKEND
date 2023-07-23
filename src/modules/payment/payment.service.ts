@@ -9,11 +9,11 @@ import { IPaymentService } from "./payment.interface";
 @injectable()
 export default class PaymentService implements IPaymentService{
     private stripe:Stripe;
-    private secretKey;
-    private signingKey;
-      constructor(@inject(Types.IDistributorRepository)private readonly distributorRepository:IDistributorRepository){
-        this.secretKey = process.env.STRIPE_SECRETKEY!;
-        this.signingKey = process.env.STRIPE_SIGNINGKEY!
+    constructor(@inject(Types.IDistributorRepository)private readonly distributorRepository:IDistributorRepository,
+        private readonly secretKey = process.env.STRIPE_SECRETKEY!, 
+        private readonly signingKey = process.env.STRIPE_SIGNINGKEY!,
+        private readonly accSigningKey = process.env.STRIPE_CONNECTEDACC_SIGNING_KEY! // key for connected accounts events
+      ){
         this.stripe =  new Stripe(this.secretKey,
             {apiVersion: '2022-11-15',  maxNetworkRetries: 3,  timeout: 1000})
     }
@@ -105,7 +105,7 @@ export default class PaymentService implements IPaymentService{
     }
 
     public handleSubscriptionEvents = async(payload:any, signature:string)=>{
-        const event = this.getEvent(payload, signature)
+        const event = this.getEvent(payload, signature, this.signingKey)
         switch(event.type){
             case("checkout.session.completed" || "invoice.paid" || "invoice.payment_succeeded"):
                 await this.handlePaymentEvent(event, true);
@@ -113,13 +113,10 @@ export default class PaymentService implements IPaymentService{
             case("invoice.payment_failed"):
                 await this.handlePaymentEvent(event, false);
                 break;
-            case("transfer.updated"):
+            case("transfer.created"):
                 await this.handleTransferEvent(event);
                 break;
-            case("account.updated"):
-                await this.handleAccountEvent(event);
-                break;
-        }
+            }
     }
 
     private handlePaymentEvent = async(event:Stripe.Event, success:boolean)=>{
@@ -142,7 +139,8 @@ export default class PaymentService implements IPaymentService{
         await this.distributorRepository.resetDistributorBalance(disitributorAccountId)
     }
 
-    private handleAccountEvent = async(event:Stripe.Event)=>{
+    public handleAccountEvent = async(payload:any, signature:string)=>{
+      const event = this.getEvent(payload, signature, this.accSigningKey)
       const account = event.data.object as Stripe.Account;
       const distibutorEmail = account.email as string;
       await this.distributorRepository.updateDistributorAccountStatus(distibutorEmail);
@@ -162,10 +160,10 @@ export default class PaymentService implements IPaymentService{
         }
     }
 
-    public getEvent = (payload:any, signature:string):Stripe.Event=>{
+    private getEvent = (payload:any, signature:string, signingKey:string):Stripe.Event=>{
         let event;
         try{
-            event = this.stripe.webhooks.constructEvent(payload, signature, this.signingKey)
+            event = this.stripe.webhooks.constructEvent(payload, signature, signingKey)
         }catch(err:any){
             logger.error("Stripe Webhook Failure", err.message);
             throw new BadRequestError(`WebHook Error ${err.message}`)

@@ -19,6 +19,8 @@ app.use(morgan('dev'));
 todo: seperate the webhook controller into a different module or define seperate routers for them 
 */
 app.post("/webhook", express.raw({ type: 'application/json' }), paymentController.stripeWebhookHandler)
+app.post("/webhook/connected", express.raw({ type: 'application/json' }), paymentController.stripeConnectedAccountWebhook)
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
