@@ -128,6 +128,7 @@ export default class PaymentService implements IPaymentService{
       const amount = session.amount_total as number;
       await this.distributorRepository.updateDistributorSubscriptionStatus(distributorStripeId, status);
       if(status == SubscriptionStatus.PAID){
+        console.log(distributorStripeId, amount)
         await this.addSignUpFee(distributorStripeId, amount);  // for the parent distributor
       }
     }
@@ -155,6 +156,8 @@ export default class PaymentService implements IPaymentService{
         const signUpBonus = (50/100) * amount;
         const sponsoringId = disitributor.referredById;
         if(sponsoringId){
+            console.log(signUpBonus)
+            console.log(sponsoringId)
             await this.distributorRepository.updateDistributorCommission(sponsoringId, signUpBonus);
         }
     }
