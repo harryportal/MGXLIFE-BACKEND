@@ -1,5 +1,5 @@
 import { injectable } from "inversify";
-import { IAdminRepository, UpdateAdmin } from "./admin.dtos";
+import { IAdminRepository, UpdateAdmin } from "./admin.interface";
 import { PrismaClient } from "@prisma/client";
 
 @injectable()

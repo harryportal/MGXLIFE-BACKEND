@@ -1,4 +1,4 @@
-export const completeprofileTemplate = (firstname:string, link:string)=>{
+export const notifyCustomerPayment = (firstname:string, link:string)=>{
     return `<!DOCTYPE html>
 	<html>
 	<head>
@@ -72,11 +72,10 @@ export const completeprofileTemplate = (firstname:string, link:string)=>{
 	<body>
 	  <div class="email-container">
 		<h1>Dear ${firstname}</h1>
-		<p>Thank you for registering as a distributor on MXFLIFE. We'd like to remind you to complete your profile by verifying your email address. This will help us better tailor our services to meet your needs.</p>
-		<p>Here's the link to verify your email:</p>
-		<a href="${link}" class="button">Verify Email</a>
-		<p>If you did not request this, please ignore this email or contact our support team immediately.</p>
-		<p>Thank you for your time.</p>
+		<p>We'ld like to inform you that your Commission and Volume Credit accumulated in the last month has been paid<p>
+		<p>Here's the link to your stripe account:</p>
+		<a href="${link}" class="button">Login to Stripe Dashboard</a>
+		<p>Thank you for registering as a distributor on MXGLIFE</p>
 		<p class="signature">Best regards,</p>
 		<p class="signature">The MXGLIFE Team</p>
 	  </div>

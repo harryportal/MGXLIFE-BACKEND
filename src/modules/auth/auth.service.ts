@@ -12,16 +12,9 @@ import { IPaymentService, PTypes } from "../payment/payment.interface";
 
 @injectable()
 export default class AuthService implements IAuthService{
-    private authRepository:IAuthRepository;
-    private mailService:IMailService;
-    private paymentService:IPaymentService;
-    constructor(@inject(MTypes.IMailService)mailService:IMailService, 
-    @inject(ATypes.IAuthRepository)authRepository:IAuthRepository, 
-    @inject(PTypes.IPaymentService)paymentService:IPaymentService){
-        this.paymentService = paymentService;
-        this.authRepository = authRepository;
-        this.mailService = mailService;
-    }
+    constructor(@inject(MTypes.IMailService)private readonly mailService:IMailService, 
+    @inject(ATypes.IAuthRepository)private readonly authRepository:IAuthRepository, 
+    @inject(PTypes.IPaymentService)private readonly paymentService:IPaymentService){}
 
     /* create the referal link using shortID and prepend the id with mg#.
     even though it will not be available to the user until subscription has been payed with stripe*/   

@@ -1,15 +1,12 @@
 import { AuthRequest } from "../auth/auth.dto";
-import { AdTypes, File, IAdminService, UpdateAdmin } from "./admin.dtos";
+import { AdTypes, File, IAdminService, UpdateAdmin } from "./admin.interface";
 import { Response } from "express";
 import { SignIn, UpdateProduct } from "./admin.validation";
 import { inject, injectable } from "inversify";
 
 @injectable()
 export default class AdminController {
-    private adminService;
-    constructor(@inject(AdTypes.IAdminService)adminService:IAdminService){
-        this.adminService = adminService;
-    }
+    constructor(@inject(AdTypes.IAdminService)private readonly adminService:IAdminService){}
 
     public signIn = async(req:AuthRequest, res:Response)=>{
         let {email, password} = req.body as SignIn;
@@ -30,6 +27,12 @@ export default class AdminController {
         const imageFile = req.file as File;
         const updatedProfile = await this.adminService.updateAdmin(profileData, adminId, imageFile);
         return res.status(200).json({success:true, data:updatedProfile})
+    }
+
+    public payCustomer = async(req:AuthRequest, res:Response)=>{
+        const customerId = req.params.id;
+        await this.adminService.payDistributor(customerId);
+        return res.status(200).json({success:true, message:"Payment for Customer Successful"})
     }
 
     public getAllProducts = async(req:AuthRequest, res:Response)=>{

@@ -3,18 +3,23 @@ import { AuthError, BadRequestError } from "../../common/error";
 import { comparePassword, createAdminToken, hashPassword } from "../../utils/jwtAuth/jwt";
 import current_page from "../../utils/pagination/page";
 import uploadImage from "../../utils/upload/uploadImage";
-import { AdTypes, File, IAdminRepository, UpdateAdmin, IAdminService } from "./admin.dtos";
+import { AdTypes, File, IAdminRepository, UpdateAdmin, IAdminService } from "./admin.interface";
 import { UpdateProduct } from "./admin.validation";
 import { IOrderRepository, OTypes } from "../order/order.dtos";
 import { IProductService, PdTypes } from "../product/product.dtos";
 import { Types, IDistributorRepository } from "../distributor/distributor.interface";
-import { Admin } from "@prisma/client";
+import { Admin, Distributor } from "@prisma/client";
+import { IPaymentService, PTypes } from "../payment/payment.interface";
+import { notifyCustomerPayment } from "../../utils/mailTemplates/paymentConfirmation";
+import { IMailService, MTypes } from "../mail/mail.dto";
 
 @injectable()
 export default class AdminService implements IAdminService{
     constructor(@inject(AdTypes.IAdminRepository)private readonly adminRepository:IAdminRepository,
+    @inject(PTypes.IPaymentService)private readonly paymentService:IPaymentService,
     @inject(OTypes.IOrderRepository)private readonly orderRepository:IOrderRepository,
     @inject(PdTypes.IProductService)private readonly productService:IProductService,
+    @inject(MTypes.IMailService)private readonly mailService:IMailService,
     @inject(Types.IDistributorRepository)private readonly distributorRepository:IDistributorRepository
     ){}
 
@@ -55,6 +60,20 @@ export default class AdminService implements IAdminService{
         const paginationObject = current_page(pageNumber);
         const distributors = await this.distributorRepository.getAllDistributors(paginationObject);
         return distributors;
+    }
+
+    private mailCustomerForPayment = async(name:string, accountId:string, email:string)=>{
+        const loginLink = await this.paymentService.getConnectedAccountLoginLink(accountId) as unknown as string;
+        const emailTemplate = notifyCustomerPayment(name, loginLink);
+        await this.mailService.sendMail({to:email, subject: "Verify Your Email Address", html:emailTemplate})
+    }
+
+    public payDistributor = async(distibutorId:string)=>{
+        const {accountId, commissionEarned, volumecredit, firstName, email} = await this.distributorRepository.
+        getProfile(distibutorId) as Distributor;
+        const amount = commissionEarned + volumecredit;
+        await this.paymentService.payOutCustomer(accountId, amount);
+        await this.mailCustomerForPayment(firstName, accountId, email);
     }
 
     public getAllOrders = async(pageNumber:string)=>{

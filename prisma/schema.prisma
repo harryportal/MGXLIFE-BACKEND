@@ -35,7 +35,7 @@ model Distributor {
   accountStatus      AccountStatus      @default(NOT_ACTIVE)
   accountId          String             @unique   
   joinedAt           DateTime           @default(now()) 
-  commissionEarned   Float?             @default(0.0)
+  commissionEarned   Float              @default(0.0)
   refferalCount      Int                @default(0)
   referredBy         Distributor?       @relation(name: "ReferredBy", fields: [referredById], references: [id])
   referredById       String?

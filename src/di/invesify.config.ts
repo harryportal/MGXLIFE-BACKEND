@@ -8,7 +8,7 @@ import { ATypes, IAuthRepository, IAuthService } from "../modules/auth/auth.dto"
 import { PrismaClient } from "@prisma/client";
 import { IMailService, MTypes } from "../modules/mail/mail.dto";
 import MailService from "../modules/mail/mail.service";
-import { AdTypes, IAdminRepository, IAdminService } from "../modules/admin/admin.dtos";
+import { AdTypes, IAdminRepository, IAdminService } from "../modules/admin/admin.interface";
 import AdminRepository from "../modules/admin/admin.repository";
 import AdminService from "../modules/admin/admin.service";
 import { IOrderRepository, OTypes } from "../modules/order/order.dtos";

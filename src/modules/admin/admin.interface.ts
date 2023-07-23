@@ -12,6 +12,7 @@ export interface IAdminRepository {
 
 export interface IAdminService {
   signIn(email: string, password: string): Promise<string>;
+  payDistributor(email:string):Promise<void>;
   updateAdmin(updateData: UpdateAdmin, adminId: string, imageFile: File | null): Promise<any>;
   getAllProducts(pageNumber: string): Promise<any>; // Update the return type as needed
   getAllDistributors(pageNumber: string): Promise<any>; // Update the return type as needed
