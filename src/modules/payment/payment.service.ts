@@ -107,11 +107,14 @@ export default class PaymentService implements IPaymentService{
     public handleSubscriptionEvents = async(payload:any, signature:string)=>{
         const event = this.getEvent(payload, signature, this.signingKey)
         switch(event.type){
-            case("checkout.session.completed" || "invoice.paid" || "invoice.payment_succeeded"):
-                await this.handlePaymentEvent(event, true);
+            case("invoice.payment_succeeded"):
+                await this.handlePaymentEvent(event, SubscriptionStatus.PAID);
+                break;
+            case("invoice.paid"):
+                await this.handlePaymentEvent(event, SubscriptionStatus.PENDING);
                 break;
             case("invoice.payment_failed"):
-                await this.handlePaymentEvent(event, false);
+                await this.handlePaymentEvent(event, SubscriptionStatus.NOT_PAID);
                 break;
             case("transfer.created"):
                 await this.handleTransferEvent(event);
@@ -119,17 +122,13 @@ export default class PaymentService implements IPaymentService{
             }
     }
 
-    private handlePaymentEvent = async(event:Stripe.Event, success:boolean)=>{
+    private handlePaymentEvent = async(event:Stripe.Event, status:SubscriptionStatus)=>{
       const session = event.data.object as Stripe.Checkout.Session;
       const distributorStripeId = session.customer as string;
       const amount = session.amount_total as number;
-      if(success){
-        await this.distributorRepository.updateDistributorSubscriptionStatus(distributorStripeId, 
-          SubscriptionStatus.PAID);
+      await this.distributorRepository.updateDistributorSubscriptionStatus(distributorStripeId, status);
+      if(status == SubscriptionStatus.PAID){
         await this.addSignUpFee(distributorStripeId, amount);  // for the parent distributor
-      }else{
-        await this.distributorRepository.updateDistributorSubscriptionStatus(distributorStripeId, 
-          SubscriptionStatus.NOT_PAID)
       }
     }
 
