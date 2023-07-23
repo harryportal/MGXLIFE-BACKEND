@@ -100,10 +100,10 @@ export default class DistributorRepository implements IDistributorRepository{
         const {take, skip} = paginationObject;
         const distributors = await this.distributor.findMany({
             take, skip, select:{
-                firstName:true, lastName:true, email:true,
+                id:true, firstName:true, lastName:true, email:true,
                 subscriptionStatus:true, referredBy:{
                     select: {
-                        firstName:true, lastName:true, email:true
+                        id:true, firstName:true, lastName:true, email:true
                     }}, commissionEarned:true, refferalCount:true, imageUrl:true, referringId:true,
                     volumecredit:true, verified:true
                 }
