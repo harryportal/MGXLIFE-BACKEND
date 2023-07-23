@@ -1,4 +1,4 @@
-import { PrismaClient, SubscriptionStatus } from "@prisma/client";
+import { AccountStatus, PrismaClient, SubscriptionStatus } from "@prisma/client";
 import logger from "../../utils/logging/winston";
 import IPagination from "../../utils/pagination/pagination.interface";
 import { injectable, inject } from "inversify";
@@ -27,8 +27,15 @@ export default class DistributorRepository implements IDistributorRepository{
             }
         });
         return distributor;
- 
     }
+
+    public updateDistributorAccountStatus = async(email:string)=>{
+        await this.distributor.update({
+            where: {email},
+            data:{accountStatus: AccountStatus.ACTIVE}
+        })
+    }
+
     public updateDistributorCommission = async(distributorId:string, commission:number)=>{
         const updatedDistributor = await this.distributor.update({
             where:{ id: distributorId },
@@ -115,6 +122,16 @@ export default class DistributorRepository implements IDistributorRepository{
         const distributorOrders = await this.distributor.findUnique({
             where:{ id: distributorId }, select:{ orders:true } });
         return distributorOrders;
+    }
+
+    public resetDistributorBalance = async(stripeAccountId:string)=>{
+        await this.distributor.update({
+            where: {
+                accountId: stripeAccountId
+            },data:{
+                volumecredit: 0.0, commissionEarned:0.0
+            }
+        })
     }
 
     public getDistributorwithStripeId = async(stripeId:string)=> {

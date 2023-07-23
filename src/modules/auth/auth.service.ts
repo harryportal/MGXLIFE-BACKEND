@@ -7,7 +7,7 @@ import { completeprofileTemplate } from "../../utils/mailTemplates/completeProfi
 import { inject, injectable } from "inversify";
 import { ATypes, IAuthRepository, IAuthService } from "./auth.dto";
 import { IMailService, MTypes } from "../mail/mail.dto";
-import { IPaymentService, PTypes } from "../payment/payment.dtos";
+import { IPaymentService, PTypes } from "../payment/payment.interface";
 
 
 @injectable()
@@ -89,10 +89,12 @@ export default class AuthService implements IAuthService{
         const checkEmail = await this.authRepository.getDistributor(email);
         if (checkEmail){ throw new AuthError("Email Already Exists!. Please use another Email Address")};
         const stripeCustomerId = await this.paymentService.createCustomer(email);
+        const stripeAccountId = await this.paymentService.createConnectedAccount(email);
         const refferingId = this.generateReferralLink();
         distributorData.referringId = refferingId;
         distributorData.password = await hashPassword(password);
         distributorData.stripeCustomerId = stripeCustomerId;
+        distributorData.accountId = stripeAccountId;
         distributorData.email = distributorData.email.toLowerCase();  // make case insensitive
         let distributor: Distributor;
         if(refferalId) {
@@ -104,7 +106,7 @@ export default class AuthService implements IAuthService{
         }
         // create the stripe customer for this new distributor instantly
         await this.sendVerificationMail(distributor.firstName, distributor.email)
-        }
+    }
 
     private verifyReferralId = async(refferingId:string)=>{
         const distributor = await this.authRepository.getDistributorwithReferalId(refferingId);

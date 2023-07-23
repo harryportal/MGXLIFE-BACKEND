@@ -1,88 +1,10 @@
 import Stripe from "stripe";
-import { BadRequestError, InternalServerError } from "../../common/error";
+import { BadRequestError } from "../../common/error";
 import { Distributor, SubscriptionStatus } from "@prisma/client";
 import logger from "../../utils/logging/winston";
 import { injectable, inject } from "inversify";
 import { IDistributorRepository, Types} from "../distributor/distributor.interface";
-import { IPaymentService } from "./payment.dtos";
-
-
-
-// // Check if the customer has bank details attached
-// async function hasBankDetails(customerId: string): Promise<boolean> {
-//   try {
-//     const customer = await stripe.customers.retrieve(customerId);
-//     return customer.bank_account !== null;
-//   } catch (error) {
-//     console.error('Error checking customer bank details:', error);
-//     throw error;
-//   }
-// }
-
-// // Transfer funds to the customer's bank account
-// async function transferFunds(customerId: string, amount: number): Promise<boolean> {
-//   try {
-//     // Check if the customer has bank details attached
-//     const hasBankInfo = await hasBankDetails(customerId);
-
-//     if (!hasBankInfo) {
-//       console.log('Customer does not have bank details attached');
-//       return false;
-//     }
-
-//     // Create a transfer to the customer's bank account
-//     const transfer = await stripe.transfers.create({
-//       amount,
-//       currency: 'usd',
-//       destination: customerId,
-//     });
-
-//     // Check the status of the transfer
-//     if (transfer.status === 'paid') {
-//       // Transfer succeeded
-//       return true;
-//     } else {
-//       // Transfer failed
-//       return false;
-//     }
-//   } catch (error) {
-//     console.error('Error transferring funds:', error);
-//     throw error;
-//   }
-// }
-
-// // Example usage
-// async function processPayment(customerId: string, amount: number): Promise<void> {
-//   try {
-//     // Create a payment intent
-//     const paymentIntentId = await createPaymentIntent(customerId, amount);
-
-//     // Confirm the payment intent
-//     const paymentSucceeded = await confirmPaymentIntent(paymentIntentId);
-
-//     if (paymentSucceeded) {
-//       // Transfer funds to the customer's bank account
-//       const transferSucceeded = await transferFunds(customerId, amount);
-
-//       if (transferSucceeded) {
-//         console.log('Payment processed and funds transferred successfully');
-//       } else {
-//         console.log('Payment processed but failed to transfer funds');
-//       }
-//     } else {
-//       console.log('Payment failed');
-//     }
-//   } catch (error) {
-//     console.error('Error processing payment:', error);
-//   }
-// }
-
-// // Usage example
-// const customerId = 'CUSTOMER_ID'; // Replace with actual customer ID
-// const amount = 1000; // Replace with the desired payment amount
-
-// processPayment(customerId, amount);
-
+import { IPaymentService } from "./payment.interface";
 
 @injectable()
 export default class PaymentService implements IPaymentService{
@@ -104,41 +26,6 @@ export default class PaymentService implements IPaymentService{
       return portalSession;
     }
 
-        // Create a payment intent and initiate the payment process
-    public createPaymentIntent = async(customerId: string, amount: number):Promise<string>=>{
-        try {
-        // Create the payment intent
-        const paymentIntent = await this.stripe.paymentIntents.create({
-            amount,
-            currency: 'usd',
-            customer: customerId,
-        });
-    
-        // Return the payment intent ID
-        return paymentIntent.id;
-        } catch (error) {
-            throw new BadRequestError("Error Crediting Customer, Please try again!")
-        }
-    }
-    // Confirm a payment intent and process the payment
-    confirmPaymentIntent = async(paymentIntentId: string): Promise<boolean> =>{
-    try {
-        // Confirm the payment intent
-        const paymentIntent = await this.stripe.paymentIntents.confirm(paymentIntentId);
-
-        // Check the status of the payment
-        if (paymentIntent.status === 'succeeded') {
-        // Payment succeeded
-        return true;
-        } else {
-        // Payment failed
-        return false;
-        }
-    } catch (error) {
-        throw new BadRequestError("Error Crediting Customer, Please try again!")
-    }
-    }
-
     public createCheckOutSession = async(email:string):Promise<string>=>{
       const priceId = "price_1NBpCIB7eY2bXlKvxEIK2GJ3";
       const distributor = await this.distributorRepository.getDistributorwithEmail(email);
@@ -153,7 +40,7 @@ export default class PaymentService implements IPaymentService{
               }],
               success_url: process.env.HOMEPAGE_URL!,
               cancel_url:  process.env.HOMEPAGE_URL!
-             })
+             }) 
           return session.url as string;
       }catch(error){
           throw new BadRequestError(`Failed to create a checkout session, ${error}`);
@@ -172,11 +59,45 @@ export default class PaymentService implements IPaymentService{
         return customer.id;  
     }
 
+    public createConnectedAccount = async(distibutorEmail:string):Promise<string>=>{
+      const account =  await this.stripe.accounts.create({
+        type: "express",
+        email:distibutorEmail,
+        capabilities: {
+          card_payments: {requested :true},
+          transfers: {requested:true}
+        }});
+        return account.id;
+    }
+
+    public getConnectedAccountLoginLink = async(email:string):Promise<Stripe.Response<Stripe.LoginLink>>=>{
+      const {accountId} = await this.distributorRepository.getDistributorwithEmail(email) as Distributor;
+      const loginLink = await this.stripe.accounts.createLoginLink( accountId );
+      return loginLink;
+    }
+
+    public getAccountOnboardingLink = async(email:string):Promise<string>=>{
+      const {accountId} = await this.distributorRepository.getDistributorwithEmail(email) as Distributor;
+      const accountCreationLink = await this.stripe.accountLinks.create({
+          account: accountId,
+          type: "account_onboarding",
+          refresh_url: process.env.HOMEPAGE_URL,
+          return_url: process.env.HOMEPAGE_URL
+      });
+      return accountCreationLink.url;
+    }
+
+    public payOutCustomer = async(accountId:string, amount:number):Promise<void>=>{
+        await this.stripe.transfers.create({
+          amount,
+          currency: "usd", 
+          destination: accountId
+        })
+    }
 
     public retrieveSubscription = async(subscriptionId: string): Promise<Stripe.Subscription>=>{
         try {
         const subscription = await this.stripe.subscriptions.retrieve(subscriptionId);
-
         return subscription;
         } catch (error:any) {
         throw new BadRequestError(`Failed to retrieve subscription: ${error.message}`);
@@ -185,24 +106,46 @@ export default class PaymentService implements IPaymentService{
 
     public handleSubscriptionEvents = async(payload:any, signature:string)=>{
         const event = this.getEvent(payload, signature)
-        const session = event.data.object as Stripe.Checkout.Session;
-        const distributorStripeId = session.customer as string;
-        const amount = session.amount_total as number;
         switch(event.type){
-            /* For this case, we set the distributor subscription status as true and add 50% of the sign 
-            up to the sponsporing distributor if any*/
             case("checkout.session.completed" || "invoice.paid" || "invoice.payment_succeeded"):
-                await this.distributorRepository.updateDistributorSubscriptionStatus(distributorStripeId, 
-                SubscriptionStatus.PAID);
-                await this.addSignUpFee(distributorStripeId, amount);
+                await this.handlePaymentEvent(event, true);
                 break;
             case("invoice.payment_failed"):
-                /*update the distributor subscription status ... optionally add the logic to redirect the user to 
-                their subscription portal*/
-                await this.distributorRepository.updateDistributorSubscriptionStatus(distributorStripeId, 
-                    SubscriptionStatus.NOT_PAID)
-                break;    
+                await this.handlePaymentEvent(event, false);
+                break;
+            case("transfer.updated"):
+                await this.handleTransferEvent(event);
+                break;
+            case("account.updated"):
+                await this.handleAccountEvent(event);
+                break;
         }
+    }
+
+    private handlePaymentEvent = async(event:Stripe.Event, success:boolean)=>{
+      const session = event.data.object as Stripe.Checkout.Session;
+      const distributorStripeId = session.customer as string;
+      const amount = session.amount_total as number;
+      if(success){
+        await this.distributorRepository.updateDistributorSubscriptionStatus(distributorStripeId, 
+          SubscriptionStatus.PAID);
+        await this.addSignUpFee(distributorStripeId, amount);  // for the parent distributor
+      }else{
+        await this.distributorRepository.updateDistributorSubscriptionStatus(distributorStripeId, 
+          SubscriptionStatus.NOT_PAID)
+      }
+    }
+
+    private handleTransferEvent = async(event:Stripe.Event)=>{
+        const transfer = event.data.object as Stripe.Transfer;
+        const disitributorAccountId = transfer.destination as string;
+        await this.distributorRepository.resetDistributorBalance(disitributorAccountId)
+    }
+
+    private handleAccountEvent = async(event:Stripe.Event)=>{
+      const account = event.data.object as Stripe.Account;
+      const distibutorEmail = account.email as string;
+      await this.distributorRepository.updateDistributorAccountStatus(distibutorEmail);
     }
 
     /**

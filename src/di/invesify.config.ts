@@ -13,7 +13,7 @@ import AdminRepository from "../modules/admin/admin.repository";
 import AdminService from "../modules/admin/admin.service";
 import { IOrderRepository, OTypes } from "../modules/order/order.dtos";
 import { OrderRepository } from "../modules/order/order.repository";
-import { IPaymentService, PTypes } from "../modules/payment/payment.dtos";
+import { IPaymentService, PTypes } from "../modules/payment/payment.interface";
 import PaymentService from "../modules/payment/payment.service";
 import { IProductRepository, IProductService, PdTypes } from "../modules/product/product.dtos";
 import ProductService from "../modules/product/product.service";

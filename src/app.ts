@@ -18,7 +18,7 @@ app.use(morgan('dev'));
 .json and .raw instead for buffer 
 todo: seperate the webhook controller into a different module or define seperate routers for them 
 */
-app.post("/subscription/webhook", express.raw({ type: 'application/json' }), paymentController.subscriptionWebhook)
+app.post("/webhook", express.raw({ type: 'application/json' }), paymentController.stripeWebhookHandler)
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
