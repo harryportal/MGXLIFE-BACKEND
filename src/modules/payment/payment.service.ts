@@ -123,12 +123,11 @@ export default class PaymentService implements IPaymentService{
     }
 
     private handlePaymentEvent = async(event:Stripe.Event, status:SubscriptionStatus)=>{
-      const session = event.data.object as Stripe.Checkout.Session;
+      const session = event.data.object as Stripe.Invoice;
       const distributorStripeId = session.customer as string;
-      const amount = session.amount_total as number;
+      const amount = session.amount_paid as number;
       await this.distributorRepository.updateDistributorSubscriptionStatus(distributorStripeId, status);
       if(status == SubscriptionStatus.PAID){
-        console.log(distributorStripeId, amount)
         await this.addSignUpFee(distributorStripeId, amount);  // for the parent distributor
       }
     }
