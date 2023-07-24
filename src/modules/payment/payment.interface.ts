@@ -15,7 +15,8 @@ export interface IPaymentService {
   createConnectedAccount(distibutorEmail:string):Promise<string>;
   createCustomer(email: string): Promise<string>;
   retrieveSubscription(subscriptionId: string): Promise<Stripe.Subscription>;
-  handleWebhookEvents(payload: any, signature: string): Promise<void>;
+  handleConnectedAccountsEvents(payload: any, signature: string): Promise<void>;
+  handleAccountEvents(payload: any, signature: string): Promise<void>;
   retrieveIdFromSession(sessionId: string): Promise<string | null>;
   getAccountOnboardingLink(customerEmail:string):Promise<string>;
   payOutCustomer(accountId:string, amount:number):Promise<Stripe.Transfer>;

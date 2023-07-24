@@ -104,7 +104,7 @@ export default class PaymentService implements IPaymentService{
         }
     }
 
-    public handleWebhookEvents = async(payload:any, signature:string)=>{
+    public handleAccountEvents = async(payload:any, signature:string)=>{
         const event = this.getEvent(payload, signature, this.signingKey)
         switch(event.type){
             case("invoice.payment_succeeded"):
@@ -136,6 +136,13 @@ export default class PaymentService implements IPaymentService{
         const transfer = event.data.object as Stripe.Transfer;
         const disitributorAccountId = transfer.destination as string;
         await this.distributorRepository.resetDistributorBalance(disitributorAccountId)
+    }
+
+    public handleConnectedAccountsEvents = async(payload:any, signature:string)=>{
+      const event = this.getEvent(payload, signature, this.accSigningKey)
+      const account = event.data.object as Stripe.Account;
+      const distibutorEmail = account.email as string;
+      await this.distributorRepository.updateDistributorAccountStatus(distibutorEmail);
     }
 
     /**
