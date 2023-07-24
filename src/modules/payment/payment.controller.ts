@@ -37,14 +37,14 @@ export default class PaymentController {
     public stripeWebhookHandler = async(req:AuthRequest, res:Response)=>{
         let payload = req.body as Buffer;
         const signature = req.headers['stripe-signature'] as string;
-        await this.paymentService.handleWebhookEvents(payload, signature)
+        await this.paymentService.handleAccountEvents(payload, signature)
         return res.status(200).json({success:true})
     }
 
     public stripeConnectedAccountWebhook = async(req:AuthRequest, res:Response)=>{
         let payload = req.body as Buffer;
         const signature = req.headers['stripe-signature'] as string;
-        await this.paymentService.handleWebhookEvents(payload, signature)
+        await this.paymentService.handleConnectedAccountsEvents(payload, signature)
         return res.status(200).json({success:true})
     }
 
