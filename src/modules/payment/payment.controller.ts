@@ -31,7 +31,7 @@ export default class PaymentController {
     public getAccountLoginLink = async(req:AuthRequest, res:Response)=>{
         const email = req.user!.email;
         const link = await this.paymentService.getConnectedAccountLoginLink(email);
-        return res.status(200).json({success:true, data:link});
+        return res.status(200).json({success:true, data:link.url});
     }
 
     public stripeWebhookHandler = async(req:AuthRequest, res:Response)=>{

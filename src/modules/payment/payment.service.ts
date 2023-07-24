@@ -87,8 +87,8 @@ export default class PaymentService implements IPaymentService{
       return accountCreationLink.url;
     }
 
-    public payOutCustomer = async(accountId:string, amount:number):Promise<void>=>{
-        await this.stripe.transfers.create({
+    public payOutCustomer = async(accountId:string, amount:number):Promise<Stripe.Transfer>=>{
+        return await this.stripe.transfers.create({
           amount,
           currency: "usd", 
           destination: accountId

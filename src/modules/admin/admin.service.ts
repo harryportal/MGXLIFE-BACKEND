@@ -72,8 +72,8 @@ export default class AdminService implements IAdminService{
         const {accountId, commissionEarned, volumecredit, firstName, email} = await this.distributorRepository.
         getProfile(distibutorId) as Distributor;
         const amount = commissionEarned + volumecredit;
-        await this.paymentService.payOutCustomer(accountId, amount);
-        await this.mailCustomerForPayment(firstName, accountId, email);
+        const transfer = await this.paymentService.payOutCustomer(accountId, amount);
+        await this.mailCustomerForPayment(firstName, transfer.destination as string, email);
     }
 
     public getAllOrders = async(pageNumber:string)=>{

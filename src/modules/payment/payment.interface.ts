@@ -19,7 +19,7 @@ export interface IPaymentService {
   handleAccountEvent(payload: any, signature: string): Promise<void>
   retrieveIdFromSession(sessionId: string): Promise<string | null>;
   getAccountOnboardingLink(customerEmail:string):Promise<string>;
-  payOutCustomer(accountId:string, amount:number):Promise<void>;
+  payOutCustomer(accountId:string, amount:number):Promise<Stripe.Transfer>;
   getConnectedAccountLoginLink(accountId:string):Promise<Stripe.Response<Stripe.LoginLink>>
 }
 
