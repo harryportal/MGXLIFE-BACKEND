@@ -62,9 +62,9 @@ export default class AdminService implements IAdminService{
         return distributors;
     }
 
-    private mailCustomerForPayment = async(name:string, accountId:string, email:string)=>{
-        const loginLink = await this.paymentService.getConnectedAccountLoginLink(accountId) as unknown as string;
-        const emailTemplate = notifyCustomerPayment(name, loginLink);
+    private mailCustomerForPayment = async(name:string, email:string)=>{
+        const loginLink = await this.paymentService.getConnectedAccountLoginLink(email);
+        const emailTemplate = notifyCustomerPayment(name, loginLink.url);
         await this.mailService.sendMail({to:email, subject: "Verify Your Email Address", html:emailTemplate})
     }
 
@@ -72,8 +72,8 @@ export default class AdminService implements IAdminService{
         const {accountId, commissionEarned, volumecredit, firstName, email} = await this.distributorRepository.
         getProfile(distibutorId) as Distributor;
         const amount = commissionEarned + volumecredit;
-        const transfer = await this.paymentService.payOutCustomer(accountId, amount);
-        await this.mailCustomerForPayment(firstName, transfer.destination as string, email);
+        await this.paymentService.payOutCustomer(accountId, amount);
+        await this.mailCustomerForPayment(firstName, email);
     }
 
     public getAllOrders = async(pageNumber:string)=>{
