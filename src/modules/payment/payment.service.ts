@@ -71,6 +71,7 @@ export default class PaymentService implements IPaymentService{
     }
 
     public getConnectedAccountLoginLink = async(email:string):Promise<Stripe.Response<Stripe.LoginLink>>=>{
+      console.log(email);
       const disitributor = await this.distributorRepository.getDistributorwithEmail(email) as Distributor;
       const loginLink = await this.stripe.accounts.createLoginLink( disitributor.accountId );
       return loginLink;
