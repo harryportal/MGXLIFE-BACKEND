@@ -55,7 +55,7 @@ export const verifyJWT = (token: string): jwtPayload=>{
     return payload as jwtPayload;
 
   } catch (e) {
-    throw new AuthError('Invalid Token Provided');
+    throw new AuthError('Please Login to Continue');
   }
 }
 
