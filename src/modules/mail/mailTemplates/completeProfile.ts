@@ -26,7 +26,10 @@ export const completeprofileTemplate = (firstname:string, link:string)=>{
 		}
 	
 		p {
-		  color: #666666;
+			color: #333333;
+			font-size: 18px;
+			margin-bottom: 10px;
+
 		}
 	
 		.highlight {
@@ -71,7 +74,7 @@ export const completeprofileTemplate = (firstname:string, link:string)=>{
 	</head>
 	<body>
 	  <div class="email-container">
-		<h1>Dear ${firstname}</h1>
+		<p>Dear ${firstname}</p>
 		<p>Thank you for registering as a distributor on MXFLIFE. We'd like to remind you to complete your profile by verifying your email address. This will help us better tailor our services to meet your needs.</p>
 		<p>Here's the link to verify your email:</p>
 		<a href="${link}" class="button">Verify Email</a>

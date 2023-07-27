@@ -21,8 +21,10 @@ export const notifyCustomerSubscription = (firstname:string, link:string)=>{
                 margin-bottom: 10px;
             }
             p {
-                color: #666666;
+                color: #333333;
+                font-size: 18px;
                 margin-bottom: 10px;
+
             }
             .highlight {
                 color: #2c3e50;
@@ -54,7 +56,7 @@ export const notifyCustomerSubscription = (firstname:string, link:string)=>{
         <p>Hello ${firstname}</p>
         <p>This is to inform you that your annual subscription was successful.<p>
 		<p>Here's the link to view your payment and manage your invoices:</p>
-		<a href="${link}" class="button">Login to Stripe Dashboard</a>
+		<a href="${link}" class="button">Login to your Payment Dashboard</a>
 		<p>Thank you for registering as a distributor on MXGLIFE</p>
         <p>Best regards,</p>
         <p>The MGXLIFE Team</p>	</div>

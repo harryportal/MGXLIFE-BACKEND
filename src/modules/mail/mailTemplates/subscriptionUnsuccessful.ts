@@ -21,7 +21,8 @@ export const notifyCustomerSubscriptionFailed = (firstname:string, link:string)=
                 margin-bottom: 10px;
             }
             p {
-                color: #666666;
+                color: #333333;
+                font-size: 18px;
                 margin-bottom: 10px;
             }
             .highlight {
@@ -54,7 +55,7 @@ export const notifyCustomerSubscriptionFailed = (firstname:string, link:string)=
         <p>Hello ${firstname}</p>
         <p>This is to inform you that your annual subscription failed or could not be auto renewed.<p>
 		<p>Use the link below to view, manage your card details and view invoices</p>
-		<a href="${link}" class="button">Login to Stripe Dashboard</a>
+		<a href="${link}" class="button">Login to your Payment Dashboard</a>
 		<p>Thank you for registering as a distributor on MXGLIFE</p>
         <p>Best regards,</p>
         <p>The MGXLIFE Team</p>	</div>

@@ -22,8 +22,10 @@ export const createresetTemplate = (name:string, link:string)=>{
 			margin-bottom: 10px;
 		}
 		p {
-			color: #666666;
-			margin-bottom: 10px;
+			color: #333333;
+            font-size: 18px;
+            margin-bottom: 10px;
+
 		}
 		.highlight {
 			color: #2c3e50;

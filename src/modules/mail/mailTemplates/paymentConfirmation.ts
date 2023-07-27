@@ -21,7 +21,8 @@ export const notifyCustomerPayment = (firstname:string, link:string)=>{
                 margin-bottom: 10px;
             }
             p {
-                color: #666666;
+                color: #333333;
+                font-size: 18px;
                 margin-bottom: 10px;
             }
             .highlight {
@@ -53,7 +54,7 @@ export const notifyCustomerPayment = (firstname:string, link:string)=>{
         <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
         <p>Hello ${firstname}</p><p>We'ld like to inform you that your Commission and Volume Credit accumulated in the last month has been paid<p>
 		<p>Here's the link to your stripe account:</p>
-		<a href="${link}" class="button">Login to Stripe Dashboard</a>
+		<a href="${link}" class="button">Click to see Your Payment Details and Invoice</a>
 		<p>Thank you for registering as a distributor on MXGLIFE</p>
         <p>Best regards,</p>
         <p>The MGXLIFE Team</p>	</div>
