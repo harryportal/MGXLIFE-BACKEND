@@ -52,7 +52,7 @@ export default class DistributorService implements IDistributorService{
         return updatedProfileData;
     }
 
-    public sendComplain = async(complaint:ComplaintDto)=>{
+    public sendEnquiry = async(complaint:ComplaintDto)=>{
         const {email, fullname, message} = complaint;
         const htmlTemplate = complainEmailTemplate(fullname, email, message)
         const adminEmail = process.env.ADMIN_EMAIL as string;

@@ -2,6 +2,7 @@ import { Response } from "express";
 import { AuthRequest } from "../auth/auth.dto";
 import { File, IDistributorService, Types} from "./distributor.interface";
 import {injectable, inject} from "inversify";
+import { ComplaintDto } from "./distributor.dtos";
 
 @injectable()
 export default class DistributorController {
@@ -39,6 +40,12 @@ export default class DistributorController {
         const distributorId = req.user!.id;
         const orders = await this.distributorService.getDistributorOrders(distributorId);
         return res.status(200).json({success:true, data:orders});
+    }
+
+    public sendEnquiry = async(req:AuthRequest, res:Response)=>{
+        const messageInfo = req.body as ComplaintDto;
+        await this.distributorService.sendEnquiry(messageInfo);
+        res.status(200).json({success:true, message:"Your Message has been sent"})
     }
     
 }

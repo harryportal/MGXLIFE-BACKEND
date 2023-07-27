@@ -26,7 +26,7 @@ export interface IDistributorService {
     getRefferedUsers(param:string): Promise<any>;
     getDistributorOrders(id:string): Promise<{orders:Order[]} | null>;
     getDistributorOrThrow(id:string):Promise<void>; 
-    sendComplain(complaint:ComplaintDto):Promise<void>
+    sendEnquiry(complaint:ComplaintDto):Promise<void>;
     updateProfile(id:string, profileData:Partial<Distributor>, imageFile:File | null):Promise<DistributorData>;
     getReferralLinks(id:string): { buyerReferralLink: string, distributorReferralLink: string }
     
