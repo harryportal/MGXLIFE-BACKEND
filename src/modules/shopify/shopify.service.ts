@@ -8,16 +8,9 @@ import { Distributor } from "@prisma/client";
 
 @injectable()
 export default class ShopifyService implements IShopifyService{
-    private productService;
-    private distributorRepository;
-    private orderRepository;
-    constructor(@inject(OTypes.IOrderRepository)orderRepository:IOrderRepository, 
-    @inject(DTypes.IDistributorRepository)distributorRepository:IDistributorRepository, 
-    @inject(PdTypes.IProductService)productService:IProductService){
-            this.orderRepository = orderRepository;
-            this.distributorRepository = distributorRepository;
-            this.productService = productService;
-    }
+    constructor(@inject(OTypes.IOrderRepository)private readonly orderRepository:IOrderRepository, 
+    @inject(DTypes.IDistributorRepository)private readonly distributorRepository:IDistributorRepository, 
+    @inject(PdTypes.IProductService)private readonly productService:IProductService){}
 
     private findAndUpdateDistributorCommission = async(refferingId:string, orderData:Order)=>{
         const distributor = await this.distributorRepository.getDistributorwithReferralId(refferingId);

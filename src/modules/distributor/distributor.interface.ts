@@ -1,5 +1,6 @@
 import { Distributor, Order, SubscriptionStatus } from "@prisma/client"
 import IPagination from "../../utils/pagination/pagination.interface";
+import { ComplaintDto } from "./distributor.dtos";
 
 export type File = Express.Multer.File
 
@@ -25,8 +26,10 @@ export interface IDistributorService {
     getRefferedUsers(param:string): Promise<any>;
     getDistributorOrders(id:string): Promise<{orders:Order[]} | null>;
     getDistributorOrThrow(id:string):Promise<void>; 
+    sendComplain(complaint:ComplaintDto):Promise<void>
     updateProfile(id:string, profileData:Partial<Distributor>, imageFile:File | null):Promise<DistributorData>;
     getReferralLinks(id:string): { buyerReferralLink: string, distributorReferralLink: string }
+    
 }
 
 export interface IDistributorRepository{

@@ -3,10 +3,14 @@ import { NotFoundError } from "../../common/error";
 import { Types, File, IDistributorRepository, IDistributorService, UpdateDistributor} from "./distributor.interface";
 import uploadImage from "../../utils/upload/uploadImage";
 import { injectable, inject } from "inversify";
+import { ComplaintDto } from "./distributor.dtos";
+import { IMailService, MTypes } from "../mail/mail.dto";
+import { complainEmailTemplate } from "../mail/mailTemplates/notifyAdmin";
 
 @injectable()
 export default class DistributorService implements IDistributorService{
-    constructor(@inject(Types.IDistributorRepository)private readonly distributorRepository: IDistributorRepository){}
+    constructor(@inject(Types.IDistributorRepository)private readonly distributorRepository: IDistributorRepository,
+    @inject(MTypes.IMailService)private readonly mailService:IMailService){}
     
     public getDistributor = async(distributorId:string)=>{
         const distributor = await this.distributorRepository.getProfile(distributorId);
@@ -48,7 +52,14 @@ export default class DistributorService implements IDistributorService{
         return updatedProfileData;
     }
 
-    public  getReferralLinks = (refferalId:string)=>{
+    public sendComplain = async(complaint:ComplaintDto)=>{
+        const {email, fullname, message} = complaint;
+        const htmlTemplate = complainEmailTemplate(fullname, email, message)
+        const adminEmail = process.env.ADMIN_EMAIL as string;
+        await this.mailService.sendMail({to:adminEmail, subject:"You have a new MXG Question/Enquiry!", html:htmlTemplate })
+    }
+
+    public getReferralLinks = (refferalId:string)=>{
         const buyerReferralLink = `${process.env.SHOPIFY_URL}?ref=${refferalId}`
         const distributorReferralLink =`${process.env.SIGNUP_URL}?${refferalId}` 
         return {buyerReferralLink, distributorReferralLink}

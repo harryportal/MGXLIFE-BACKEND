@@ -44,7 +44,7 @@ model Distributor {
   referredUsers      Distributor[]      @relation(name: "ReferredBy")
   payments           Payment[]
   refreshtokens      RefreshToken[]
-  volumecredit       Float              @default(0.0)
+  groupVolume      Float              @default(0.0)
 }
 
 model Order {
