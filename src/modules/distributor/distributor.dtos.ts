@@ -14,9 +14,9 @@ export class ComplaintDto {
     @IsEmail()
     email:string;
     
-    @IsEmail()
+    @IsString()
     fullname:string;
 
-    @IsEmail()
+    @IsString()
     message:string
 }
