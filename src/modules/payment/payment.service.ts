@@ -143,18 +143,18 @@ export default class PaymentService implements IPaymentService{
     private sendSubcriptionMail = async(session:Stripe.Invoice)=>{
         // send a mail to notify the distributor of a successfull annual subscription
         const email = session.customer_email as string;
-        const name = session.customer_name as string;
+        const { lastName }= await this.distributorRepository.getDistributorwithEmail(email) as Distributor;
         const distributorStripeLink = await this.createPortalSession(email);
-        const template = notifyCustomerSubscription(name, distributorStripeLink.url);
+        const template = notifyCustomerSubscription(lastName, distributorStripeLink.url);
         this.mailService.sendMail({to:email, subject:"Subscription to MXGLIFE Successful", html:template})
     }
 
     private sendSubcriptionFailedMail = async(session:Stripe.Invoice)=>{
         // send a mail to notify the distributor of a successfull annual subscription
         const email = session.customer_email as string;
-        const name = session.customer_name as string;
+        const { lastName }= await this.distributorRepository.getDistributorwithEmail(email) as Distributor;
         const distributorStripeLink = await this.createPortalSession(email);
-        const template = notifyCustomerSubscriptionFailed(name, distributorStripeLink.url);
+        const template = notifyCustomerSubscriptionFailed(lastName, distributorStripeLink.url);
         this.mailService.sendMail({to:email, subject:"Subscription to MXGLIFE Failed", html:template})
     }
 
