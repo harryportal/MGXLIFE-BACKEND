@@ -5,9 +5,9 @@ import logger from "../../utils/logging/winston";
 import { injectable, inject } from "inversify";
 import { IDistributorRepository, Types} from "../distributor/distributor.interface";
 import { IPaymentService } from "./payment.interface";
-import { notifyCustomerSubscription } from "../../utils/mailTemplates/subscriptionConfirmation";
+import { notifyCustomerSubscription } from "../mail/mailTemplates/subscriptionConfirmation";
 import { IMailService, MTypes } from "../mail/mail.dto";
-import { notifyCustomerSubscriptionFailed } from "../../utils/mailTemplates/subscriptionUnsuccessful";
+import { notifyCustomerSubscriptionFailed } from "../mail/mailTemplates/subscriptionUnsuccessful";
 
 @injectable()
 export default class PaymentService implements IPaymentService{

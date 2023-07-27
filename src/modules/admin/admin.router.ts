@@ -3,7 +3,7 @@ import AdminController from "./admin.controller";
 import { adminProtect } from "./admin.middleware";
 import RequestValidator from "../../common/validation";
 import { UpdateProduct, UpdateProfile } from "./admin.validation";
-import seedAdmin from "../../utils/seed/admin/seedadmin";
+import seedAdmin from "../../database/seed/admin/seedadmin";
 import container from "../../di/invesify.config";
 
 const adminController = container.resolve<AdminController>(AdminController);

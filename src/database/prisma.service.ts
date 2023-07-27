@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client"
-import logger from '../logging/winston';
+import logger from '../utils/logging/winston';
 
 // creates and return a reusable prisma client
 

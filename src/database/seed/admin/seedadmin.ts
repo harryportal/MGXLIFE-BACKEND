@@ -1,9 +1,10 @@
-import { prisma } from "../../db/prisma";
-import { hashPassword } from "../../jwtAuth/jwt";
-import logger from "../../logging/winston";
+import { prisma } from "../../prisma.service";
+import { hashPassword } from "../../../utils/jwtAuth/jwt";
+import logger from "../../../utils/logging/winston";
 
 const seedAdmin = async():Promise<void>=>{
     try {
+      console.log(process.env.ADMIN_PASSWORD)
       const admin = await prisma.admin.create({
         data: {
           firstName: process.env.ADMIN_FIRSTNAME!,

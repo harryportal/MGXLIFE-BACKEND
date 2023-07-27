@@ -10,7 +10,7 @@ import { IProductService, PdTypes } from "../product/product.dtos";
 import { Types, IDistributorRepository } from "../distributor/distributor.interface";
 import { Admin, Distributor } from "@prisma/client";
 import { IPaymentService, PTypes } from "../payment/payment.interface";
-import { notifyCustomerPayment } from "../../utils/mailTemplates/paymentConfirmation";
+import { notifyCustomerPayment } from "../mail/mailTemplates/paymentConfirmation";
 import { IMailService, MTypes } from "../mail/mail.dto";
 
 @injectable()

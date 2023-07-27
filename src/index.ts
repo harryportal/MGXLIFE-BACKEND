@@ -2,7 +2,7 @@ import "reflect-metadata";
 import app from './app';
 import * as dotenv from 'dotenv';
 import logger from './utils/logging/winston';
-import {Prisma }from './utils/db/prisma';
+import {Prisma }from './database/prisma.service';
 import { Application } from 'express';
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
