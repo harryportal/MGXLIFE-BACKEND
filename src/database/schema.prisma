@@ -11,7 +11,7 @@ datasource db {
 }
 
 enum SubscriptionStatus {
-  NOT_PAID
+  UNPAID
   PAID
   PENDING
 }
@@ -28,7 +28,7 @@ model Distributor {
   lastName           String
   email              String             @unique
   password           String
-  subscriptionStatus SubscriptionStatus @default(NOT_PAID)
+  subscriptionStatus SubscriptionStatus @default(UNPAID)
   stripeCustomerId   String             @unique
   referringId        String             @unique
   imageUrl           String?
@@ -40,7 +40,7 @@ model Distributor {
   referredBy         Distributor?       @relation(name: "ReferredBy", fields: [referredById], references: [id])
   referredById       String?
   verified           Boolean            @default(false)
-  orders             Order[] // This displays the order that were made through their refferal code
+  orders             Order[] 
   referredUsers      Distributor[]      @relation(name: "ReferredBy")
   payments           Payment[]
   refreshtokens      RefreshToken[]

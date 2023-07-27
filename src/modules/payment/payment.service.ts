@@ -118,7 +118,7 @@ export default class PaymentService implements IPaymentService{
                 await this.handlePaymentEvent(event, SubscriptionStatus.PENDING);
                 break;
             case("invoice.payment_failed"):
-                await this.handlePaymentEvent(event, SubscriptionStatus.NOT_PAID);
+                await this.handlePaymentEvent(event, SubscriptionStatus.UNPAID);
                 break;
             case("transfer.created"):
                 await this.handleTransferEvent(event);
@@ -131,7 +131,7 @@ export default class PaymentService implements IPaymentService{
       const distributorStripeId = session.customer as string;
       const amount = session.amount_paid as number;
       await this.distributorRepository.updateDistributorSubscriptionStatus(distributorStripeId, status);
-      if(status == SubscriptionStatus.NOT_PAID){
+      if(status == SubscriptionStatus.UNPAID){
         await this.sendSubcriptionFailedMail(session);
       }
       if(status == SubscriptionStatus.PAID){
