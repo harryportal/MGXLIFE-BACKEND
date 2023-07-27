@@ -88,7 +88,7 @@ export default class DistributorRepository implements IDistributorRepository{
       public updateSponsoringDistributorVolumeCredit = async(SponsoringDistributorId:string, volumeCredit:number)=>{
         const updatedSponsoringDistributor = await this.distributor.update({
             where:{ id: SponsoringDistributorId },
-            data:{ volumecredit: {
+            data:{ groupVolume: {
                 increment: volumeCredit
             }}
         });
@@ -105,7 +105,7 @@ export default class DistributorRepository implements IDistributorRepository{
                     select: {
                         id:true, firstName:true, lastName:true, email:true
                     }}, commissionEarned:true, refferalCount:true, imageUrl:true, referringId:true,
-                    volumecredit:true, verified:true
+                    groupVolume:true, verified:true
                 }
             });
         return distributors;
@@ -129,7 +129,7 @@ export default class DistributorRepository implements IDistributorRepository{
             where: {
                 accountId: stripeAccountId
             },data:{
-                volumecredit: 0.0, commissionEarned:0.0
+                groupVolume: 0.0, commissionEarned:0.0
             }
         })
     }
@@ -173,7 +173,7 @@ export default class DistributorRepository implements IDistributorRepository{
             where:{
                 id: distributorId
             }, data:{
-                volumecredit: {
+                groupVolume: {
                     increment: amount
                 }
             }
