@@ -5,11 +5,15 @@ import logger from "../../utils/logging/winston";
 import { injectable, inject } from "inversify";
 import { IDistributorRepository, Types} from "../distributor/distributor.interface";
 import { IPaymentService } from "./payment.interface";
+import { notifyCustomerSubscription } from "../../utils/mailTemplates/subscriptionConfirmation";
+import { IMailService, MTypes } from "../mail/mail.dto";
+import { notifyCustomerSubscriptionFailed } from "../../utils/mailTemplates/subscriptionUnsuccessful";
 
 @injectable()
 export default class PaymentService implements IPaymentService{
     private stripe:Stripe;
     constructor(@inject(Types.IDistributorRepository)private readonly distributorRepository:IDistributorRepository,
+        @inject(MTypes.IMailService)private readonly mailService:IMailService,
         private readonly secretKey = process.env.STRIPE_SECRETKEY!, 
         private readonly signingKey = process.env.STRIPE_SIGNINGKEY!,
         private readonly accSigningKey = process.env.STRIPE_CONNECTEDACC_SIGNING_KEY! // key for connected accounts events
@@ -127,9 +131,31 @@ export default class PaymentService implements IPaymentService{
       const distributorStripeId = session.customer as string;
       const amount = session.amount_paid as number;
       await this.distributorRepository.updateDistributorSubscriptionStatus(distributorStripeId, status);
+      if(status == SubscriptionStatus.NOT_PAID){
+        await this.sendSubcriptionFailedMail(session);
+      }
       if(status == SubscriptionStatus.PAID){
         await this.addSignUpFee(distributorStripeId, amount);  // for the parent distributor
+        await this.sendSubcriptionMail(session);
       }
+    }
+
+    private sendSubcriptionMail = async(session:Stripe.Invoice)=>{
+        // send a mail to notify the distributor of a successfull annual subscription
+        const email = session.customer_email as string;
+        const name = session.customer_name as string;
+        const distributorStripeLink = await this.createPortalSession(email);
+        const template = notifyCustomerSubscription(name, distributorStripeLink.url);
+        this.mailService.sendMail({to:email, subject:"Subscription to MXGLIFE Successful", html:template})
+    }
+
+    private sendSubcriptionFailedMail = async(session:Stripe.Invoice)=>{
+        // send a mail to notify the distributor of a successfull annual subscription
+        const email = session.customer_email as string;
+        const name = session.customer_name as string;
+        const distributorStripeLink = await this.createPortalSession(email);
+        const template = notifyCustomerSubscriptionFailed(name, distributorStripeLink.url);
+        this.mailService.sendMail({to:email, subject:"Subscription to MXGLIFE Failed", html:template})
     }
 
     private handleTransferEvent = async(event:Stripe.Event)=>{

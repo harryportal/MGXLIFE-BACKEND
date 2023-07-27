@@ -28,7 +28,6 @@ export default class Cloudinary {
 
     uploadImage = async (imagetoUpload: string):Promise<CloudinaryResponse> =>{
         try{
-            console.log(imagetoUpload)
             const cloudinaryData = await cloudinary.uploader.upload(
                 imagetoUpload, {
                     public_id: process.env.CLOUDINARY_FOLDER_NAME

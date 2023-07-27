@@ -2,7 +2,7 @@ import { prisma } from "../../db/prisma";
 import { hashPassword } from "../../jwtAuth/jwt";
 import logger from "../../logging/winston";
 
-const seedAdmin = async()=>{
+const seedAdmin = async():Promise<void>=>{
     try {
       const admin = await prisma.admin.create({
         data: {
@@ -14,7 +14,7 @@ const seedAdmin = async()=>{
       });
       logger.info('Admin seeded successfully:', admin.id);
     } catch (error) {
-      console.error('Error seeding admin:', error);
+      logger.error('Error seeding admin:', error);
     } finally {
       await prisma.$disconnect();
     }

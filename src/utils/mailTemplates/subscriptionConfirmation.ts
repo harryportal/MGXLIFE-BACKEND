@@ -1,4 +1,4 @@
-export const notifyCustomerPayment = (firstname:string, link:string)=>{
+export const notifyCustomerSubscription = (firstname:string, link:string)=>{
     return `<!DOCTYPE html>
     <html>
     <head>
@@ -51,8 +51,9 @@ export const notifyCustomerPayment = (firstname:string, link:string)=>{
     </head>
     <body>
         <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <p>Hello ${firstname}</p><p>We'ld like to inform you that your Commission and Volume Credit accumulated in the last month has been paid<p>
-		<p>Here's the link to your stripe account:</p>
+        <p>Hello ${firstname}</p>
+        <p>This is to inform you that your annual subscription was successful.<p>
+		<p>Here's the link to view your payment and manage your invoices:</p>
 		<a href="${link}" class="button">Login to Stripe Dashboard</a>
 		<p>Thank you for registering as a distributor on MXGLIFE</p>
         <p>Best regards,</p>
