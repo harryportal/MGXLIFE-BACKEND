@@ -39,8 +39,9 @@ export const complainEmailTemplate = (name:string, email:string, message:string)
 </head>
 <body>
   <div class="container">
-    <h1>Enquiry</h1>
+    <h1>New Enquiry</h1>
     <div class="box complaint-details">
+      <p class="complaint-label">FullName: ${name}</p>
     </div>
     <div class="box complaint-details">
       <p class="complaint-label">User Email: ${email}</p>
