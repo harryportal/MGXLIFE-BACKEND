@@ -122,4 +122,5 @@ export default class AuthService implements IAuthService{
         const addPasswordUrl = `${process.env.FRONTENDURL}/reset_page.php?token=${userToken}`;
         const mailtemplate = createresetTemplate(user.firstName, addPasswordUrl);
         await this.mailService.sendMail({to:email, subject: "Reset Your Password", html:mailtemplate})
-}}
+    }
+}
