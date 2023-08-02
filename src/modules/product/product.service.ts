@@ -14,6 +14,7 @@ export default class ProductService implements IProductService{
     public addProduct = async(productData:SingleProduct):Promise<string | undefined>=>{
         // first check if the product does not exist already.
         const product = await this.productRepository.getProduct(productData.productId);
+        console.log(product)
         if(!product){
             const productId = await this.productRepository.addProduct(productData);
             return productId;

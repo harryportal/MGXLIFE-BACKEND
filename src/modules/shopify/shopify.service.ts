@@ -119,7 +119,9 @@ export default class ShopifyService implements IShopifyService{
     }
     
     public addSingleProduct = async(product:Product)=>{
+        console.log(product)
         const productObject = this.retrieveProductData(product);
+        console.log(productObject)
         const productId = await this.productService.addProduct(productObject);
         this.logProductInfo(productId);
     }
@@ -133,8 +135,8 @@ export default class ShopifyService implements IShopifyService{
     }
 
     private retrieveProductData = (product:Product):SingleProduct=>{
-        const price = parseFloat(product.variants[0]. price);
-        const image = product.image.src;
+        const price = parseFloat(product.variants[0].price);
+        const image = product.image?.src ?? "";
         const productId = String(product.id);
         const title = product.title;
         const productObject:SingleProduct = {productId, title, image, price};
