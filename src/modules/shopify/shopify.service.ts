@@ -108,12 +108,12 @@ export default class ShopifyService implements IShopifyService{
     
     private processDistributorCommission = async(distributor:Distributor, orderData:Order)=>{
         const {amount} = this.calculateOrderAmountandQuantity(orderData.line_items);
-        const interest = (20/100) * amount;
+        const interest = ((20/100) * amount)/ 100;
         await this.distributorRepository.updateDistributorCommission(distributor.id, interest);
         // Add 20% of the amount left to the commission of the sponsoring distributor
         if(distributor.referredById){
             const sponsoringId = distributor.referredById;
-            const sponsoringInterest = (20/100 * (80/100 *  amount));
+            const sponsoringInterest = ((20/100 * (80/100 *  amount)))/100;
             await this.distributorRepository.updateDistributorCommission(sponsoringId, sponsoringInterest);
         }
     }

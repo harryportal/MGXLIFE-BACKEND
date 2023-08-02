@@ -178,11 +178,9 @@ export default class PaymentService implements IPaymentService{
      */
     private addSignUpFee = async(stripeId:string, amount:number):Promise<void>=>{
         const disitributor = await this.distributorRepository.getDistributorwithStripeId(stripeId) as Distributor;
-        const signUpBonus = (20/100) * amount;
+        const signUpBonus = ((20/100) * amount) / 100;
         const sponsoringId = disitributor.referredById;
         if(sponsoringId){
-            console.log(signUpBonus)
-            console.log(sponsoringId)
             await this.distributorRepository.updateDistributorCommission(sponsoringId, signUpBonus);
         }
     }
