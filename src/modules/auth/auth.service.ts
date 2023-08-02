@@ -70,7 +70,7 @@ export default class AuthService implements IAuthService{
         const verifiedPayload = verifyJWT(refreshToken);
 
         const token = await this.authRepository.getRefreshToken(refreshToken)
-        if (!token || token.expiresAt < new Date) { throw new AuthError("Invalid Refresh Token") };
+        if (!token || token.expiresAt < new Date) { throw new AuthError("Please login to Continue") };
         const email = verifiedPayload.email;
         const user = await this.authRepository.getDistributor(email) as Distributor;
         const acessToken = createAcessToken(user);
