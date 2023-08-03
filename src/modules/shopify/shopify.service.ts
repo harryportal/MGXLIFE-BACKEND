@@ -18,7 +18,7 @@ export default class ShopifyService implements IShopifyService{
             // update the distributor's commission for each of the products line items
             for(const productData of orderData.line_items){
                 const commission = await this.calculateCommission(productData);
-                await this.distributorRepository.updateDistributorCommission(distributor.id, commission);
+                await this.distributorRepository.updateDistributorCommission(distributor.id, commission, 0);
             }
             // get the total amount from the order and update the sponsoring distributor's vplume credit
             const {amount} = this.calculateOrderAmountandQuantity(orderData.line_items);
@@ -109,12 +109,12 @@ export default class ShopifyService implements IShopifyService{
     private processDistributorCommission = async(distributor:Distributor, orderData:Order)=>{
         const {amount} = this.calculateOrderAmountandQuantity(orderData.line_items);
         const interest = ((20/100) * amount)/ 100;
-        await this.distributorRepository.updateDistributorCommission(distributor.id, interest);
+        await this.distributorRepository.updateDistributorCommission(distributor.id, interest, 0);
         // Add 20% of the amount left to the commission of the sponsoring distributor
         if(distributor.referredById){
             const sponsoringId = distributor.referredById;
             const sponsoringInterest = ((20/100 * (80/100 *  amount)))/100;
-            await this.distributorRepository.updateDistributorCommission(sponsoringId, sponsoringInterest);
+            await this.distributorRepository.updateDistributorCommission(sponsoringId, sponsoringInterest, 0);
         }
     }
     
