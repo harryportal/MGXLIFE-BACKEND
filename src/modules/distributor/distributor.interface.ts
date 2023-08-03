@@ -1,4 +1,4 @@
-import { Distributor, Order, SubscriptionStatus } from "@prisma/client"
+import { Distributor, Order, SubscriptionStatus, SubscriptionTransaction } from "@prisma/client"
 import IPagination from "../../utils/pagination/pagination.interface";
 import { ComplaintDto } from "./distributor.dtos";
 
@@ -37,7 +37,10 @@ export interface IDistributorRepository{
     getDistributor(email:string):Promise<Distributor | null>;
     updateDistributorAccountStatus(email:string):Promise<void>;
     resetDistributorBalance(stripeAccountId:string):Promise<void>;
-    updateDistributorCommission(id:string, commission:number):Promise<void>;
+    getSubsriptionTransaction(stripeId:string):Promise<null | SubscriptionTransaction>;
+    createSubscriptionTransaction(stripeId:string, distributorId:string):Promise<void>;
+    updateDistributorGroupVolume(distributorId:string, amount:number):Promise<Distributor>;
+    updateDistributorCommission(id:string, commission:number, groupVolume:number):Promise<void>;
     getReferredUsers(id:string):Promise<{referredUsers: ReferredUsers[]}[]>;
     getDistributorOrders(id:string): Promise<{orders:Order[]} | null>;
     getAllDistributors(paginationObject:IPagination):Promise<AllDistributors[]>;

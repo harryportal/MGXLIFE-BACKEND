@@ -7,8 +7,10 @@ import { IDistributorRepository, UpdateDistributor } from "./distributor.interfa
 @injectable()
 export default class DistributorRepository implements IDistributorRepository{
     private readonly distributor;
+    private readonly transaction;
     constructor(@inject(PrismaClient)prisma:PrismaClient){
         this.distributor = prisma.distributor;
+        this.transaction = prisma.subscriptionTransaction;
     }
     
     public getProfile = async(distributorId:string) => {
@@ -19,6 +21,7 @@ export default class DistributorRepository implements IDistributorRepository{
         });
         return distributor;
     }
+
 
     public getDistributor = async(email:string)=>{
         const distributor = await this.distributor.findUnique({
@@ -36,14 +39,11 @@ export default class DistributorRepository implements IDistributorRepository{
         })
     }
 
-    public updateDistributorCommission = async(distributorId:string, commission:number)=>{
-        const updatedDistributor = await this.distributor.update({
+    public updateDistributorCommission = async(distributorId:string, commission:number, groupVolume:number)=>{
+        await this.distributor.update({
             where:{ id: distributorId },
-            data:{ commissionEarned:{
-                increment: commission
-            }}
+            data:{ commissionEarned:{increment: commission}, groupVolume: {increment: groupVolume}}
         });
-        logger.info(`Distributor with id ${updatedDistributor} has been updated with commission ${commission}`)
     }
 
     public getReferredUsers = async(distributorId:string)=>{
@@ -85,6 +85,14 @@ export default class DistributorRepository implements IDistributorRepository{
         return SponsoringDistributor?.referredBy;
       };
     
+      public updateDistributorGroupVolume = async(distributorId:string, amount:number)=>{
+            const distributor = await this.distributor.update({
+                where: {id: distributorId},
+                data: {groupVolume: {increment:amount}}
+            });
+            return distributor;
+
+      }
       public updateSponsoringDistributorVolumeCredit = async(SponsoringDistributorId:string, volumeCredit:number)=>{
         const updatedSponsoringDistributor = await this.distributor.update({
             where:{ id: SponsoringDistributorId },
@@ -95,7 +103,21 @@ export default class DistributorRepository implements IDistributorRepository{
         console.log(updatedSponsoringDistributor);
         logger.info(`Distributor with id ${updatedSponsoringDistributor} has been updated with volumeCredit ${volumeCredit}`)
     }
-      
+    
+    public createSubscriptionTransaction = async(stripeId:string, stripeCustomerId:string)=>{
+        await this.transaction.create({
+            data:{
+                stripeId, distributor:{connect:{stripeCustomerId}}
+            }
+        })
+    }
+
+    public getSubsriptionTransaction = async(stripeId:string)=>{
+        return await this.transaction.findUnique({
+            where:{ stripeId }
+        })
+    }
+
     public getAllDistributors = async(paginationObject:IPagination)=>{
         const {take, skip} = paginationObject;
         const distributors = await this.distributor.findMany({

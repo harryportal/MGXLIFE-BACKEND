@@ -45,6 +45,7 @@ model Distributor {
   payments           Payment[]
   refreshtokens      RefreshToken[]
   groupVolume      Float              @default(0.0)
+  subscriptionTransactions  SubscriptionTransaction[]
 }
 
 model Order {
@@ -103,4 +104,11 @@ model Admin {
   lastName  String
   imageUrl  String?
   password  String
+}
+
+model SubscriptionTransaction {
+  id String @id @default(uuid())
+  stripeId  String @unique
+  distributorId String 
+  distributor Distributor @relation(fields: [distributorId], references: [id])
 }

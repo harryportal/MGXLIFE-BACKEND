@@ -114,9 +114,6 @@ export default class PaymentService implements IPaymentService{
             case("invoice.payment_succeeded"):
                 await this.handlePaymentEvent(event, SubscriptionStatus.PAID);
                 break;
-            case("invoice.paid"):
-                await this.handlePaymentEvent(event, SubscriptionStatus.PENDING);
-                break;
             case("invoice.payment_failed"):
                 await this.handlePaymentEvent(event, SubscriptionStatus.UNPAID);
                 break;
@@ -128,17 +125,22 @@ export default class PaymentService implements IPaymentService{
 
     private handlePaymentEvent = async(event:Stripe.Event, status:SubscriptionStatus)=>{
       const session = event.data.object as Stripe.Invoice;
+      const invoiceId = session.id;
       const distributorStripeId = session.customer as string;
       const amount = session.amount_paid as number;
-      await this.distributorRepository.updateDistributorSubscriptionStatus(distributorStripeId, status);
-      if(status == SubscriptionStatus.UNPAID){
-        await this.sendSubcriptionFailedMail(session);
-      }
-      if(status == SubscriptionStatus.PAID){
+
+      // check if this invoice object has been sent before -- to avoid idempotency
+      const transaction = await this.distributorRepository.getSubsriptionTransaction(invoiceId);
+      if(!transaction){
+        await this.distributorRepository.createSubscriptionTransaction(invoiceId, distributorStripeId)
+        await this.distributorRepository.updateDistributorSubscriptionStatus(distributorStripeId, status);
+        if(status == SubscriptionStatus.UNPAID){ await this.sendSubcriptionFailedMail(session); }
+        if(status == SubscriptionStatus.PAID){
         await this.addSignUpFee(distributorStripeId, amount);  // for the parent distributor
         await this.sendSubcriptionMail(session);
+        }
       }
-    }
+      }
 
     private sendSubcriptionMail = async(session:Stripe.Invoice)=>{
         // send a mail to notify the distributor of a successfull annual subscription
@@ -178,10 +180,26 @@ export default class PaymentService implements IPaymentService{
      */
     private addSignUpFee = async(stripeId:string, amount:number):Promise<void>=>{
         const disitributor = await this.distributorRepository.getDistributorwithStripeId(stripeId) as Distributor;
+        console.log(amount) // todo: comment this out after testing the logic with Tayo
         const signUpBonus = ((20/100) * amount) / 100;
         const sponsoringId = disitributor.referredById;
         if(sponsoringId){
-            await this.distributorRepository.updateDistributorCommission(sponsoringId, signUpBonus);
+            await this.distributorRepository.updateDistributorCommission(sponsoringId, signUpBonus, amount);
+            await this.addVolumeToAllUplines(sponsoringId, amount);
+        }
+        
+    }
+
+    /**
+     * Recursively add group volumes to every upline of the current distributor
+     * @param distributorId 
+     * @param amount 
+     */
+    private addVolumeToAllUplines = async(distributorId:string, amount:number)=>{
+        const disitributor = await this.distributorRepository.updateDistributorGroupVolume(distributorId, amount);
+        if (disitributor.referredById){
+            const uplineDistributorId = disitributor.referredById;
+            await this.addVolumeToAllUplines(uplineDistributorId, amount);
         }
     }
 
