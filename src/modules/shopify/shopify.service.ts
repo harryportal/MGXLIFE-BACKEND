@@ -92,18 +92,18 @@ export default class ShopifyService implements IShopifyService{
     private proccessOrderData = async(orderData:Order, orderId:string, refferingId:string)=>{
         const {order_number, line_items} = orderData;
             const {first_name, last_name, email } = orderData.customer;
-            const {amount, quantity} = this.calculateOrderAmountandQuantity(line_items);
+            const amount = this.calculateOrderAmountandQuantity(line_items);
             const createdAt = new Date().toLocaleString();
             
             const order:AddOrder = { shopifyId:orderId, orderNumber:order_number, customerEmail:email,
-                amountPaid:amount, quantity, customerFirstName:first_name, customerLastName:last_name,
+                amountPaid:amount, customerFirstName:first_name, customerLastName:last_name,
                 distributorId:refferingId, createdAt };
             const createOrder = await this.orderRepository.addOrder(order);
             logger.info(`An Order with ID ${createOrder.id} has been added`);
     }
     
     private processDistributorCommission = async(distributor:Distributor, orderData:Order)=>{
-        const {amount} = this.calculateOrderAmountandQuantity(orderData.line_items);
+        const amount = this.calculateOrderAmountandQuantity(orderData.line_items);
         const interest = ((20/100) * amount);
         /* todo: If the distributor buys a product, he gets a 20% commision to indicate that he has a discount
         but not group volume, but then his uplines get a group volume 

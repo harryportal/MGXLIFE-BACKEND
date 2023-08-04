@@ -53,7 +53,6 @@ model Order {
   shopifyId         String @unique
   orderNumber       Int
   amountPaid        Float
-  quantity          Int
   customerFirstName String
   customerLastName  String
   customerEmail String
