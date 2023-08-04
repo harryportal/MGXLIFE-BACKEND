@@ -136,7 +136,7 @@ export default class PaymentService implements IPaymentService{
         const disitributor = await this.distributorRepository.updateDistributorSubscriptionStatus(distributorStripeId, status);
         if(status == SubscriptionStatus.UNPAID){ await this.sendSubcriptionFailedMail(session); }
         if(status == SubscriptionStatus.PAID){
-        await this.addSignUpFee(disitributor, amount);  // for the parent distributor
+        await this.addSignUpFee(disitributor, amount/100);  // for the parent distributor
         await this.sendSubcriptionMail(session);
         }
       }
@@ -186,7 +186,7 @@ export default class PaymentService implements IPaymentService{
      */
     private addSignUpFee = async(distributor:Distributor, amount:number):Promise<void>=>{
         console.log(amount) // todo: comment this out after testing the logic with Tayo
-        const signUpBonus = ((20/100) * amount) / 100;
+        const signUpBonus = ((20/100) * amount);
         const sponsoringId = distributor.referredById;
         if(sponsoringId){
             const SponsoringDistributor = await this.distributorRepository.getProfile(sponsoringId) as Distributor;
