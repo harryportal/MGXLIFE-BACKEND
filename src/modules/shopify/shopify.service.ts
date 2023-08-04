@@ -106,13 +106,17 @@ export default class ShopifyService implements IShopifyService{
     
     private processDistributorCommission = async(distributor:Distributor, orderData:Order)=>{
         const {amount} = this.calculateOrderAmountandQuantity(orderData.line_items);
-        const interest = ((20/100) * amount)/ 100;
+        const interest = ((20/100) * amount);
+        /* todo: If the distributor buys a product, he gets a 20% commision to indicate that he has a discount
+        but not group volume, but then his uplines get a group volume 
+        */
         await this.distributorRepository.updateDistributorCommission(distributor.id, interest, 0);
         // Add 20% of the amount left to the commission of the sponsoring distributor
         if(distributor.referredById){
             const sponsoringId = distributor.referredById;
-            const sponsoringInterest = ((20/100 * (80/100 *  amount)))/100;
+            const sponsoringInterest = ((20/100 * (80/100 *  amount)));
             await this.distributorRepository.updateDistributorCommission(sponsoringId, sponsoringInterest, 0);
+            await this.distributorRepository.addVolumeToAllUplines(sponsoringId, amount);
         }
     }
     
