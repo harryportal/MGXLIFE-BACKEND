@@ -18,10 +18,11 @@ export default class ShopifyService implements IShopifyService{
             // update the distributor's commission for each of the products line items
             // get the total amount from the order and update the sponsoring distributor's vplume credit
             const {amount} = this.calculateOrderAmountandQuantity(orderData.line_items);
+            let totalCommission:number = 0.0;
             for(const productData of orderData.line_items){
-                const commission = await this.calculateCommission(productData);
-                await this.distributorRepository.updateDistributorCommission(distributor.id, commission, amount);
+                totalCommission += await this.calculateCommission(productData);
             }
+            await this.distributorRepository.updateDistributorCommission(distributor.id, totalCommission, amount);
             await this.distributorRepository.addVolumeToAllUplines(distributor.referredById, amount);
         }
     }
