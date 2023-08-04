@@ -186,7 +186,7 @@ export default class PaymentService implements IPaymentService{
      */
     private addSignUpFee = async(distributor:Distributor, amount:number):Promise<void>=>{
         console.log(amount) // todo: comment this out after testing the logic with Tayo
-        const signUpBonus = ((20/100) * amount);
+        const signUpBonus = Math.round(((20/100) * amount));
         const sponsoringId = distributor.referredById;
         if(sponsoringId){
             const SponsoringDistributor = await this.distributorRepository.getProfile(sponsoringId) as Distributor;
