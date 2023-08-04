@@ -133,17 +133,20 @@ export default class PaymentService implements IPaymentService{
       const transaction = await this.distributorRepository.getSubsriptionTransaction(invoiceId);
       if(!transaction){
         await this.distributorRepository.createSubscriptionTransaction(invoiceId, distributorStripeId)
-        await this.distributorRepository.updateDistributorSubscriptionStatus(distributorStripeId, status);
+        const disitributor = await this.distributorRepository.updateDistributorSubscriptionStatus(distributorStripeId, status);
         if(status == SubscriptionStatus.UNPAID){ await this.sendSubcriptionFailedMail(session); }
         if(status == SubscriptionStatus.PAID){
-        await this.addSignUpFee(distributorStripeId, amount);  // for the parent distributor
+        await this.addSignUpFee(disitributor, amount);  // for the parent distributor
         await this.sendSubcriptionMail(session);
         }
       }
       }
 
+    /**
+     * Sends a mail to notify the distributor of a successfull annual subscription
+     * @param session 
+     */
     private sendSubcriptionMail = async(session:Stripe.Invoice)=>{
-        // send a mail to notify the distributor of a successfull annual subscription
         const email = session.customer_email as string;
         const { lastName }= await this.distributorRepository.getDistributorwithEmail(email) as Distributor;
         const distributorStripeLink = await this.createPortalSession(email);
@@ -174,33 +177,24 @@ export default class PaymentService implements IPaymentService{
     }
 
     /**
-     * Gets the distributor from the stripeId, check
+     * Gets the distributor sponsor, check if the sponsor is currently subscribed
+     * Adds the sign up bonus and group volume (sign up fee) to the direct sponsor's commission
+     * Then call a recursive function that adds the sign up fee as a group volume to every upline of the 
+     * current sponsoring distributors
      * @param distibutorStripeId 
      * @param amount 
      */
-    private addSignUpFee = async(stripeId:string, amount:number):Promise<void>=>{
-        const disitributor = await this.distributorRepository.getDistributorwithStripeId(stripeId) as Distributor;
+    private addSignUpFee = async(distributor:Distributor, amount:number):Promise<void>=>{
         console.log(amount) // todo: comment this out after testing the logic with Tayo
         const signUpBonus = ((20/100) * amount) / 100;
-        const sponsoringId = disitributor.referredById;
+        const sponsoringId = distributor.referredById;
         if(sponsoringId){
-            await this.distributorRepository.updateDistributorCommission(sponsoringId, signUpBonus, amount);
-            await this.addVolumeToAllUplines(sponsoringId, amount);
-        }
-        
-    }
-
-    /**
-     * Recursively add group volumes to every upline of the current distributor
-     * @param distributorId 
-     * @param amount 
-     */
-    private addVolumeToAllUplines = async(distributorId:string, amount:number)=>{
-        const disitributor = await this.distributorRepository.updateDistributorGroupVolume(distributorId, amount);
-        if (disitributor.referredById){
-            const uplineDistributorId = disitributor.referredById;
-            await this.addVolumeToAllUplines(uplineDistributorId, amount);
-        }
+            const SponsoringDistributor = await this.distributorRepository.getProfile(sponsoringId) as Distributor;
+            if(SponsoringDistributor.subscriptionStatus == "PAID"){
+                await this.distributorRepository.updateDistributorCommission(sponsoringId, signUpBonus, amount);
+                await this.distributorRepository.addVolumeToAllUplines(SponsoringDistributor.referredById, amount);
+            }
+        }        
     }
 
     private getEvent = (payload:any, signature:string, signingKey:string):Stripe.Event=>{

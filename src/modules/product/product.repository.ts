@@ -1,5 +1,5 @@
 import { PrismaClient, Product } from "@prisma/client";
-import { IProductRepository, SingleProduct, updateProduct } from "./product.dtos";
+import { IProductRepository, SingleProduct, updateProduct } from "./product.interface";
 import { inject, injectable } from "inversify";
 
 

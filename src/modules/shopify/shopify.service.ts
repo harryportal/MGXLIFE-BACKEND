@@ -1,10 +1,10 @@
 import logger from "../../utils/logging/winston";
-import { IProductService, PdTypes, SingleProduct } from "../product/product.dtos";
-import Product, { IShopifyService, LineItem, Order, ProductCommission } from "./shopify.dtos";
+import { IProductService, PdTypes, SingleProduct } from "../product/product.interface";
+import { Product as ShopifyProduct, IShopifyService, LineItem, Order, ProductCommission } from "./shopify.dtos";
 import { AddOrder, IOrderRepository, OTypes } from "../order/order.dtos";
 import { inject, injectable } from "inversify";
 import { Types as DTypes, IDistributorRepository } from "../distributor/distributor.interface";
-import { Distributor } from "@prisma/client";
+import { Distributor, Product } from "@prisma/client";
 
 @injectable()
 export default class ShopifyService implements IShopifyService{
@@ -16,16 +16,13 @@ export default class ShopifyService implements IShopifyService{
         const distributor = await this.distributorRepository.getDistributorwithReferralId(refferingId);
         if(distributor && distributor.subscriptionStatus == "PAID"){
             // update the distributor's commission for each of the products line items
-            for(const productData of orderData.line_items){
-                const commission = await this.calculateCommission(productData);
-                await this.distributorRepository.updateDistributorCommission(distributor.id, commission, 0);
-            }
             // get the total amount from the order and update the sponsoring distributor's vplume credit
             const {amount} = this.calculateOrderAmountandQuantity(orderData.line_items);
-            const SponsoringDistributorId = distributor.referredById;
-            if(SponsoringDistributorId){
-                await this.distributorRepository.addVolumeCredit(SponsoringDistributorId, amount);
+            for(const productData of orderData.line_items){
+                const commission = await this.calculateCommission(productData);
+                await this.distributorRepository.updateDistributorCommission(distributor.id, commission, amount);
             }
+            await this.distributorRepository.addVolumeToAllUplines(distributor.referredById, amount);
         }
     }
 
@@ -36,7 +33,7 @@ export default class ShopifyService implements IShopifyService{
      */
     private calculateCommission = async (orderCommissionDetails: ProductCommission)=>{
         const { product_id, quantity } = orderCommissionDetails;
-        let product = await this.productService.getProduct(String(product_id));
+        const product = await this.productService.getProduct(String(product_id)) as Product;
         const bonusType = product!.bonusType;
         const bonusAmount = product!.bonusAmount;
         let commission: number;
@@ -118,7 +115,7 @@ export default class ShopifyService implements IShopifyService{
         }
     }
     
-    public addSingleProduct = async(product:Product)=>{
+    public addSingleProduct = async(product:ShopifyProduct)=>{
         console.log(product)
         const productObject = this.retrieveProductData(product);
         console.log(productObject)
@@ -134,7 +131,7 @@ export default class ShopifyService implements IShopifyService{
         }
     }
 
-    private retrieveProductData = (product:Product):SingleProduct=>{
+    private retrieveProductData = (product:ShopifyProduct):SingleProduct=>{
         const price = parseFloat(product.variants[0].price);
         const image = product.image?.src ?? "";
         const productId = String(product.id);

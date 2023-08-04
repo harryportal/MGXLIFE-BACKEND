@@ -1,15 +1,12 @@
 import { inject, injectable } from "inversify";
 import { BadRequestError } from "../../common/error";
 import IPagination from "../../utils/pagination/pagination.interface";
-import { IProductRepository, IProductService, PdTypes, SingleProduct, updateProduct } from "./product.dtos";
+import { IProductRepository, IProductService, PdTypes, SingleProduct, updateProduct } from "./product.interface";
 import { BonusType, Product } from "@prisma/client";
 
 @injectable()
 export default class ProductService implements IProductService{
-    private productRepository:IProductRepository;
-    constructor(@inject(PdTypes.IProductRepository)productRepository:IProductRepository){
-        this.productRepository = productRepository;
-    }
+    constructor(@inject(PdTypes.IProductRepository)private readonly productRepository:IProductRepository){}
 
     public addProduct = async(productData:SingleProduct):Promise<string | undefined>=>{
         // first check if the product does not exist already.

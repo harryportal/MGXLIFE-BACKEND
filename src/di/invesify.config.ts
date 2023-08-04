@@ -15,7 +15,7 @@ import { IOrderRepository, OTypes } from "../modules/order/order.dtos";
 import { OrderRepository } from "../modules/order/order.repository";
 import { IPaymentService, PTypes } from "../modules/payment/payment.interface";
 import PaymentService from "../modules/payment/payment.service";
-import { IProductRepository, IProductService, PdTypes } from "../modules/product/product.dtos";
+import { IProductRepository, IProductService, PdTypes } from "../modules/product/product.interface";
 import ProductService from "../modules/product/product.service";
 import ProductRepository from "../modules/product/product.repository";
 import { IShopifyService, STypes } from "../modules/shopify/shopify.dtos";

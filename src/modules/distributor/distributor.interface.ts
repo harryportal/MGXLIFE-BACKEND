@@ -37,6 +37,7 @@ export interface IDistributorRepository{
     getDistributor(email:string):Promise<Distributor | null>;
     updateDistributorAccountStatus(email:string):Promise<void>;
     resetDistributorBalance(stripeAccountId:string):Promise<void>;
+    addVolumeToAllUplines(distributorId:string | null, amount:number):Promise<void>;
     getSubsriptionTransaction(stripeId:string):Promise<null | SubscriptionTransaction>;
     createSubscriptionTransaction(stripeId:string, distributorId:string):Promise<void>;
     updateDistributorGroupVolume(distributorId:string, amount:number):Promise<Distributor>;

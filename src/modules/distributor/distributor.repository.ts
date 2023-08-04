@@ -1,4 +1,4 @@
-import { AccountStatus, PrismaClient, SubscriptionStatus } from "@prisma/client";
+import { AccountStatus, Distributor, PrismaClient, SubscriptionStatus } from "@prisma/client";
 import logger from "../../utils/logging/winston";
 import IPagination from "../../utils/pagination/pagination.interface";
 import { injectable, inject } from "inversify";
@@ -116,6 +116,21 @@ export default class DistributorRepository implements IDistributorRepository{
         return await this.transaction.findUnique({
             where:{ stripeId }
         })
+    }
+
+    /**
+     * Recursively add group volumes to every upline of the current distributor if
+     * they are currently subscribed
+     * @param distributorId 
+     * @param amount 
+     */
+    public addVolumeToAllUplines = async(distributorId:string | null, amount:number)=>{
+        if(distributorId){
+            const uplineDistributor = await this.getProfile(distributorId) as Distributor;
+            if(uplineDistributor.subscriptionStatus == "PAID"){
+                await this.updateDistributorGroupVolume(distributorId, amount)
+                await this.addVolumeToAllUplines(uplineDistributor.referredById, amount);
+            }}
     }
 
     public getAllDistributors = async(paginationObject:IPagination)=>{

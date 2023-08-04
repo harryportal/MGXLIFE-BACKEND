@@ -6,7 +6,7 @@ import uploadImage from "../../utils/upload/uploadImage";
 import { AdTypes, File, IAdminRepository, UpdateAdmin, IAdminService } from "./admin.interface";
 import { UpdateProduct } from "./admin.validation";
 import { IOrderRepository, OTypes } from "../order/order.dtos";
-import { IProductService, PdTypes } from "../product/product.dtos";
+import { IProductService, PdTypes } from "../product/product.interface";
 import { Types, IDistributorRepository } from "../distributor/distributor.interface";
 import { Admin, Distributor } from "@prisma/client";
 import { IPaymentService, PTypes } from "../payment/payment.interface";
