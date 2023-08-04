@@ -17,7 +17,7 @@ export default class ShopifyService implements IShopifyService{
         if(distributor && distributor.subscriptionStatus == "PAID"){
             // update the distributor's commission for each of the products line items
             // get the total amount from the order and update the sponsoring distributor's vplume credit
-            const {amount} = this.calculateOrderAmountandQuantity(orderData.line_items);
+            const amount = this.calculateOrderAmountandQuantity(orderData.line_items);
             let totalCommission:number = 0.0;
             for(const productData of orderData.line_items){
                 totalCommission += await this.calculateCommission(productData);
@@ -50,13 +50,11 @@ export default class ShopifyService implements IShopifyService{
      * @param lineItems
      */
     private calculateOrderAmountandQuantity = (lineItems:LineItem[])=>{
-        let amount:number = 0.0;
-        let quantity:number = 0;
+        let amount = 0.0;
         for(const orderLineItem of lineItems){
-            amount += Number(orderLineItem.price);
-            quantity += orderLineItem.quantity;
+            amount += Number(orderLineItem.price) * orderLineItem.quantity
         }
-        return {amount, quantity};
+        return amount;
     }
 
     
