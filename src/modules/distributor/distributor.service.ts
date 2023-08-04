@@ -13,10 +13,10 @@ export default class DistributorService implements IDistributorService{
     @inject(MTypes.IMailService)private readonly mailService:IMailService){}
     
     public getDistributor = async(distributorId:string)=>{
-        const distributor = await this.distributorRepository.getProfile(distributorId);
+        const distributor = await this.distributorRepository.getProfile(distributorId) as Distributor;
         if(!distributor) { throw new NotFoundError("No Distributor with Id Found!")};
         const distributorData = this.removePassword(distributor);
-        distributorData.commissionEarned =  Number(distributorData.commissionEarned!.toPrecision(4));
+        distributorData.commissionEarned =  parseFloat(distributorData.commissionEarned.toFixed(2));
         return distributorData;
     }
 
