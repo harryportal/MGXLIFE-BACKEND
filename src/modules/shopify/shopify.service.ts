@@ -1,7 +1,8 @@
 import logger from "../../utils/logging/winston";
 import { IProductService, PdTypes, SingleProduct } from "../product/product.interface";
 import { Product as ShopifyProduct, IShopifyService, LineItem, Order, ProductCommission } from "./shopify.dtos";
-import { AddOrder, IOrderRepository, OTypes } from "../order/order.dtos";
+import { IOrderRepository, OTypes } from "../order/order.dtos";
+import { Order as NewOrder } from "@prisma/client";
 import { inject, injectable } from "inversify";
 import { Types as DTypes, IDistributorRepository } from "../distributor/distributor.interface";
 import { Distributor, Product } from "@prisma/client";
@@ -17,7 +18,7 @@ export default class ShopifyService implements IShopifyService{
         if(distributor && distributor.subscriptionStatus == "PAID"){
             // update the distributor's commission for each of the products line items
             // get the total amount from the order and update the sponsoring distributor's vplume credit
-            const amount = this.calculateOrderAmountandQuantity(orderData.line_items);
+            const amount = this.calculateTotalAmount(orderData.line_items);
             let totalCommission:number = 0.0;
             for(const productData of orderData.line_items){
                 totalCommission += await this.calculateCommission(productData);
@@ -49,7 +50,7 @@ export default class ShopifyService implements IShopifyService{
      * Returns the total quantity and amount for the entire order
      * @param lineItems
      */
-    private calculateOrderAmountandQuantity = (lineItems:LineItem[])=>{
+    private calculateTotalAmount = (lineItems:LineItem[])=>{
         let amount = 0.0;
         for(const orderLineItem of lineItems){
             amount += Number(orderLineItem.price) * orderLineItem.quantity
@@ -80,7 +81,7 @@ export default class ShopifyService implements IShopifyService{
             const customerEmail = orderData.customer.email;
             const refferingId = orderData.landing_site_ref ?? null;
             const distributor = await this.distributorRepository.getDistributor(customerEmail);
-            if(distributor){
+            if(distributor && distributor.subscriptionStatus == "PAID"){
                 await this.processDistributorCommission(distributor,orderData);
             }else if(refferingId){
                 await this.findAndUpdateDistributorCommission(refferingId, orderData);
@@ -92,10 +93,10 @@ export default class ShopifyService implements IShopifyService{
     private proccessOrderData = async(orderData:Order, orderId:string, refferingId:string)=>{
         const {order_number, line_items} = orderData;
             const {first_name, last_name, email } = orderData.customer;
-            const amount = this.calculateOrderAmountandQuantity(line_items);
+            const amount = this.calculateTotalAmount(line_items);
             const createdAt = new Date().toLocaleString();
             
-            const order:AddOrder = { shopifyId:orderId, orderNumber:order_number, customerEmail:email,
+            const order:Omit<NewOrder, "id"> = { shopifyId:orderId, orderNumber:order_number, customerEmail:email,
                 amountPaid:amount, customerFirstName:first_name, customerLastName:last_name,
                 distributorId:refferingId, createdAt };
             const createOrder = await this.orderRepository.addOrder(order);
@@ -103,7 +104,7 @@ export default class ShopifyService implements IShopifyService{
     }
     
     private processDistributorCommission = async(distributor:Distributor, orderData:Order)=>{
-        const amount = this.calculateOrderAmountandQuantity(orderData.line_items);
+        const amount = this.calculateTotalAmount(orderData.line_items);
         const interest = ((20/100) * amount);
         /* todo: If the distributor buys a product, he gets a 20% commision to indicate that he has a discount
         but not group volume, but then his uplines get a group volume 
@@ -112,10 +113,12 @@ export default class ShopifyService implements IShopifyService{
         // Add 20% of the amount left to the commission of the sponsoring distributor
         if(distributor.referredById){
             const sponsoringId = distributor.referredById;
+            const sponsoringDistributor = await this.distributorRepository.getProfile(sponsoringId) as Distributor;
+            if(sponsoringDistributor.subscriptionStatus == "PAID"){ 
             const sponsoringInterest = ((20/100 * (80/100 *  amount)));
-            await this.distributorRepository.updateDistributorCommission(sponsoringId, sponsoringInterest, 0);
-            await this.distributorRepository.addVolumeToAllUplines(sponsoringId, amount);
-        }
+            await this.distributorRepository.updateDistributorCommission(sponsoringId, sponsoringInterest, amount);
+            await this.distributorRepository.addVolumeToAllUplines(sponsoringDistributor.referredById, amount);
+        }}
     }
     
     public addSingleProduct = async(product:ShopifyProduct)=>{
