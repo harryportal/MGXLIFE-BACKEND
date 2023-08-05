@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import IPagination from "../../utils/pagination/pagination.interface";
-import { AddOrder, IOrderRepository } from "./order.dtos";
-import { PrismaClient } from "@prisma/client";
+import {IOrderRepository } from "./order.dtos";
+import { Prisma, PrismaClient } from "@prisma/client";
 
 @injectable()
 export class OrderRepository implements IOrderRepository{
@@ -10,7 +10,7 @@ export class OrderRepository implements IOrderRepository{
         this.order = prisma.order;
     }
 
-    public addOrder = async(orderData:AddOrder)=>{
+    public addOrder = async(orderData:Prisma.OrderCreateInput)=>{
         const order = await this.order.create({
             data: {
                 ...orderData
