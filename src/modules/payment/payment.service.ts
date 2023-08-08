@@ -92,11 +92,14 @@ export default class PaymentService implements IPaymentService{
     }
 
     public payOutCustomer = async(accountId:string, amount:number):Promise<Stripe.Transfer>=>{
-        return await this.stripe.transfers.create({
+        try{
+          return await this.stripe.transfers.create({
           amount,
           currency: "usd", 
           destination: accountId
-        })
+        })} catch(error:any){
+            throw new BadRequestError("Customer payment not successfull", error)
+        }
     }
 
     public retrieveSubscription = async(subscriptionId: string): Promise<Stripe.Subscription>=>{

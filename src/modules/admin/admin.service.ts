@@ -69,11 +69,48 @@ export default class AdminService implements IAdminService{
     }
 
     public payDistributor = async(distibutorId:string)=>{
-        const {accountId, commissionEarned, groupVolume, firstName, email} = await this.distributorRepository.
+        const {accountId, groupVolume, firstName, email} = await this.distributorRepository.
         getProfile(distibutorId) as Distributor;
-        const amount = commissionEarned + groupVolume;
-        await this.paymentService.payOutCustomer(accountId, amount);
+        /* todo: check the commission earned logic to know how payment is made for it
+           Confirm if the user get the payment for a previous level when they get to a new level
+           Confirm if the all the group volume and commission should be cleared after payment
+           E.g at the end of the month I have $2000 in commission and $3500 in group volume. What happens when payment
+           is made here
+        */
+        const amount = groupVolume;
+        const amountBonus = this.calculateBonusAmount(amount);
+        await this.paymentService.payOutCustomer(accountId, amountBonus);
         await this.mailCustomerForPayment(firstName, email);
+    }
+    
+    private calculateBonusAmount = (amount:number):number=>{
+        let amountBonus:number;
+        switch(true){
+            case amount >= 1000 && amount < 2500:
+                amountBonus = 100;
+                break;
+            case amount >= 2500 && amount < 5000:
+                amountBonus = 250;
+                break;
+            case amount >= 5000 && amount < 7500:
+                amountBonus = 500;
+                break;
+            case amount >= 7500 && amount < 10000:
+                amountBonus = 750;
+                break;
+            case amount >= 10000 && amount < 20000:
+                amountBonus = 1000;
+                break;
+            case amount >= 20000 && amount < 30000:
+                amountBonus = 2000;
+                break;
+            case amount >= 30000 && amount < 50000:
+                amountBonus = 3000;
+                break;
+            default:
+                amountBonus = 5000;
+        }
+        return amountBonus;
     }
 
     public getAllOrders = async(pageNumber:string)=>{
