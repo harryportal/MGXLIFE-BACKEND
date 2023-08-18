@@ -98,7 +98,9 @@ export default class PaymentService implements IPaymentService{
           currency: "usd", 
           destination: accountId
         })} catch(error:any){
+            logger.error("Customer payment not successfull", error)
             throw new BadRequestError("Customer payment not successfull", error)
+            
         }
     }
 
@@ -107,6 +109,7 @@ export default class PaymentService implements IPaymentService{
         const subscription = await this.stripe.subscriptions.retrieve(subscriptionId);
         return subscription;
         } catch (error:any) {
+        logger.error(`Failed to retrieve subscription: ${error.message}`)
         throw new BadRequestError(`Failed to retrieve subscription: ${error.message}`);
         }
     }
