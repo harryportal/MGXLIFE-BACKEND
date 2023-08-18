@@ -65,7 +65,7 @@ export default class AdminService implements IAdminService{
     private mailCustomerForPayment = async(name:string, email:string)=>{
         const loginLink = await this.paymentService.getConnectedAccountLoginLink(email);
         const emailTemplate = notifyCustomerPayment(name, loginLink.url);
-        await this.mailService.sendMail({to:email, subject: "Verify Your Email Address", html:emailTemplate})
+        await this.mailService.sendMail({to:email, subject: "Congratulations on Your New Payment", html:emailTemplate})
     }
 
     public payDistributor = async(distibutorId:string)=>{
@@ -79,13 +79,16 @@ export default class AdminService implements IAdminService{
         */
         const amount = groupVolume;
         const amountBonus = this.calculateBonusAmount(amount);
-        await this.paymentService.payOutCustomer(accountId, amountBonus);
+        await this.paymentService.payOutCustomer(accountId, amountBonus * 100);
         await this.mailCustomerForPayment(firstName, email);
     }
     
     private calculateBonusAmount = (amount:number):number=>{
         let amountBonus:number;
         switch(true){
+            case amount < 1000:
+                amountBonus = 0;
+                break;
             case amount >= 1000 && amount < 2500:
                 amountBonus = 100;
                 break;
