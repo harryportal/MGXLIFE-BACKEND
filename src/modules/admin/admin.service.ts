@@ -69,7 +69,7 @@ export default class AdminService implements IAdminService{
     }
 
     public payDistributor = async(distibutorId:string)=>{
-        const {accountId, groupVolume, firstName, email} = await this.distributorRepository.
+        const {accountId, groupVolume, commissionEarned, firstName, email} = await this.distributorRepository.
         getProfile(distibutorId) as Distributor;
         /* todo: check the commission earned logic to know how payment is made for it
            Confirm if the user get the payment for a previous level when they get to a new level
@@ -79,7 +79,7 @@ export default class AdminService implements IAdminService{
         */
         const amount = groupVolume;
         const amountBonus = this.calculateBonusAmount(amount);
-        await this.paymentService.payOutCustomer(accountId, amountBonus * 100);
+        await this.paymentService.payOutCustomer(accountId, amountBonus +  commissionEarned);
         await this.mailCustomerForPayment(firstName, email);
     }
     
@@ -93,25 +93,25 @@ export default class AdminService implements IAdminService{
                 amountBonus = 100;
                 break;
             case amount >= 2500 && amount < 5000:
-                amountBonus = 250;
+                amountBonus = 250 + 100;
                 break;
             case amount >= 5000 && amount < 7500:
-                amountBonus = 500;
+                amountBonus = 500 + 250 + 100;
                 break;
             case amount >= 7500 && amount < 10000:
-                amountBonus = 750;
+                amountBonus = 750 + 500 + 250 + 100;
                 break;
             case amount >= 10000 && amount < 20000:
-                amountBonus = 1000;
+                amountBonus = 1000 + 750 + 500 + 250 + 100;
                 break;
             case amount >= 20000 && amount < 30000:
-                amountBonus = 2000;
+                amountBonus = 2000 + 1000 + 750 + 500 + 250 + 100;
                 break;
             case amount >= 30000 && amount < 50000:
-                amountBonus = 3000;
+                amountBonus = 3000 + 2000 + 1000 + 750 + 500 + 250 + 100;
                 break;
             default:
-                amountBonus = 5000;
+                amountBonus = 5000 + 3000 + 2000 + 1000 + 750 + 500 + 250 + 100;
         }
         return amountBonus;
     }

@@ -57,7 +57,7 @@ export const notifyCustomerSubscription = (firstname:string, link:string)=>{
         <p>This is to inform you that your annual subscription was successful.<p>
 		<p>Here's the link to view your payment and manage your invoices:</p>
 		<a href="${link}" class="button">Login to your Payment Dashboard</a>
-		<p>Thank you for registering as a distributor on MXGLIFE</p>
+		<p>If the link has expired, sign in to your distributor doashboard to veiw payment details</p>
         <p>Best regards,</p>
         <p>The MGXLIFE Team</p>	</div>
         </body>
