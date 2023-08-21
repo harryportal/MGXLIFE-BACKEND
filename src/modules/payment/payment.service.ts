@@ -31,16 +31,15 @@ export default class PaymentService implements IPaymentService{
     }
 
     public createCheckOutSession = async(email:string):Promise<string>=>{
-      const priceId = "price_1NBpCIB7eY2bXlKvxEIK2GJ3";
+      const priceId = "price_1NhcQFIXKEZsaAtDD1qmToiw";
       const distributor = await this.distributorRepository.getDistributorwithEmail(email);
       try{
           const session = await this.stripe.checkout.sessions.create({
               customer: distributor!.stripeCustomerId,
-              payment_method_types: ["card"],
               mode: "subscription",
               line_items:[{
-                  price:priceId,
-                  quantity:1,
+                price:priceId,
+                quantity:1,
               }],
               success_url: process.env.HOMEPAGE_URL!,
               cancel_url:  process.env.HOMEPAGE_URL!
