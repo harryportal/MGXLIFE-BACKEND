@@ -1,12 +1,14 @@
-import { Distributor } from "@prisma/client";
-import { BadRequestError } from "../../common/error";
-import {prisma} from "../../utils/db/prisma";
-import { DistributorwithoutReferral } from "./auth.interface";
+import { DistributorNoReferral, IAuthRepository } from "./auth.dto";
+import { inject, injectable } from "inversify";
+import { PrismaClient } from "@prisma/client";
 
-export default class AuthRepository{
+@injectable()
+export default class AuthRepository implements IAuthRepository{
     private refreshToken;
     private distributor;
-    constructor(){
+    private prisma;
+    constructor(@inject(PrismaClient)prisma:PrismaClient){
+        this.prisma = prisma;
         this.distributor = prisma.distributor;
         this.refreshToken = prisma.refreshToken;
     }
@@ -24,14 +26,29 @@ export default class AuthRepository{
         })
     }
 
-    public createDistributorwithReferral = async(distributor:DistributorwithoutReferral,refferedById:string)=>{
-        const userData  = await this.distributor.create({
+    public createDistributorwithReferral = async(distributor:DistributorNoReferral,refferedById:string)=>{
+        /* 
+        This runs two queries using prisma transaction 
+        1. Create the Distributor Account
+        2. Update the Referall Count of the parent distributora
+        */
+        const  [newDistributor] = await this.prisma.$transaction([
+            this.distributor.create({
             data:{
                 ...distributor,
                 referredBy: {connect: {referringId: refferedById}}
-            }
-        })
-        return userData;
+            } }),
+
+            this.distributor.update({
+                where: {referringId:refferedById},
+                data:{ 
+                    refferalCount: {
+                        increment: 1
+                    }
+                }
+            })
+        ])
+        return newDistributor;
     }
 
     public getDistributorwithReferalId = async(referringId:string)=>{
@@ -41,7 +58,7 @@ export default class AuthRepository{
         return distributor;
     }
 
-    public createDistributorwithoutReferral = async(distributor:DistributorwithoutReferral)=>{
+    public createDistributorwithoutReferral = async(distributor:DistributorNoReferral)=>{
         const userData  = await this.distributor.create({ data:{ ...distributor } });
         return userData;
     }

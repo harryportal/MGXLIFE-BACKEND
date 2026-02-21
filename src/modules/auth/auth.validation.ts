@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsPhoneNumber, IsOptional, IsNumberString, IsBooleanString, IsBoolean, IsNumber } from "class-validator";
+import { IsEmail, IsString, IsOptional } from "class-validator";
 
 
 export class SignIn {
@@ -28,33 +28,7 @@ export class SignUp{
   
 }
 
-export class Profile {
-    @IsString()
-    category: string;
-
-    @IsNumberString()
-    businessNo: number;
-
-    @IsString()
-    businessCategory: string;
-
-    @IsString()
-    businessModel: string;
-
-    @IsNumberString()
-    dealSizeMin: number;
-
-    @IsNumberString()
-    dealSizeMax: number;
-
-    @IsBooleanString()
-    financeRequired: boolean;
-
-    @IsString()
-    aboutCompany: string
-}
-
-export class AddResetPassword {
+export class ResetPassword {
     @IsString()
     token:string;
 
@@ -62,6 +36,6 @@ export class AddResetPassword {
     password: string;
 
     @IsString()
-    confirmPasswor: string;
+    confirmPassword: string;
 
 }

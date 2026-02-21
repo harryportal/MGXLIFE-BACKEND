@@ -7,20 +7,27 @@ import * as dotenv from "dotenv";
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
+export default class Cloudinary {
+    private static instance: Cloudinary;
 
-export default class Cloudinary{
-    constructor(){
-
+    private constructor() {
+        // Initialize Cloudinary configuration
         cloudinary.config({
             cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
             api_key: process.env.CLOUDINARY_API_KEY,
-            api_secret: process.env.CLOUDINARY_API_SECRET
-        })
+            api_secret: process.env.CLOUDINARY_API_SECRET,
+        });
+    }
+
+    public static getInstance(): Cloudinary {
+        if (!Cloudinary.instance) {
+            Cloudinary.instance = new Cloudinary();
+        }
+        return Cloudinary.instance;
     }
 
     uploadImage = async (imagetoUpload: string):Promise<CloudinaryResponse> =>{
         try{
-            console.log(imagetoUpload)
             const cloudinaryData = await cloudinary.uploader.upload(
                 imagetoUpload, {
                     public_id: process.env.CLOUDINARY_FOLDER_NAME

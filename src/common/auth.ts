@@ -1,5 +1,5 @@
 import { Response, NextFunction } from 'express';
-import { AuthRequest }from '../modules/auth/auth.interface';
+import { AuthRequest }from '../modules/auth/auth.dto';
 import { AuthError } from './error';
 import { verifyJWT } from '../utils/jwtAuth/jwt';
 

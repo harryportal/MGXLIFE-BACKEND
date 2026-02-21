@@ -1,17 +1,18 @@
+import "reflect-metadata";
 import app from './app';
 import * as dotenv from 'dotenv';
 import logger from './utils/logging/winston';
-import {Prisma }from './utils/db/prisma';
+import {Prisma}from './database/prisma.service';
 import { Application } from 'express';
-
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
  
 class Server {
   private port = process.env.PORT || 8000;
   private app;
-  private prisma = new Prisma();
-  constructor(app: Application) {
+  private prisma:Prisma;
+  constructor(app: Application, prisma:Prisma) {
       this.app = app;
+      this.prisma = prisma;
   }
 
   start() {
@@ -22,5 +23,5 @@ class Server {
   }
 }
 
-const server =  new Server(app);
+const server =  new Server(app, new Prisma());
 server.start()

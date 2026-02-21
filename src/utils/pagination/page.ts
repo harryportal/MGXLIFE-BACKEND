@@ -1,10 +1,12 @@
-import { Request } from 'express';
+import IPagination from "./pagination.interface";
 
-const current_page = (req: Request) => {
-  let pagenumber = Number(req.query.page) || 1;
-  const page_size = Number(process.env.PAGE_SIZE);
-  const skip = (pagenumber - 1) * page_size;
-  return [page_size, skip];
+/* 
+This is an utitilty function that uses prisma logic to implement pagination 
+It returns the number of expected data for the current page and the number of rows to be skipped in db
+*/
+export default function current_page(pageNumber:string):IPagination{
+  let pagenumber = Number(pageNumber) || 1;
+  const take = Number(process.env.PAGE_SIZE);  // This is the page size, using take since it correlates with prisma's term
+  const skip = (pagenumber - 1) * take;
+  return {take, skip};
 };
-
-export default current_page;

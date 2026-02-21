@@ -1,0 +1,60 @@
+import { Distributor, Order, SubscriptionStatus, SubscriptionTransaction } from "@prisma/client"
+import IPagination from "../../utils/pagination/pagination.interface";
+import { ComplaintDto } from "./distributor.dtos";
+
+export type File = Express.Multer.File
+
+type DistributorData = Omit<Distributor, "password">;
+type ReferredUsers = Pick<Distributor,  "firstName" | "lastName" | "email" | 
+    "subscriptionStatus" | "imageUrl" | "commissionEarned" | "verified">
+
+interface AllDistributors extends Partial<Distributor>{
+    referredBy:{
+        firstName:string,
+        lastName:string,
+        email:string
+    } | null
+}
+
+export interface UpdateDistributor{
+    firstname:string,
+    lastname:string,
+    imageUrl?: string 
+}
+export interface IDistributorService {
+    getDistributor(id:string): Promise<DistributorData>;
+    getRefferedUsers(param:string): Promise<any>;
+    getDistributorOrders(id:string): Promise<{orders:Order[]} | null>;
+    getDistributorOrThrow(id:string):Promise<void>; 
+    sendEnquiry(complaint:ComplaintDto):Promise<void>;
+    updateProfile(id:string, profileData:Partial<Distributor>, imageFile:File | null):Promise<DistributorData>;
+    getReferralLinks(id:string): { buyerReferralLink: string, distributorReferralLink: string }
+    
+}
+
+export interface IDistributorRepository{
+    getProfile(id:string):Promise<Distributor | null>;
+    getDistributor(email:string):Promise<Distributor | null>;
+    updateDistributorAccountStatus(email:string):Promise<void>;
+    resetDistributorBalance(stripeAccountId:string):Promise<void>;
+    addVolumeToAllUplines(distributorId:string | null, amount:number):Promise<void>;
+    getSubsriptionTransaction(stripeId:string):Promise<null | SubscriptionTransaction>;
+    createSubscriptionTransaction(stripeId:string, distributorId:string):Promise<void>;
+    updateDistributorGroupVolume(distributorId:string, amount:number):Promise<Distributor>;
+    updateDistributorCommission(id:string, commission:number, groupVolume:number):Promise<void>;
+    getReferredUsers(id:string):Promise<{referredUsers: ReferredUsers[]}[]>;
+    getDistributorOrders(id:string): Promise<{orders:Order[]} | null>;
+    getAllDistributors(paginationObject:IPagination):Promise<AllDistributors[]>;
+    updateProfile(id:string,profile:UpdateDistributor):Promise<Distributor>;
+    updateDistributorSubscriptionStatus(id:string, status:SubscriptionStatus):Promise<Distributor>;
+    getDistributorwithStripeId(id:string):Promise<Distributor|null>;
+    addVolumeCredit(distributorId:string, amount:number):Promise<void>;
+    getDistributorwithReferralId(id:string):Promise<Distributor|null>;
+    getDistributorwithEmail(email:string):Promise<Distributor | null>;
+}
+
+export const Types = {
+    IDistributorRepository: Symbol("IDistributorRepository"),
+    IDistributorService: Symbol("IDistributorService")
+}
+

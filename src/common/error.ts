@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import logger from '../utils/logging/winston';
 
 export class ApiError extends Error {
   constructor(message: string, public statusCode: number, public rawErrors?: string[] | unknown) {
@@ -11,12 +12,21 @@ export class ErrorHandler {
   static handle() {
     return (err: ApiError, req: Request, res: Response, next: NextFunction) => {
       const statusCode = err.statusCode || 500;
+      let message = err.message;
       let errorStack = {};
-      if (process.env.NODE_ENV == 'development') {
+      if(process.env.DEBUG=="False" && statusCode == 500){
+        message = "Something went wrong, Please try again later!"
+        logger.error(`An Error occured on the server.
+         Message: ${err.message}, 
+         Stack: ${err.stack}` );
+
+      }
+      if (process.env.DEBUG == "True") {
         errorStack = { stack: err.stack };
       }
+
       res.status(statusCode).json({
-        message: err.message,
+        message,
         success: false,
         errorStack,
         rawErrors: err.rawErrors ?? [],

@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SubscriptionStatus {
+  UNPAID
+  PAID
+  PENDING
+}
+
+enum AccountStatus {
+  ACTIVE
+  NOT_ACTIVE
+}
+
+// schema.prisma
+model Distributor {
+  id                 String             @id @default(uuid())
+  firstName          String
+  lastName           String
+  email              String             @unique
+  password           String
+  subscriptionStatus SubscriptionStatus @default(UNPAID)
+  stripeCustomerId   String             @unique
+  referringId        String             @unique
+  imageUrl           String?
+  accountStatus      AccountStatus      @default(NOT_ACTIVE)
+  accountId          String             @unique   
+  joinedAt           DateTime           @default(now()) 
+  commissionEarned   Float              @default(0.0)
+  refferalCount      Int                @default(0)
+  referredBy         Distributor?       @relation(name: "ReferredBy", fields: [referredById], references: [id])
+  referredById       String?
+  verified           Boolean            @default(false)
+  orders             Order[] 
+  referredUsers      Distributor[]      @relation(name: "ReferredBy")
+  payments           Payment[]
+  refreshtokens      RefreshToken[]
+  groupVolume      Float              @default(0.0)
+  subscriptionTransactions  SubscriptionTransaction[]
+}
+
+model Order {
+  id                String @id @default(uuid())
+  shopifyId         String @unique
+  orderNumber       Int
+  amountPaid        Float
+  customerFirstName String
+  customerLastName  String
+  customerEmail String
+  distributorId String?
+  distributor   Distributor? @relation(fields: [distributorId], references: [referringId])
+  createdAt     String
+}
+
+enum BonusType {
+  FLAT
+  PERCENTAGE
+}
+
+model Product {
+  id          String    @id @default(uuid())
+  productId   String    @unique
+  title       String
+  price       Float
+  image       String?
+  bonusType   BonusType @default(PERCENTAGE)
+  bonusAmount Float     @default(20.0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+}
+
+model Payment {
+  id            String      @id @default(uuid())
+  amount        Float
+  status        String
+  createdAt     DateTime    @default(now())
+  distributor   Distributor @relation(fields: [distributorId], references: [id])
+  distributorId String
+}
+
+model RefreshToken {
+  id            String      @id @default(uuid())
+  distributorId String
+  token         String      @unique
+  createdAt     DateTime    @default(now())
+  expiresAt     DateTime
+  distributor   Distributor @relation(fields: [distributorId], references: [id])
+}
+
+model Admin {
+  id        String  @id @default(uuid())
+  email     String  @unique
+  firstName String
+  lastName  String
+  imageUrl  String?
+  password  String
+}
+
+model SubscriptionTransaction {
+  id String @id @default(uuid())
+  stripeId  String @unique
+  distributorId String 
+  distributor Distributor @relation(fields: [distributorId], references: [id])
+}

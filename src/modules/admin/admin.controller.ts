@@ -1,0 +1,70 @@
+import { AuthRequest } from "../auth/auth.dto";
+import { AdTypes, File, IAdminService, UpdateAdmin } from "./admin.interface";
+import { Response } from "express";
+import { SignIn, UpdateProduct } from "./admin.validation";
+import { inject, injectable } from "inversify";
+
+@injectable()
+export default class AdminController {
+    constructor(@inject(AdTypes.IAdminService)private readonly adminService:IAdminService){}
+
+    public signIn = async(req:AuthRequest, res:Response)=>{
+        let {email, password} = req.body as SignIn;
+        console.log({email, password});
+        const accessToken = await this.adminService.signIn(email,password);
+        return res.status(200).json({success:true, data:{accessToken}});
+    }
+
+    public getProfile = async(req:AuthRequest, res:Response)=>{
+        const email = req.user!.email;
+        const profile = await this.adminService.getProfile(email);
+        return res.status(200).json({success:true, data:profile});
+    }
+
+    public updateProfile = async(req:AuthRequest, res:Response)=>{
+        const profileData = req.body as UpdateAdmin;
+        const adminId = req.user!.id;
+        const imageFile = req.file as File;
+        const updatedProfile = await this.adminService.updateAdmin(profileData, adminId, imageFile);
+        return res.status(200).json({success:true, data:updatedProfile})
+    }
+
+    public payCustomer = async(req:AuthRequest, res:Response)=>{
+        const customerId = req.params.id;
+        await this.adminService.payDistributor(customerId);
+        return res.status(200).json({success:true, message:"Payment for Customer Successful"})
+    }
+
+    public getAllProducts = async(req:AuthRequest, res:Response)=>{
+        const pageNumber = req.params.page;
+        const products = await this.adminService.getAllProducts(pageNumber);
+        return res.status(200).json({success:true, data:products});
+    }
+
+    public getAllDistributors = async(req:AuthRequest, res:Response)=>{
+        const pageNumber = req.params.page;
+        const distributors = await this.adminService.getAllDistributors(pageNumber);
+        return res.status(200).json({success:true, data:distributors});
+    }   
+
+    public  getAllOrders = async(req:AuthRequest, res:Response)=>{
+        const pageNumber = req.params.page;
+        const orders = await this.adminService.getAllOrders(pageNumber);
+        return res.status(200).json({success:true, data:orders});
+    }
+
+    public updateProduct = async(req:AuthRequest, res:Response)=>{
+        const productId = req.params.id;
+        const updateData = req.body as UpdateProduct;
+        const updatedProduct = await this.adminService.updateProduct(productId, updateData);
+        return res.status(200).json({success:true, data:updatedProduct})
+    }
+
+    public resetPassword = async(req:AuthRequest, res:Response)=>{
+        const adminId = req.user!.id;
+        const {password, confirmPassword, secret} = req.body;
+        await this.adminService.resetPassword(secret, password, confirmPassword, adminId);
+        return res.status(200).json({success:true, message:"Password Updated Successfully"})
+    }
+
+}
